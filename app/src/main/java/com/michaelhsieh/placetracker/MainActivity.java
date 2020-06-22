@@ -99,21 +99,4 @@ public class MainActivity extends AppCompatActivity {
 
         return false;
     }
-
-    /*
-    Source:
-    Alex Jasmin
-    https://stackoverflow.com/questions/4238921/detect-whether-there-is-an-internet-connection-available-on-android
-     */
-    /*private boolean isNetworkAvailable() {
-        ConnectivityManager connectivityManager
-                = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (connectivityManager != null) {
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-        } else {
-            Log.e(TAG, "ConnectivityManager is null");
-            return false;
-        }
-    }*/
 }
