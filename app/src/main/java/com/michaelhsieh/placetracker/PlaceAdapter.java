@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.michaelhsieh.placetracker.model.PlaceModel;
+
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -20,13 +22,12 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
 
-    // TODO: change String to Place model class
-    private List<String> places;
+    private List<PlaceModel> places;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
 
     // data is passed into the constructor
-    public PlaceAdapter(Context context, List<String> places) {
+    public PlaceAdapter(Context context, List<PlaceModel> places) {
         this.inflater = LayoutInflater.from(context);
         this.places = places;
     }
@@ -42,8 +43,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(@NonNull PlaceAdapter.ViewHolder holder, int position) {
-        String place = places.get(position);
-        holder.nameDisplay.setText(place);
+        PlaceModel place = places.get(position);
+        holder.nameDisplay.setText(place.getName());
+        holder.addressDisplay.setText(place.getAddress());
     }
 
     // total number of rows
@@ -55,12 +57,13 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        // TODO: Add address display
         TextView nameDisplay;
+        TextView addressDisplay;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nameDisplay = itemView.findViewById(R.id.tv_name);
+            addressDisplay = itemView.findViewById(R.id.tv_address);
             itemView.setOnClickListener(this);
         }
 
@@ -73,7 +76,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     }
 
     // convenience method for getting data at click position
-    String getItem(int id) {
+    PlaceModel getItem(int id) {
         return places.get(id);
     }
 

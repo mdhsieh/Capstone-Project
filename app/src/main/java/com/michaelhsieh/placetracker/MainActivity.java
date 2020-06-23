@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.api.Status;
@@ -22,6 +23,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,9 +34,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // list of places user selects from search results
-    private List<String> places;
+    private List<PlaceModel> places;
 
     private PlaceAdapter adapter;
+
+    // TextView displaying empty list message
+    TextView emptyListDisplay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,47 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
+        // get TextView displaying empty list message
+        emptyListDisplay = findViewById(R.id.tv_empty_list);
+
+        /* Display empty list message if no places have been added yet.
+        Register an Observer that checks if an empty list message needs
+        to be displayed whenever the RecyclerView updates, inserts items, or removes items.
+
+        Source:
+        wonsuc
+        https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
+         */
+        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                checkEmpty();
+            }
+
+            @Override
+            public void onItemRangeInserted(int positionStart, int itemCount) {
+                super.onItemRangeInserted(positionStart, itemCount);
+                checkEmpty();
+            }
+
+            @Override
+            public void onItemRangeRemoved(int positionStart, int itemCount) {
+                super.onItemRangeRemoved(positionStart, itemCount);
+                checkEmpty();
+            }
+
+            /* Display empty list message if list is empty,
+            otherwise hide message */
+            void checkEmpty() {
+                if (places.size() == 0) {
+                    emptyListDisplay.setVisibility(View.VISIBLE);
+                } else {
+                    emptyListDisplay.setVisibility(View.GONE);
+                }
+            }
+        });
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), getString(R.string.google_places_api_key));
@@ -81,15 +127,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place and put in model object.
                 String name = place.getName();
                 String id = place.getId();
                 String address = place.getAddress();
+
+                PlaceModel newPlace = new PlaceModel(id, name, address);
                 Log.i(TAG, "Place: " + name + ", " + id);
                 Log.i(TAG, "Place address: " + address);
 
                 // add to the list of places
-                insertSingleItem(name);
+                insertSingleItem(newPlace);
             }
 
             @Override
@@ -136,16 +183,22 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "You clicked " + adapter.getItem(position).getName() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
+    /* Methods to update RecyclerView data.
+
+    Source:
+    Suragch
+    https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data/48959184#48959184  */
+
     /* Insert an item into the RecyclerView
-     */
-    private void insertSingleItem(String name) {
+    */
+    private void insertSingleItem(PlaceModel place) {
         // insert at the very end of the list
         int insertIndex = places.size();
         // add place to list
-        places.add(insertIndex, name);
+        places.add(insertIndex, place);
         adapter.notifyItemInserted(insertIndex);
     }
 }
