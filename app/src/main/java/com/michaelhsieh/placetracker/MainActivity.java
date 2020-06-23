@@ -1,6 +1,7 @@
 package com.michaelhsieh.placetracker;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,10 +52,18 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        // add a divider
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        // use a custom white divider
+        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
+        recyclerView.addItemDecoration(dividerItemDecoration);
         adapter = new PlaceAdapter(this, animalNames);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), getString(R.string.google_places_api_key));
@@ -73,15 +82,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
             public void onPlaceSelected(Place place) {
-                // TODO: Get info about the selected place.
+                // TODO: Get info about the selected place and put in model object.
                 Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
                 Log.i(TAG, "Place address: " + place.getAddress());
             }
 
             @Override
             public void onError(Status status) {
-                // TODO: Handle the error.
-                Log.i(TAG, "An error occurred: " + status);
+                Log.e(TAG, "An error occurred: " + status);
             }
         });
 

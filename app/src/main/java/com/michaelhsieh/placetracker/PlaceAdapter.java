@@ -55,6 +55,7 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+        // TODO: Add address display
         TextView nameDisplay;
 
         public ViewHolder(View itemView) {
