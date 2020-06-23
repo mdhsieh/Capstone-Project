@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Place Tracker</string>
     <string name="internet_connection_error">No Internet connection! Please connect to search.</string>
-    <string name="empty_list">You have no places yet! \nAdd them with the search bar.</string>
+    <string name="empty_list">You have no places yet!\nAdd them with the search bar.</string>
 </resources>
