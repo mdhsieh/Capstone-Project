@@ -3,4 +3,6 @@
     <color name="colorPrimary">#ff9800</color>
     <color name="colorPrimaryDark">#c66900</color>
     <color name="colorAccent">#448AFF</color>
+    <!--color of the manual button-->
+    <color name="buttonColor">#8BC34A</color>
 </resources>

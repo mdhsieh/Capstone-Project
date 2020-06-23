@@ -2,4 +2,7 @@
     <string name="app_name">Place Tracker</string>
     <string name="internet_connection_error">No Internet connection! Please connect to search.</string>
     <string name="empty_list">You have no places yet!\nAdd them with the search bar.</string>
+    <string name="my_places">My Places</string>
+    <string name="or">or</string>
+    <string name="add_place_manually">Add a place manually</string>
 </resources>
