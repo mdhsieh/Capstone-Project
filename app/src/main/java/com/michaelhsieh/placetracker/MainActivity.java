@@ -25,10 +25,14 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
+
+    // list of places user selects from search results
+    private List<String> places;
 
     private PlaceAdapter adapter;
 
@@ -42,13 +46,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             Toast.makeText(this, R.string.internet_connection_error, Toast.LENGTH_LONG).show();
         }
 
-        // test data to populate the RecyclerView with
-        ArrayList<String> animalNames = new ArrayList<>();
-        animalNames.add("Horse");
-        animalNames.add("Cow");
-        animalNames.add("Camel");
-        animalNames.add("Sheep");
-        animalNames.add("Goat");
+        // initialize places list
+        places = new ArrayList<>();
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // use a custom white divider
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
-        adapter = new PlaceAdapter(this, animalNames);
+        adapter = new PlaceAdapter(this, places);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -83,8 +82,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             @Override
             public void onPlaceSelected(Place place) {
                 // TODO: Get info about the selected place and put in model object.
-                Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-                Log.i(TAG, "Place address: " + place.getAddress());
+                String name = place.getName();
+                String id = place.getId();
+                String address = place.getAddress();
+                Log.i(TAG, "Place: " + name + ", " + id);
+                Log.i(TAG, "Place address: " + address);
+
+                // add to the list of places
+                insertSingleItem(name);
             }
 
             @Override
@@ -132,5 +137,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     @Override
     public void onItemClick(View view, int position) {
         Toast.makeText(this, "You clicked " + adapter.getItem(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+    }
+
+    /* Insert an item into the RecyclerView
+     */
+    private void insertSingleItem(String name) {
+        // insert at the very end of the list
+        int insertIndex = places.size();
+        // add place to list
+        places.add(insertIndex, name);
+        adapter.notifyItemInserted(insertIndex);
     }
 }
