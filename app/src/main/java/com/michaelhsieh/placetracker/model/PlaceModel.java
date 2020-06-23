@@ -10,6 +10,7 @@ public class PlaceModel {
     private String id;
     private String name;
     private String address;
+    private int numVisits;
 
     public PlaceModel(String id, String name, String address) {
         this.id = id;
@@ -27,5 +28,9 @@ public class PlaceModel {
 
     public String getAddress() {
         return address;
+    }
+
+    public int getNumVisits() {
+        return numVisits;
     }
 }
