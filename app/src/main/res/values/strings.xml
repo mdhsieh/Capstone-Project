@@ -5,4 +5,10 @@
     <string name="my_places">My Places</string>
     <string name="or">or</string>
     <string name="add_place_manually">Add a place manually</string>
+    <string name="name_label">Name:</string>
+    <string name="address_label">Address:</string>
+    <string name="num_visits_label">Number of visits:</string>
+    <string name="dates_visited">Dates Visited:</string>
+    <string name="add_visit">Add Visit</string>
+    <string name="edit">Edit</string>
 </resources>

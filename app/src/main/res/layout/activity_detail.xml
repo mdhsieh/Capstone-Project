@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".DetailActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/tv_label_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/name_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_name"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_label_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/address_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_address"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_label_num_visits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/num_visits_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/tv_num_visits"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/et_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_name"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="Name of place" />
+
+        <EditText
+            android:id="@+id/et_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:ems="10"
+            android:inputType="textPersonName"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_address"
+            app:layout_constraintTop_toBottomOf="@+id/et_name"
+            tools:text="Address of place" />
+
+        <TextView
+            android:id="@+id/tv_num_visits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_add_visit"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_num_visits"
+            tools:text="0" />
+
+        <Button
+            android:id="@+id/btn_add_visit"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/add_visit"
+            app:layout_constraintStart_toEndOf="@+id/tv_num_visits"
+            app:layout_constraintTop_toBottomOf="@+id/et_address" />
+
+        <TextView
+            android:id="@+id/tv_label_dates_visited"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/dates_visited"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_edit_dates"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <Button
+            android:id="@+id/btn_edit_dates"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginTop="24dp"
+            android:text="@string/edit"
+            app:layout_constraintStart_toStartOf="@+id/btn_add_visit"
+            app:layout_constraintTop_toBottomOf="@+id/btn_add_visit" />
+
+        <TextView
+            android:id="@+id/tv_dates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btn_edit_dates"
+            android:background="@color/colorPrimary"
+            tools:text="Last visit: date"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:padding="16dp"/>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

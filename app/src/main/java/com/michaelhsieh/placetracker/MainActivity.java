@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -185,6 +186,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     @Override
     public void onItemClick(View view, int position) {
         Toast.makeText(this, "You clicked " + adapter.getItem(position).getName() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        // start DetailActivity
+        Intent intent = new Intent(this, DetailActivity.class);
+        startActivity(intent);
     }
 
     /* Methods to update RecyclerView data.
