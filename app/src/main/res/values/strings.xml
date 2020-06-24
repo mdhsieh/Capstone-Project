@@ -5,10 +5,18 @@
     <string name="my_places">My Places</string>
     <string name="or">or</string>
     <string name="add_place_manually">Add a place manually</string>
+    <!--Strings used in DetailActivity-->
     <string name="name_label">Name:</string>
     <string name="address_label">Address:</string>
     <string name="num_visits_label">Number of visits:</string>
     <string name="dates_visited">Dates Visited:</string>
     <string name="add_visit">Add Visit</string>
     <string name="edit">Edit</string>
+    <string name="notes_label">Notes:</string>
+    <string name="delete">Delete</string>
+    <string name="save">Save</string>
+    <!--EditText hints-->
+    <string name="name_hint">Name of place</string>
+    <string name="address_hint">Address of place</string>
+    <string name="notes_hint">Any notes about this place.</string>
 </resources>

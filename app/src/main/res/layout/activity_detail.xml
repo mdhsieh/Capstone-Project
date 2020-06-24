@@ -54,7 +54,8 @@
             android:inputType="textPersonName"
             app:layout_constraintStart_toEndOf="@+id/tv_label_name"
             app:layout_constraintTop_toTopOf="parent"
-            tools:text="Name of place" />
+            android:autofillHints="@string/name_hint"
+            android:hint="@string/name_hint"/>
 
         <EditText
             android:id="@+id/et_address"
@@ -67,7 +68,8 @@
             android:inputType="textPersonName"
             app:layout_constraintStart_toEndOf="@+id/tv_label_address"
             app:layout_constraintTop_toBottomOf="@+id/et_name"
-            tools:text="Address of place" />
+            android:hint="@string/address_hint"
+            android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS" />
 
         <TextView
             android:id="@+id/tv_num_visits"
@@ -121,6 +123,51 @@
             android:textSize="18sp"
             android:textColor="@android:color/white"
             android:padding="16dp"/>
+
+        <TextView
+            android:id="@+id/tv_label_notes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/notes_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_notes"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/et_notes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:autofillHints=""
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/notes_hint"
+            android:inputType="textMultiLine"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_notes"
+            app:layout_constraintTop_toBottomOf="@+id/tv_dates" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:text="@string/delete"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_notes" />
+
+        <Button
+            android:id="@+id/btn_save"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:text="@string/save"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_delete"
+            app:layout_constraintEnd_toStartOf="@+id/btn_delete" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
