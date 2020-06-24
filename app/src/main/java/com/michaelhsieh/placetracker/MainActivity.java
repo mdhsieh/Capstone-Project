@@ -34,6 +34,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    // PlaceModel key when using Intent
+    public static final String EXTRA_PLACE = "PlaceModel";
+
     // list of places user selects from search results
     private List<PlaceModel> places;
 
@@ -134,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                //Log.i(TAG, "Place: " + name + ", " + id);
-                //Log.i(TAG, "Place address: " + address);
+                Log.i(TAG, "Place: " + name + ", " + id);
+                Log.i(TAG, "Place address: " + address);
 
                 // add to the list of places
                 insertSingleItem(newPlace);
@@ -188,6 +191,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         Toast.makeText(this, "You clicked " + adapter.getItem(position).getName() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
         startActivity(intent);
     }
 
