@@ -5,6 +5,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -21,6 +23,10 @@ public class DetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        EditText nameDisplay = findViewById(R.id.et_name);
+        EditText addressDisplay = findViewById(R.id.et_address);
+        TextView numVisitsDisplay = findViewById(R.id.tv_num_visits);
+
         // get the Movie from the Intent that started this Activity
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLACE)) {
@@ -30,6 +36,10 @@ public class DetailActivity extends AppCompatActivity {
                 Log.d(TAG, "name: " + place.getName());
                 Log.d(TAG, "address: " + place.getAddress());
                 Log.d(TAG, "number of visits: " + place.getNumVisits());
+
+                nameDisplay.setText(place.getName());
+                addressDisplay.setText(place.getAddress());
+                numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
             } else {
                 Log.e(TAG, "place is null");
             }
