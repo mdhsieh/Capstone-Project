@@ -18,6 +18,8 @@ public class PlaceModel implements Parcelable {
     private String name;
     private String address;
     private int numVisits;
+    // notes default empty text
+    private String notes = "";
 
     public PlaceModel(String id, String name, String address) {
         this.id = id;
@@ -39,6 +41,10 @@ public class PlaceModel implements Parcelable {
 
     public int getNumVisits() {
         return numVisits;
+    }
+
+    public String getNotes() {
+        return notes;
     }
 
     /* everything below here is for implementing Parcelable */

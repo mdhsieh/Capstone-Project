@@ -26,6 +26,7 @@ public class DetailActivity extends AppCompatActivity {
         EditText nameDisplay = findViewById(R.id.et_name);
         EditText addressDisplay = findViewById(R.id.et_address);
         TextView numVisitsDisplay = findViewById(R.id.tv_num_visits);
+        EditText notesDisplay = findViewById(R.id.et_notes);
 
         // get the Movie from the Intent that started this Activity
         Intent intent = getIntent();
@@ -40,6 +41,7 @@ public class DetailActivity extends AppCompatActivity {
                 nameDisplay.setText(place.getName());
                 addressDisplay.setText(place.getAddress());
                 numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
+                notesDisplay.setText(place.getNotes());
             } else {
                 Log.e(TAG, "place is null");
             }

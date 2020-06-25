@@ -137,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                Log.i(TAG, "Place: " + name + ", " + id);
-                Log.i(TAG, "Place address: " + address);
+                //Log.i(TAG, "Place: " + name + ", " + id);
+                //Log.i(TAG, "Place address: " + address);
 
                 // add to the list of places
                 insertSingleItem(newPlace);
