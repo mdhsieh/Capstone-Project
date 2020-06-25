@@ -45,31 +45,37 @@
 
         <EditText
             android:id="@+id/et_name"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:autofillHints="@string/name_hint"
             android:ems="10"
             android:hint="@string/name_hint"
             android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_name"
             app:layout_constraintTop_toTopOf="parent" />
 
         <EditText
             android:id="@+id/et_address"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS"
             android:ems="10"
-            android:inputType="textMultiLine"
-            app:layout_constraintStart_toEndOf="@+id/tv_label_address"
-            app:layout_constraintTop_toBottomOf="@+id/et_name"
             android:hint="@string/address_hint"
-            android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS" />
+            android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_address"
+            app:layout_constraintTop_toBottomOf="@+id/et_name" />
 
         <TextView
             android:id="@+id/tv_num_visits"
@@ -137,16 +143,19 @@
 
         <EditText
             android:id="@+id/et_notes"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:autofillHints=""
             android:ems="10"
             android:gravity="start|top"
             android:hint="@string/notes_hint"
             android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_notes"
             app:layout_constraintTop_toBottomOf="@+id/tv_dates" />
 
