@@ -20,4 +20,5 @@
     <string name="delete">Delete</string>
     <string name="save">Save</string>
     <string name="last_visit">Last visit:</string>
+    <string name="existing_place_message">This place is already in your list!</string>
 </resources>
