@@ -21,7 +21,7 @@ public class VisitGroupViewHolder extends GroupViewHolder {
         arrow = (ImageView) itemView.findViewById(R.id.list_item_visit_group_arrow);
     }
 
-    public void setGenreTitle(ExpandableGroup visitGroup) {
+    public void setVisitGroupTitle(ExpandableGroup visitGroup) {
         if (visitGroup instanceof VisitGroup) {
             visitGroupName.setText(visitGroup.getTitle());
         }
