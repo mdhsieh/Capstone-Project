@@ -117,7 +117,7 @@
             app:layout_constraintStart_toStartOf="@+id/btn_add_visit"
             app:layout_constraintTop_toBottomOf="@+id/btn_add_visit" />
 
-        <TextView
+        <!--<TextView
             android:id="@+id/tv_dates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -128,7 +128,15 @@
             android:text="@string/last_visit"
             android:textSize="18sp"
             android:textColor="@android:color/white"
-            android:padding="16dp"/>
+            android:padding="16dp"/>-->
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/expanding_rv_visits"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/btn_edit_dates"
+            tools:layout_editor_absoluteX="0dp" />
 
         <TextView
             android:id="@+id/tv_label_notes"
@@ -157,7 +165,7 @@
             android:inputType="textMultiLine"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_notes"
-            app:layout_constraintTop_toBottomOf="@+id/tv_dates" />
+            app:layout_constraintTop_toBottomOf="@+id/expanding_rv_visits" />
 
         <Button
             android:id="@+id/btn_delete"
