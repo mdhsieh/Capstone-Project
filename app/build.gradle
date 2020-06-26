@@ -34,4 +34,6 @@ dependencies {
 
     // use Google Places SDK to autocomplete searches and get restaurant information
     implementation 'com.google.android.libraries.places:places:2.3.0'
+    // use ExpandableRecyclerView to show expandable visit dates and times
+    implementation 'com.thoughtbot:expandablerecyclerview:1.3'
 }
