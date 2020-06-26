@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 // each Visit contains a date and a time
+// ExpandableRecyclerView library requires implementing Parcelable or error occurs
 public class Visit implements Parcelable {
     private String date;
     private String time;
