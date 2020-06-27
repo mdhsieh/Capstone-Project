@@ -3,6 +3,11 @@ package com.michaelhsieh.placetracker.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.michaelhsieh.placetracker.Visit;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /** Model class to hold place information.
  * This is named PlaceModel to avoid confusion with the existing Place class in the
  * Google Places SDK.
@@ -18,13 +23,21 @@ public class PlaceModel implements Parcelable {
     private String name;
     private String address;
     private int numVisits;
+    // notes the user writes about the place
     // notes default empty text
     private String notes = "";
+    // each visit contains a day and a time
+    // initialize visits
+    private List<Visit> visits = new ArrayList<>();
 
     public PlaceModel(String id, String name, String address) {
         this.id = id;
         this.name = name;
         this.address = address;
+
+        // create test date and times
+//        visits.add(new Visit("Wednesday, January 13, 2020", "3:00 pm"));
+//        visits.add(new Visit("Friday, June 26, 2020", "12:00 pm"));
     }
 
     public String getId() {
@@ -47,6 +60,10 @@ public class PlaceModel implements Parcelable {
         return notes;
     }
 
+    public List<Visit> getVisits() {
+        return visits;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {
@@ -59,6 +76,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(id);
         out.writeString(name);
         out.writeString(address);
+        out.writeList(visits);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -80,6 +98,7 @@ public class PlaceModel implements Parcelable {
         id = in.readString();
         name = in.readString();
         address = in.readString();
+        in.readParcelableList(visits, Visit.class.getClassLoader());
     }
 
 
