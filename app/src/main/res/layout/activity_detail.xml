@@ -50,14 +50,6 @@
             app:layout_constraintBaseline_toBaselineOf="@+id/tv_num_visits"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <!-- Dummy item to prevent EditText from receiving focus -->
-        <!--<View
-            android:layout_width="0px"
-            android:layout_height="0px"
-            android:focusableInTouchMode="true"
-            app:layout_constraintBottom_toTopOf="@+id/et_name"
-            app:layout_constraintStart_toStartOf="parent" />-->
-
         <EditText
             android:id="@+id/et_name"
             android:layout_width="0dp"

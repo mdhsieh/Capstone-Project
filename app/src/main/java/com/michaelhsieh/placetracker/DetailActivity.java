@@ -10,6 +10,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -39,7 +41,7 @@ public class DetailActivity extends AppCompatActivity {
         TextView numVisitsDisplay = findViewById(R.id.tv_num_visits);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
-        List<VisitGroup> visitGroupList = makeVisitGroupList(this);
+        final List<VisitGroup> visitGroupList = makeVisitGroupList(this);
         RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 
@@ -50,7 +52,6 @@ public class DetailActivity extends AppCompatActivity {
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        // TODO: Disable EditText
         // TODO: Ensure ExpandableRecyclerView able to scroll
 
         // RecyclerView has some built in animations to it, using the DefaultItemAnimator.
@@ -61,11 +62,23 @@ public class DetailActivity extends AppCompatActivity {
             ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
         }*/
 
-        // instantiate the adapter with the list of visit groups
+        // instantiate the adapter with the list of visit groups.
         // there's only one visit group
         adapter = new VisitGroupAdapter(visitGroupList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
+
+        // show the expanded dates when the edit dates button is clicked and
+        // the group is not already expanded
+        Button editDatesButton = (Button) findViewById(R.id.btn_edit_dates);
+        editDatesButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!adapter.isGroupExpanded(visitGroupList.get(0))) {
+                    adapter.toggleGroup(visitGroupList.get(0));
+                }
+            }
+        });
 
         // get the Movie from the Intent that started this Activity
         Intent intent = getIntent();
