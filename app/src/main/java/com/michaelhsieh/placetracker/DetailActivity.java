@@ -10,7 +10,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -51,7 +50,6 @@ public class DetailActivity extends AppCompatActivity {
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        // TODO: Make button look pressed
         // TODO: Ensure ExpandableRecyclerView able to scroll
 
         // RecyclerView has some built in animations to it, using the DefaultItemAnimator.
