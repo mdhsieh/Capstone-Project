@@ -50,6 +50,7 @@ public class DetailActivity extends AppCompatActivity {
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
+        // TODO: Disable EditText
         // TODO: Ensure ExpandableRecyclerView able to scroll
 
         // RecyclerView has some built in animations to it, using the DefaultItemAnimator.

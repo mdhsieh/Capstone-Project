@@ -3,17 +3,3 @@
     <item android:drawable="@color/colorAccent" android:state_pressed="true"/>
     <item android:drawable="@color/colorPrimary"/>
 </selector>
-<!--add layer-list to pad button background image-->
-<!--<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:bottom="6dp"
-        android:left="4dp"
-        android:right="4dp"
-        android:top="6dp">
-
-        <selector>
-            <item android:drawable="@color/colorAccent" android:state_pressed="true"/>
-            <item android:drawable="@color/colorPrimary"/>
-        </selector>
-    </item>
-</layer-list>-->
