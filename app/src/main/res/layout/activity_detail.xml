@@ -117,19 +117,6 @@
             app:layout_constraintStart_toStartOf="@+id/btn_add_visit"
             app:layout_constraintTop_toBottomOf="@+id/btn_add_visit" />
 
-        <!--<TextView
-            android:id="@+id/tv_dates"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/btn_edit_dates"
-            android:background="@color/colorPrimary"
-            android:text="@string/last_visit"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:padding="16dp"/>-->
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/expanding_rv_visits"
             android:layout_width="match_parent"
