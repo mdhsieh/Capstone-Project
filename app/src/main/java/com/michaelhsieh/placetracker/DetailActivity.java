@@ -50,9 +50,6 @@ public class DetailActivity extends AppCompatActivity {
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        // TODO: Switch visit group title with label
-        // TODO: Refactor all appropriate text to MediumWhiteTextStyle
-        //  to make future maintenance easier
         // TODO: Make button look pressed
         // TODO: Ensure ExpandableRecyclerView able to scroll
 
@@ -114,7 +111,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     public static VisitGroup makeVisitGroup(Context context) {
-        return new VisitGroup(context.getResources().getString(R.string.last_visit), makeVisits());
+        return new VisitGroup(context.getResources().getString(R.string.dates_visited), makeVisits());
     }
 
     // TODO: replace with dates and times from PlaceModel

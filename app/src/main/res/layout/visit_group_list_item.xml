@@ -10,11 +10,11 @@
         android:id="@+id/list_item_visit_group_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        style="@style/MediumWhiteTextStyle"
+        style="@style/BigWhiteTextStyle"
         android:layout_marginStart="@dimen/list_item_left_margin"
         android:layout_marginLeft="@dimen/list_item_left_margin"
         android:gravity="center_vertical"
-        tools:text="Visits"/>
+        tools:text="@string/dates_visited"/>
 
     <ImageView
         android:id="@+id/list_item_visit_group_arrow"
