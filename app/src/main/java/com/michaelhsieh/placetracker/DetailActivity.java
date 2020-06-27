@@ -2,6 +2,7 @@ package com.michaelhsieh.placetracker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -39,8 +40,21 @@ public class DetailActivity extends AppCompatActivity {
         EditText notesDisplay = findViewById(R.id.et_notes);
 
         List<VisitGroup> visitGroupList = makeVisitGroupList(this);
-        RecyclerView recyclerView = (RecyclerView) findViewById(R.id.expanding_rv_visits);
+        RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+
+        // add a divider
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        // use custom white divider
+        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        // TODO: Switch visit group title with label
+        // TODO: Refactor all appropriate text to MediumWhiteTextStyle
+        //  to make future maintenance easier
+        // TODO: Make button look pressed
+        // TODO: Ensure ExpandableRecyclerView able to scroll
 
         // RecyclerView has some built in animations to it, using the DefaultItemAnimator.
         // Specifically when you call notifyItemChanged() it does a fade animation for the changing
@@ -103,6 +117,7 @@ public class DetailActivity extends AppCompatActivity {
         return new VisitGroup(context.getResources().getString(R.string.last_visit), makeVisits());
     }
 
+    // TODO: replace with dates and times from PlaceModel
     // create test date and times
     public static List<Visit> makeVisits() {
         Visit day1 = new Visit("Wednesday, January 13, 2020", "3:00 pm");

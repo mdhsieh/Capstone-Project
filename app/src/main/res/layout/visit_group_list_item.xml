@@ -10,18 +10,17 @@
         android:id="@+id/list_item_visit_group_name"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="@dimen/list_item_left_margin"
+        style="@style/MediumWhiteTextStyle"
         android:layout_marginStart="@dimen/list_item_left_margin"
+        android:layout_marginLeft="@dimen/list_item_left_margin"
         android:gravity="center_vertical"
-        tools:text="Visits"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"/>
+        tools:text="Visits"/>
 
     <ImageView
         android:id="@+id/list_item_visit_group_arrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:srcCompat="@android:drawable/arrow_down_float"
+        app:srcCompat="@drawable/baseline_arrow_drop_down_white_24"
         android:layout_gravity="center_vertical|end"
         android:layout_marginRight="@dimen/horizontal_margin"
         android:layout_marginEnd="@dimen/horizontal_margin"
