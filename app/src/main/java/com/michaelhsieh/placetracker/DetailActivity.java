@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,8 +41,18 @@ public class DetailActivity extends AppCompatActivity {
         List<VisitGroup> visitGroupList = makeVisitGroupList(this);
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.expanding_rv_visits);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        //instantiate your adapter with the list of genres
-        VisitGroupAdapter adapter = new VisitGroupAdapter(visitGroupList);
+
+        // RecyclerView has some built in animations to it, using the DefaultItemAnimator.
+        // Specifically when you call notifyItemChanged() it does a fade animation for the changing
+        // of the data in the ViewHolder. If you would like to disable this you can use the following:
+        /*RecyclerView.ItemAnimator animator = recyclerView.getItemAnimator();
+        if (animator instanceof DefaultItemAnimator) {
+            ((DefaultItemAnimator) animator).setSupportsChangeAnimations(false);
+        }*/
+
+        // instantiate the adapter with the list of visit groups
+        // there's only one visit group
+        adapter = new VisitGroupAdapter(visitGroupList);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
@@ -62,6 +73,25 @@ public class DetailActivity extends AppCompatActivity {
             } else {
                 Log.e(TAG, "place is null");
             }
+        }
+    }
+
+    /* to save the expand and collapse state of the adapter,
+    you have to explicitly call through to the adapter's
+    onSaveInstanceState() and onRestoreInstanceState()in the calling Activity */
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (adapter != null) {
+            adapter.onSaveInstanceState(outState);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (adapter != null) {
+            adapter.onRestoreInstanceState(savedInstanceState);
         }
     }
 
