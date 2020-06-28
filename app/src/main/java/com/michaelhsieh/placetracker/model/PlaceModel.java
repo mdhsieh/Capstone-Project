@@ -60,6 +60,10 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
+    public void addVisit() {
+        numVisits += 1;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {

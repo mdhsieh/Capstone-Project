@@ -35,6 +35,8 @@ public class DetailActivity extends AppCompatActivity {
     // list of visit groups which will only contain one group at position 0
     List<VisitGroup> visitGroupList;
 
+    TextView numVisitsDisplay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,7 +44,8 @@ public class DetailActivity extends AppCompatActivity {
 
         EditText nameDisplay = findViewById(R.id.et_name);
         EditText addressDisplay = findViewById(R.id.et_address);
-        TextView numVisitsDisplay = findViewById(R.id.tv_num_visits);
+//        TextView numVisitsDisplay = findViewById(R.id.tv_num_visits);
+        numVisitsDisplay = findViewById(R.id.tv_num_visits);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
         // TODO: Ensure ExpandableRecyclerView able to scroll
@@ -211,6 +214,9 @@ public class DetailActivity extends AppCompatActivity {
         int insertIndex = visitGroupList.get(0).getItems().size();
         // add place to list
         visitGroupList.get(0).getItems().add(insertIndex, visit);
-        adapter.notifyItemInserted(insertIndex);
+        //adapter.notifyItemInserted(insertIndex);
+        adapter.notifyItemChanged(0);
+        place.addVisit();
+        numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
     }
 }
