@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -21,7 +22,7 @@ import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
 
-public class DetailActivity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -85,6 +86,8 @@ public class DetailActivity extends AppCompatActivity {
                 // there's only one visit group
                 adapter = new VisitGroupAdapter(visitGroupList);
                 recyclerView.setLayoutManager(layoutManager);
+                // set the click listener for clicks on individual visits
+                adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
 
                 // show the expanded dates when the edit dates button is clicked and
@@ -146,16 +149,22 @@ public class DetailActivity extends AppCompatActivity {
         }
     }*/
 
+    // called whenever a visit in the list is clicked
+    @Override
+    public void onItemClick(View view, int position) {
+        Toast.makeText(this, "You clicked " + visitGroupList.get(0).getItems().get(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+    }
+
     /* Insert an item into the RecyclerView
      */
     private void insertSingleItem(Visit visit) {
         // insert at the very end of the list
         int insertIndex = visitGroupList.get(0).getItems().size();
-        // add place to list
+        // add visit
         visitGroupList.get(0).getItems().add(insertIndex, visit);
         adapter.notifyItemChanged(0);
         // increase number of visits by 1 and display updated text
-        place.addVisit();
+        place.increaseNumVisits();
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
     }
 }

@@ -13,7 +13,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -138,8 +137,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                Log.i(TAG, "Place: " + name + ", " + id);
-                Log.i(TAG, "Place address: " + address);
+                //Log.i(TAG, "Place: " + name + ", " + id);
+                //Log.i(TAG, "Place address: " + address);
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();

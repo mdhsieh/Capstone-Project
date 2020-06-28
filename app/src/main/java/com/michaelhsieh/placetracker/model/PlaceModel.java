@@ -60,7 +60,7 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
-    public void addVisit() {
+    public void increaseNumVisits() {
         numVisits += 1;
     }
 
