@@ -94,6 +94,7 @@ public class DetailActivity extends AppCompatActivity {
                 Log.d(TAG, "name: " + place.getName());
                 Log.d(TAG, "address: " + place.getAddress());
                 Log.d(TAG, "number of visits: " + place.getNumVisits());
+                // visits and notes should be empty on first startup
                 Log.d(TAG, "visits: " + place.getVisits());
                 Log.d(TAG, "notes: " + place.getNotes());
 
@@ -146,7 +147,7 @@ public class DetailActivity extends AppCompatActivity {
                 addVisitButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        insertSingleItem(new Visit("Wednesday, January 13, 2020", "3:00 pm"));
+                        insertSingleItem(new Visit("Saturday, June 27, 2020", "1:15 pm"));
                     }
                 });
 
@@ -184,7 +185,6 @@ public class DetailActivity extends AppCompatActivity {
         return new VisitGroup(context.getResources().getString(R.string.dates_visited), makeVisits());
     }
 
-    // TODO: replace with dates and times from PlaceModel
     public static List<Visit> makeVisits() {
         // create test date and times
         Visit day1 = new Visit("Wednesday, January 13, 2020", "3:00 pm");
@@ -193,6 +193,7 @@ public class DetailActivity extends AppCompatActivity {
         return Arrays.asList(day1, day2);
     }*/
 
+    // method to get the one visit group
     /*private VisitGroup getVisitGroup() {
         if (visitGroupList != null) {
             return visitGroupList.get(0);

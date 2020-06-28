@@ -34,10 +34,6 @@ public class PlaceModel implements Parcelable {
         this.id = id;
         this.name = name;
         this.address = address;
-
-        // create test date and times
-//        visits.add(new Visit("Wednesday, January 13, 2020", "3:00 pm"));
-//        visits.add(new Visit("Friday, June 26, 2020", "12:00 pm"));
     }
 
     public String getId() {
@@ -98,7 +94,8 @@ public class PlaceModel implements Parcelable {
         id = in.readString();
         name = in.readString();
         address = in.readString();
-        in.readParcelableList(visits, Visit.class.getClassLoader());
+        //in.readParcelableList(visits, Visit.class.getClassLoader());
+        in.readList(visits, Visit.class.getClassLoader());
     }
 
 
