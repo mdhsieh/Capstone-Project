@@ -98,7 +98,6 @@ public class PlaceModel implements Parcelable {
         id = in.readString();
         name = in.readString();
         address = in.readString();
-        //in.readParcelableList(visits, Visit.class.getClassLoader());
         in.readList(visits, Visit.class.getClassLoader());
     }
 

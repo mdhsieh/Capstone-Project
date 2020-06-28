@@ -38,9 +38,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
 
-    // Visits list key when using Intent
-    // public static final String EXTRA_VISITS = "Visits";
-
     // list of places user selects from search results
     private List<PlaceModel> places;
 
@@ -200,7 +197,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
-        //intent.putParcelableArrayListExtra(EXTRA_VISITS, new ArrayList<Parcelable>(adapter.getItem(position).getVisits()));
         startActivity(intent);
     }
 
