@@ -65,7 +65,7 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
         void onItemClick(View view, int position);
     }
 
-    // moved VisitViewHolder into the same file as VisitGroupAdapter to allow
+    // moved VisitViewHolder inside VisitGroupAdapter to allow
     // click listener to be set up
     public class VisitViewHolder extends ChildViewHolder implements View.OnClickListener {
         private TextView visitDate;
@@ -99,7 +99,7 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
     }
 
 
-    // moved VisitGroupViewHolder into same file as VisitGroupAdapter so
+    // moved VisitGroupViewHolder inside VisitGroupAdapter so
     // both ViewHolders are inside the Adapter
     public class VisitGroupViewHolder extends GroupViewHolder {
 

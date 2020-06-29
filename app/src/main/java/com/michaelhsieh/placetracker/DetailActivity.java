@@ -90,18 +90,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
 
-                // show the expanded dates when the edit dates button is clicked and
-                // the group is not already expanded
-                Button editDatesButton = findViewById(R.id.btn_edit_dates);
-                editDatesButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (!adapter.isGroupExpanded(visitGroupList.get(0))) {
-                            adapter.toggleGroup(visitGroupList.get(0));
-                        }
-                    }
-                });
-
                 // add visit when the add visit button is clicked
                 // TODO: change visit to current date and time
                 Button addVisitButton = findViewById(R.id.btn_add_visit);
@@ -154,7 +142,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     @Override
     public void onItemClick(View view, int position) {
         Visit visit = visitGroupList.get(0).getItems().get(position);
-        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_LONG).show();
+        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
     /* Insert an item into the RecyclerView
