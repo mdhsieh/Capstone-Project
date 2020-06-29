@@ -75,6 +75,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // initialize expanding RecyclerView
                 RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
                 LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+                recyclerView.setLayoutManager(layoutManager);
                 // add a divider
                 DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
                         layoutManager.getOrientation());
@@ -85,7 +86,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // instantiate the adapter with the list of visit groups.
                 // there's only one visit group
                 adapter = new VisitGroupAdapter(visitGroupList);
-                recyclerView.setLayoutManager(layoutManager);
                 // set the click listener for clicks on individual visits
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
@@ -153,10 +153,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // position param is the position of the Visit clicked, calculated by getAdapterPosition() - 1
     @Override
     public void onItemClick(View view, int position) {
-        Log.d(TAG, "visit group items: " + visitGroupList.get(0).getItems());
-        Log.d(TAG, "position is: " + position);
         Visit visit = visitGroupList.get(0).getItems().get(position);
-        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_LONG).show();
     }
 
     /* Insert an item into the RecyclerView
