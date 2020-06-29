@@ -46,7 +46,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
-        // get the Movie from the Intent that started this Activity
+        // get the Place from the Intent that started this Activity
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
@@ -150,9 +150,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }*/
 
     // called whenever a visit in the list is clicked
+    // position param is the position of the Visit clicked, calculated by getAdapterPosition() - 1
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + visitGroupList.get(0).getItems().get(position) + " on row number " + position, Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "visit group items: " + visitGroupList.get(0).getItems());
+        Log.d(TAG, "position is: " + position);
+        Visit visit = visitGroupList.get(0).getItems().get(position);
+        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
     /* Insert an item into the RecyclerView
