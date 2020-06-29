@@ -127,21 +127,15 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     // method to get the one visit group
-    /*private VisitGroup getVisitGroup() {
-        if (visitGroupList != null) {
-            return visitGroupList.get(0);
-        }
-        else {
-            Log.e(TAG, "visit group list is null");
-            return null;
-        }
-    }*/
+    private VisitGroup getVisitGroup() {
+        return visitGroupList.get(0);
+    }
 
     // called whenever a visit in the list is clicked
     // position param is the position of the Visit clicked, calculated by getAdapterPosition() - 1
     @Override
     public void onItemClick(View view, int position) {
-        Visit visit = visitGroupList.get(0).getItems().get(position);
+        Visit visit = getVisitGroup().getItems().get(position);
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
@@ -149,9 +143,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      */
     private void insertSingleItem(Visit visit) {
         // insert at the very end of the list
-        int insertIndex = visitGroupList.get(0).getItems().size();
+        int insertIndex = getVisitGroup().getItems().size();
         // add visit
-        visitGroupList.get(0).getItems().add(insertIndex, visit);
+        getVisitGroup().getItems().add(insertIndex, visit);
         adapter.notifyItemChanged(0);
         // increase number of visits by 1 and display updated text
         place.increaseNumVisits();

@@ -15,7 +15,6 @@
     <string name="num_visits_label">Number of visits:</string>
     <string name="dates_visited">Dates Visited:</string>
     <string name="add_visit">Add Visit</string>
-    <string name="edit">Edit</string>
     <string name="notes_label">Notes:</string>
     <string name="delete">Delete</string>
     <string name="save">Save</string>
