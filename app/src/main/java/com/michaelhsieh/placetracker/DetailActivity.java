@@ -39,6 +39,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     TextView numVisitsDisplay;
 
+    // label TextView and TextView of last date visited
+    TextView lastVisitLabel;
+    TextView lastVisitDisplay;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,9 +51,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         EditText nameDisplay = findViewById(R.id.et_name);
         EditText addressDisplay = findViewById(R.id.et_address);
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
+        lastVisitLabel = findViewById(R.id.tv_label_last_visit);
+        lastVisitDisplay = findViewById(R.id.tv_last_visit);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
-        // get the Place from the Intent that started this Activity
+        // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
@@ -67,13 +73,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
                 notesDisplay.setText(place.getNotes());
 
-
                 // initialize the visit group and visits
                 visitGroupList =
                         Arrays.asList
                                 (new VisitGroup(getResources().getString(R.string.dates_visited),
                                         place.getVisits())
                                 );
+
+                // show last visit if PlaceModel already has visits,
+                // otherwise hide last visit text and label
+                showOrHideMostRecentVisit();
 
                 // initialize expanding RecyclerView
                 RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
@@ -152,9 +161,38 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // increase number of visits by 1 and display updated text
         place.increaseNumVisits();
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
+
+        Log.d(TAG, "number of visits increased, new num: " + place.getNumVisits());
+        // update last visit
+        showOrHideMostRecentVisit();
+
+//        Log.d(TAG, "visits in place object:");
+//        for (int i = 0; i < place.getVisits().size(); i++) {
+//            Visit placeVisit = place.getVisits().get(i);
+//            Log.d(TAG, i + ": " + placeVisit.getDate() + " " + placeVisit.getTime());
+//        }
     }
 
-    // method to get the current week, month, and day as a single String
+    // show or hide the most recent date visited label and text
+    private void showOrHideMostRecentVisit() {
+        Log.d(TAG, "place visits: " + place.getVisits());
+        Log.d(TAG, "num visits: " + place.getNumVisits());
+        Log.d(TAG, "visit group: " + getVisitGroup());
+        Log.d(TAG, "visit group items: " + getVisitGroup().getItems());
+        if (place.getNumVisits() == 0) {
+            lastVisitLabel.setVisibility(View.GONE);
+            lastVisitDisplay.setVisibility(View.GONE);
+        } else {
+            lastVisitLabel.setVisibility(View.VISIBLE);
+            lastVisitDisplay.setVisibility(View.VISIBLE);
+            int lastIndex = getVisitGroup().getItems().size() - 1;
+            Visit lastVisit = getVisitGroup().getItems().get(lastIndex);
+            String lastVisitString = lastVisit.getDate() + " at " + lastVisit.getTime();
+            lastVisitDisplay.setText(lastVisitString);
+        }
+    }
+
+    // get the current week, month, and day as a single String
     private String getCurrentDate() {
         String date = "";
         // object whose calendar fields have been initialized with the current date and time
@@ -242,11 +280,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         return date;
     }
 
-    // method to get the current hours and minutes as a single String
+    // get the current hours and minutes as a single String
     private String getCurrentTime() {
         String time = "";
         Calendar rightNow = Calendar.getInstance();
+        // get current date
         Date date = rightNow.getTime();
+        // format date to show only hours and minutes
         time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
 
         return time;
