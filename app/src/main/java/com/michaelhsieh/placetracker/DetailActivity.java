@@ -18,13 +18,10 @@ import android.widget.Toast;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Month;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
 
@@ -250,9 +247,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         String time = "";
         Calendar rightNow = Calendar.getInstance();
         Date date = rightNow.getTime();
-//        Log.d(TAG, "calendar getTime returned Date: " + date);
         time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
-//        Log.d(TAG, "time is: " + time);
 
         return time;
     }
