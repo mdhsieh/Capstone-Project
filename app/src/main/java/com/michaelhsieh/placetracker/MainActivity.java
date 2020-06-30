@@ -192,7 +192,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     @Override
     public void onItemClick(View view, int position) {
-        Toast.makeText(this, "You clicked " + adapter.getItem(position).getName() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "You clicked " + adapter.getItem(position).getName() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(EXTRA_PLACE, adapter.getItem(position));

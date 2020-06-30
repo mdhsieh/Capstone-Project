@@ -6,9 +6,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -19,9 +17,12 @@ import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.time.Month;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -96,13 +97,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 recyclerView.setAdapter(adapter);
 
                 // add visit when the add visit button is clicked
-                // TODO: change visit to current date and time
                 Button addVisitButton = findViewById(R.id.btn_add_visit);
                 addVisitButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        getCurrentDate();
-                        insertSingleItem(new Visit("Saturday, June 27, 2020", "1:15 pm"));
+                        insertSingleItem(new Visit(getCurrentDate(), getCurrentTime()));
                     }
                 });
 
@@ -168,16 +167,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         int monthField = rightNow.get(Calendar.MONTH);
         int dayField = rightNow.get(Calendar.DAY_OF_MONTH);
         int yearField = rightNow.get(Calendar.YEAR);
-//        Log.d(TAG, "week field: " + weekField);
-//        Log.d(TAG, "month field: " + monthField);
-//        Log.d(TAG, "day field: " + dayField);
-//        Log.d(TAG, "year field: " + yearField);
-
-        // get the current locale to display names
-//        Locale currentLocale = getResources().getConfiguration().locale;
-        // get display names of week and month fields to show to user
-//        String week = rightNow.getDisplayName(weekField, Calendar.LONG, currentLocale);
-//        String month = rightNow.getDisplayName(monthField, Calendar.LONG, currentLocale);
 
         // get names of week and month fields to show to user
         String week;
@@ -250,26 +239,21 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 Log.e(TAG, "Unexpected value for month: " + monthField);
         }
 
-//        Log.d(TAG, "week: " + week);
-//        Log.d(TAG, "month: " + month);
-//        Log.d(TAG, "day: " + dayField);
-//        Log.d(TAG, "year: " + yearField);
-
         // combine into a single String
         date = week + ", " + month + " " + dayField + ", " + yearField;
-
-        Log.d(TAG, "date: " + date);
 
         return date;
     }
 
-    /* Get current Locale. Used to display a human-readable String from the
-    Calendar fields in getCurrentDate(). */
-    /*Locale getCurrentLocale(Context context){
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-            return context.getResources().getConfiguration().getLocales().get(0);
-        } else{
-            return context.getResources().getConfiguration().locale;
-        }
-    }*/
+    // method to get the current hours and minutes as a single String
+    private String getCurrentTime() {
+        String time = "";
+        Calendar rightNow = Calendar.getInstance();
+        Date date = rightNow.getTime();
+//        Log.d(TAG, "calendar getTime returned Date: " + date);
+        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+//        Log.d(TAG, "time is: " + time);
+
+        return time;
+    }
 }
