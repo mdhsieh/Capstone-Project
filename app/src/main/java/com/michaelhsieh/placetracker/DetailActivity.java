@@ -48,8 +48,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        Log.d(TAG, "onCreate");
-
         EditText nameDisplay = findViewById(R.id.et_name);
         EditText addressDisplay = findViewById(R.id.et_address);
         numVisitsDisplay = findViewById(R.id.tv_num_visits);

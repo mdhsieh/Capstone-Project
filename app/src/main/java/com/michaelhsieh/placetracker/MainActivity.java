@@ -1,6 +1,5 @@
 package com.michaelhsieh.placetracker;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,7 +13,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -54,8 +52,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        Log.d(TAG, "onCreate");
 
         // show a Toast if there's no Internet connection (Wi-Fi or cellular network)
         if (!isNetworkConnected()) {
@@ -164,16 +160,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     }
 
-    /** Save the state of this Activity, ex. on screen orientation change
-     * This should not be needed if using a ViewModel.
+    /** Save the state of this Activity, ex. when screen rotated
+     *
      */
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
 
-        // Save the user's current list of places, ex. on screen rotation
-        savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<PlaceModel>(places));
+        // Save the user's current list of places
+        savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
     }
 
     /* Check if connected to Wi-Fi or cellular network.
@@ -213,7 +209,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     /* Display empty list message if list is empty,
             otherwise hide message */
     private void checkEmpty() {
-        Log.d(TAG, "checking if list empty, size is: " + places.size());
         if (places.size() == 0) {
             emptyListDisplay.setVisibility(View.VISIBLE);
         } else {
