@@ -23,11 +23,18 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import static com.michaelhsieh.placetracker.MainActivity.EXTRA_CLICKED_POSITION;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
+
+    // key of this place's position in MainActivity to delete
+    public static final String EXTRA_DELETE_POSITION = "delete_position";
+
+    // position of the place in MainActivity's places list
+    private int placePos;
 
     private PlaceModel place;
 
@@ -55,8 +62,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
-        // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
+        // get PlaceModel's position in places list from the Intent that started this Activity
+        // This will be used to save or delete the place if the save or delete buttons are clicked
+        if (intent.hasExtra(EXTRA_CLICKED_POSITION)) {
+            placePos = intent.getIntExtra(EXTRA_CLICKED_POSITION, -1);
+        }
+
+        // get the PlaceModel from the Intent that started this Activity
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
@@ -118,6 +131,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     @Override
                     public void onClick(View v) {
                         insertSingleItem(new Visit(getCurrentDate(), getCurrentTime()));
+                    }
+                });
+
+                Button deleteButton = findViewById(R.id.btn_delete);
+                deleteButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent deletePlaceIntent = new Intent();
+                        deletePlaceIntent.putExtra(EXTRA_DELETE_POSITION, placePos);
+                        setResult(RESULT_OK, deletePlaceIntent);
+                        finish();
                     }
                 });
 

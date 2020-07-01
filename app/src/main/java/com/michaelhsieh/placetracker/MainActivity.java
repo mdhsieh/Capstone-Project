@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -30,6 +31,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_DELETE_POSITION;
+
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -39,6 +42,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
+    // key of the selected place when user clicks a place in list
+    public static final String EXTRA_CLICKED_POSITION = "position";
+
+    // request code when deleting a place
+    public static final int DELETE_PLACE_REQUEST_CODE = 0;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -160,6 +168,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == DELETE_PLACE_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null) {
+                removeSingleItem(data.getIntExtra(EXTRA_DELETE_POSITION, -1));
+            }
+        }
+    }
+
     /** Save the state of this Activity, ex. when device rotated
      *
      */
@@ -221,10 +240,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
-        startActivity(intent);
+        intent.putExtra(EXTRA_CLICKED_POSITION, position);
+        // startActivity(intent);
+        startActivityForResult(intent, DELETE_PLACE_REQUEST_CODE);
     }
 
-    /**checks if user is trying to add a place that already exists in places list
+    /** Checks if user is trying to add a place that already exists in places list
      *
      * @param place The place that is being added
      * @return boolean indicating if the place is already in the list
@@ -257,10 +278,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     }
 
     /** Remove an item from the RecyclerView
+     * @param removeIndex The index of the place to be removed
      */
-    private void removeSingleItem() {
-        // remove at the very end of the list
-        int removeIndex = places.size();
+    private void removeSingleItem(int removeIndex) {
         // remove place from list
         places.remove(removeIndex);
         adapter.notifyItemRemoved(removeIndex);
