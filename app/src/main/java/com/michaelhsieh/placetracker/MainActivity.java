@@ -34,7 +34,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    // key to get the saved places list when Activity recreated, ex. when screen rotated
+    // key to get the saved places list when Activity recreated, ex. when device rotated
     private static final String STATE_PLACES = "places";
 
     // PlaceModel key when using Intent
@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     }
 
-    /** Save the state of this Activity, ex. when screen rotated
+    /** Save the state of this Activity, ex. when device rotated
      *
      */
     @Override
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
     }
 
-    /* Check if connected to Wi-Fi or cellular network.
+    /** Check if connected to Wi-Fi or cellular network.
 
         Source:
         pavelnazimok
@@ -206,7 +206,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return false;
     }
 
-    /* Display empty list message if list is empty,
+    /** Display empty list message if list is empty,
             otherwise hide message */
     private void checkEmpty() {
         if (places.size() == 0) {
@@ -224,7 +224,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         startActivity(intent);
     }
 
-    // checks if user is trying to add a place that already exists in places list
+    /**checks if user is trying to add a place that already exists in places list
+     *
+     * @param place The place that is being added
+     * @return boolean indicating if the place is already in the list
+     */
     private boolean isPlaceInList(PlaceModel place) {
         for (PlaceModel existingPlace: places) {
             // compare existing places with new place by Place ID
@@ -241,7 +245,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     Suragch
     https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data/48959184#48959184  */
 
-    /* Insert an item into the RecyclerView
+    /** Insert an item into the RecyclerView
+     * @param place The place being inserted
     */
     private void insertSingleItem(PlaceModel place) {
         // insert at the very end of the list
@@ -249,5 +254,25 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // add place to list
         places.add(insertIndex, place);
         adapter.notifyItemInserted(insertIndex);
+    }
+
+    /** Remove an item from the RecyclerView
+     */
+    private void removeSingleItem() {
+        // remove at the very end of the list
+        int removeIndex = places.size();
+        // remove place from list
+        places.remove(removeIndex);
+        adapter.notifyItemRemoved(removeIndex);
+    }
+
+    /** Update an item in the RecyclerView
+     * @param updateIndex The index of the place which will be updated
+     * @param place The new place which will replace the existing place
+     */
+    private void updateSingleItem(int updateIndex, PlaceModel place) {
+        // update place at index in list
+        places.set(updateIndex, place);
+        adapter.notifyItemChanged(updateIndex);
     }
 }

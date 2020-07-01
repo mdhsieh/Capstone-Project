@@ -155,7 +155,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
-    /* Insert an item into the RecyclerView
+    /** Insert an item into the RecyclerView
+     * @param visit The visit being inserted
      */
     private void insertSingleItem(Visit visit) {
         // insert at the very end of the list
