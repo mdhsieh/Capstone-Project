@@ -34,8 +34,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // custom adapter to display a group of visits using ExpandingRecyclerView
     private VisitGroupAdapter adapter;
 
-    // list of visit groups which will only contain one group at position 0
-    List<VisitGroup> visitGroupList;
+    // list of visits from place
+    List<Visit> visits;
 
     TextView numVisitsDisplay;
 
@@ -60,25 +60,35 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
-                Log.d(TAG, "Place ID: " + place.getId());
-                Log.d(TAG, "name: " + place.getName());
-                Log.d(TAG, "address: " + place.getAddress());
-                Log.d(TAG, "number of visits: " + place.getNumVisits());
+                String placeId = place.getId();
+                String name = place.getName();
+                String address = place.getAddress();
+                int numVisits = place.getNumVisits();
+                String notes = place.getNotes();
+
+                Log.d(TAG, "Place ID: " + placeId);
+                Log.d(TAG, "name: " + name);
+                Log.d(TAG, "address: " + address);
+                Log.d(TAG, "number of visits: " + numVisits);
                 // visits and notes should be empty on first startup
-                Log.d(TAG, "visits: " + place.getVisits());
-                Log.d(TAG, "notes: " + place.getNotes());
+                Log.d(TAG, "notes: " + notes);
 
                 nameDisplay.setText(place.getName());
                 addressDisplay.setText(place.getAddress());
-                numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
                 notesDisplay.setText(place.getNotes());
 
                 // initialize the visit group and visits
-                visitGroupList =
+                visits = place.getVisits();
+                Log.d(TAG, "visits: " + visits);
+
+                // list of visit groups which will only contain one group at position 0
+                List<VisitGroup> visitGroupList =
                         Arrays.asList
                                 (new VisitGroup(getResources().getString(R.string.dates_visited),
-                                        place.getVisits())
+                                        visits)
                                 );
+
+                numVisitsDisplay.setText(String.valueOf(numVisits));
 
                 // show last visit if PlaceModel already has visits,
                 // otherwise hide last visit text and label
@@ -137,16 +147,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
-    // method to get the one visit group
-    private VisitGroup getVisitGroup() {
-        return visitGroupList.get(0);
-    }
-
     // called whenever a visit in the list is clicked
     // position param is the position of the Visit clicked, calculated by getAdapterPosition() - 1
     @Override
     public void onItemClick(View view, int position) {
-        Visit visit = getVisitGroup().getItems().get(position);
+        Visit visit = visits.get(position);
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
     }
 
@@ -154,9 +159,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      */
     private void insertSingleItem(Visit visit) {
         // insert at the very end of the list
-        int insertIndex = getVisitGroup().getItems().size();
+        int insertIndex = place.getNumVisits();
         // add visit
-        getVisitGroup().getItems().add(insertIndex, visit);
+        visits.add(insertIndex, visit);
         adapter.notifyItemChanged(0);
         // increased number of visits by 1, so
         // display updated text
@@ -174,17 +179,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         } else {
             lastVisitLabel.setVisibility(View.VISIBLE);
             lastVisitDisplay.setVisibility(View.VISIBLE);
-            int lastIndex = getVisitGroup().getItems().size() - 1;
-            Visit lastVisit = getVisitGroup().getItems().get(lastIndex);
+            int lastIndex = place.getNumVisits() - 1;
+            Visit lastVisit = visits.get(lastIndex);
             String lastVisitString = lastVisit.getDate() + getString(R.string.at) + lastVisit.getTime();
             lastVisitDisplay.setText(lastVisitString);
-
-//            Log.d(TAG, "place data visits: " + place.getVisits());
-//            Log.d(TAG, "number of place data visits: " +  place.getNumVisits());
-//            Log.d(TAG, "visit group: " + getVisitGroup());
-//            Log.d(TAG, "visit group items: " + getVisitGroup().getItems());
-//            Log.d(TAG, "number of visit group items: " + getVisitGroup().getItems().size());
-//            Log.d(TAG, "place data visits match visit group items?: " + place.getVisits().equals(getVisitGroup().getItems()));
         }
     }
 
