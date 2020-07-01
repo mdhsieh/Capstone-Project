@@ -158,27 +158,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // add visit
         getVisitGroup().getItems().add(insertIndex, visit);
         adapter.notifyItemChanged(0);
-        // increase number of visits by 1 and display updated text
-        place.increaseNumVisits();
+        // increased number of visits by 1, so
+        // display updated text
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
 
-        Log.d(TAG, "number of visits increased, new num: " + place.getNumVisits());
         // update last visit
         showOrHideMostRecentVisit();
-
-//        Log.d(TAG, "visits in place object:");
-//        for (int i = 0; i < place.getVisits().size(); i++) {
-//            Visit placeVisit = place.getVisits().get(i);
-//            Log.d(TAG, i + ": " + placeVisit.getDate() + " " + placeVisit.getTime());
-//        }
     }
 
     // show or hide the most recent date visited label and text
     private void showOrHideMostRecentVisit() {
-        Log.d(TAG, "place visits: " + place.getVisits());
-        Log.d(TAG, "num visits: " + place.getNumVisits());
-        Log.d(TAG, "visit group: " + getVisitGroup());
-        Log.d(TAG, "visit group items: " + getVisitGroup().getItems());
         if (place.getNumVisits() == 0) {
             lastVisitLabel.setVisibility(View.GONE);
             lastVisitDisplay.setVisibility(View.GONE);

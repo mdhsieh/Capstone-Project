@@ -22,9 +22,8 @@ public class PlaceModel implements Parcelable {
     private String id;
     private String name;
     private String address;
-    private int numVisits;
     // notes the user writes about the place
-    // notes default empty text
+    // default empty text
     private String notes = "";
     // each visit contains a day and a time
     // initialize visits
@@ -49,7 +48,7 @@ public class PlaceModel implements Parcelable {
     }
 
     public int getNumVisits() {
-        return numVisits;
+        return visits.size();
     }
 
     public String getNotes() {
@@ -58,10 +57,6 @@ public class PlaceModel implements Parcelable {
 
     public List<Visit> getVisits() {
         return visits;
-    }
-
-    public void increaseNumVisits() {
-        numVisits += 1;
     }
 
     /* everything below here is for implementing Parcelable */
