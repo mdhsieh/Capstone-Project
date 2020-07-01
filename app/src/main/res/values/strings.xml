@@ -21,4 +21,6 @@
     <string name="last_visit">Last visit:</string>
     <string name="existing_place_message">This place is already in your list!</string>
     <string name="desc_down_arrow">down arrow</string>
+    <!--used in last visit TextView, ex. June 30, 2020 at 5:20 pm-->
+    <string name="at">" at "</string>
 </resources>

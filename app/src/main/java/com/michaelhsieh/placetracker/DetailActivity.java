@@ -176,8 +176,15 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             lastVisitDisplay.setVisibility(View.VISIBLE);
             int lastIndex = getVisitGroup().getItems().size() - 1;
             Visit lastVisit = getVisitGroup().getItems().get(lastIndex);
-            String lastVisitString = lastVisit.getDate() + " at " + lastVisit.getTime();
+            String lastVisitString = lastVisit.getDate() + getString(R.string.at) + lastVisit.getTime();
             lastVisitDisplay.setText(lastVisitString);
+
+//            Log.d(TAG, "place data visits: " + place.getVisits());
+//            Log.d(TAG, "number of place data visits: " +  place.getNumVisits());
+//            Log.d(TAG, "visit group: " + getVisitGroup());
+//            Log.d(TAG, "visit group items: " + getVisitGroup().getItems());
+//            Log.d(TAG, "number of visit group items: " + getVisitGroup().getItems().size());
+//            Log.d(TAG, "place data visits match visit group items?: " + place.getVisits().equals(getVisitGroup().getItems()));
         }
     }
 
