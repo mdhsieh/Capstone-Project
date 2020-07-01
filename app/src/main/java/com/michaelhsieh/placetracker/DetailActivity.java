@@ -48,6 +48,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        Log.d(TAG, "onCreate");
+
         EditText nameDisplay = findViewById(R.id.et_name);
         EditText addressDisplay = findViewById(R.id.et_address);
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
@@ -130,7 +132,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     /* to save the expand and collapse state of the adapter,
     you have to explicitly call through to the adapter's
-    onSaveInstanceState() and onRestoreInstanceState()in the calling Activity */
+    onSaveInstanceState() and onRestoreInstanceState() in the calling Activity */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);

@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -13,6 +14,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -34,6 +36,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    // key to get the saved places list when Activity recreated, ex. when screen rotated
+    private static final String STATE_PLACES = "places";
+
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
 
@@ -50,13 +55,28 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        Log.d(TAG, "onCreate");
+
         // show a Toast if there's no Internet connection (Wi-Fi or cellular network)
         if (!isNetworkConnected()) {
             Toast.makeText(this, R.string.internet_connection_error, Toast.LENGTH_LONG).show();
         }
 
-        // initialize places list
-        places = new ArrayList<>();
+        // Check whether we're recreating a previously destroyed instance
+        if (savedInstanceState != null) {
+            // Restore places list from saved state
+            places = savedInstanceState.getParcelableArrayList(STATE_PLACES);
+        } else {
+            // initialize places list
+            places = new ArrayList<>();
+        }
+
+        // get TextView displaying empty list message
+        emptyListDisplay = findViewById(R.id.tv_empty_list);
+
+        // Check if empty list message should be displayed.
+        // must call checkEmpty() here because adapter is not created yet
+        checkEmpty();
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
@@ -71,9 +91,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         adapter = new PlaceAdapter(this, places);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
-
-        // get TextView displaying empty list message
-        emptyListDisplay = findViewById(R.id.tv_empty_list);
 
         /* Display empty list message if no places have been added yet.
         Register an Observer that checks if an empty list message needs
@@ -103,15 +120,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 checkEmpty();
             }
 
-            /* Display empty list message if list is empty,
-            otherwise hide message */
-            void checkEmpty() {
-                if (places.size() == 0) {
-                    emptyListDisplay.setVisibility(View.VISIBLE);
-                } else {
-                    emptyListDisplay.setVisibility(View.GONE);
-                }
-            }
         });
 
         // Initialize the SDK
@@ -156,6 +164,18 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     }
 
+    /** Save the state of this Activity, ex. on screen orientation change
+     * This should not be needed if using a ViewModel.
+     */
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+
+        // Save the user's current list of places, ex. on screen rotation
+        savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<PlaceModel>(places));
+    }
+
     /* Check if connected to Wi-Fi or cellular network.
 
         Source:
@@ -188,6 +208,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
 
         return false;
+    }
+
+    /* Display empty list message if list is empty,
+            otherwise hide message */
+    private void checkEmpty() {
+        Log.d(TAG, "checking if list empty, size is: " + places.size());
+        if (places.size() == 0) {
+            emptyListDisplay.setVisibility(View.VISIBLE);
+        } else {
+            emptyListDisplay.setVisibility(View.GONE);
+        }
     }
 
     @Override
