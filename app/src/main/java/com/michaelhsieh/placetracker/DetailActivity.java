@@ -33,8 +33,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // key of this place's position in MainActivity's places list
     public static final String EXTRA_PLACE_POSITION = "place_position";
 
+    // key of String used to determine which button was clicked
+    public static final String EXTRA_BUTTON_TYPE = "button_type";
+
+    // Strings to either save or delete the place depending on what button is clicked
+    public static final String DELETE = "delete";
+    public static final String SAVE = "save";
+
     // position of the place in MainActivity's places list
     private int placePos;
+
+    // type of button clicked, which is either the save or delete button
+    private String buttonType;
 
     private PlaceModel place;
 
@@ -140,6 +150,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     public void onClick(View view) {
                         Intent deletePlaceIntent = new Intent();
                         deletePlaceIntent.putExtra(EXTRA_PLACE_POSITION, placePos);
+                        buttonType = DELETE;
+                        deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                         setResult(RESULT_OK, deletePlaceIntent);
                         finish();
                     }

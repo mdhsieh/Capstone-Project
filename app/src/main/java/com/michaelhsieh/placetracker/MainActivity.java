@@ -30,7 +30,10 @@ import com.michaelhsieh.placetracker.model.PlaceModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
+import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
+import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_PLACE_POSITION;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
@@ -184,7 +187,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         if (requestCode == DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-                removeSingleItem(data.getIntExtra(EXTRA_PLACE_POSITION, -1));
+                String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
+                if (buttonType != null && buttonType.equals(DELETE)) {
+                    removeSingleItem(data.getIntExtra(EXTRA_PLACE_POSITION, -1));
+                }
             }
         }
     }
