@@ -8,6 +8,10 @@ import com.michaelhsieh.placetracker.Visit;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.room.ColumnInfo;
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 /** Model class to hold place information.
  * This is named PlaceModel to avoid confusion with the existing Place class in the
  * Google Places SDK.
@@ -17,8 +21,14 @@ import java.util.List;
 /* Source: Jeremy Logan
 https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-android-activity-to-another-using-intents?page=1&tab=votes#tab-top
  */
+@Entity(tableName = "place_table")
 public class PlaceModel implements Parcelable {
-    // a place's unique Place ID
+    // the ID that identifies this Entity, NOT the same as Place ID
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
+    // a place's unique Place ID, which is a String
+    @ColumnInfo(name = "place_id")
     private String placeId;
     private String name;
     private String address;
@@ -33,6 +43,11 @@ public class PlaceModel implements Parcelable {
         this.placeId = placeId;
         this.name = name;
         this.address = address;
+    }
+
+    // get the ID of this particular Entity
+    public int getId() {
+        return id;
     }
 
     public String getPlaceId() {
