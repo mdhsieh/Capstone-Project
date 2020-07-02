@@ -59,6 +59,14 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {

@@ -23,15 +23,11 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import static com.michaelhsieh.placetracker.MainActivity.EXTRA_CLICKED_POSITION;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
-
-    // key of this place's position in MainActivity's places list
-    public static final String EXTRA_PLACE_POSITION = "place_position";
 
     // key of String used to determine which button was clicked
     public static final String EXTRA_BUTTON_TYPE = "button_type";
@@ -39,9 +35,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // Strings to either save or delete the place depending on what button is clicked
     public static final String DELETE = "delete";
     public static final String SAVE = "save";
-
-    // position of the place in MainActivity's places list
-    private int placePos;
 
     // type of button clicked, which is either the save or delete button
     private String buttonType;
@@ -72,14 +65,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
         EditText notesDisplay = findViewById(R.id.et_notes);
 
-        Intent intent = getIntent();
-        // get PlaceModel's position in places list from the Intent that started this Activity
-        // This will be used to save or delete the place if the save or delete buttons are clicked
-        if (intent.hasExtra(EXTRA_CLICKED_POSITION)) {
-            placePos = intent.getIntExtra(EXTRA_CLICKED_POSITION, -1);
-        }
-
         // get the PlaceModel from the Intent that started this Activity
+        Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
@@ -149,7 +136,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     @Override
                     public void onClick(View view) {
                         Intent deletePlaceIntent = new Intent();
-                        deletePlaceIntent.putExtra(EXTRA_PLACE_POSITION, placePos);
+                        // button is used to delete this place from place list
                         buttonType = DELETE;
                         deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                         setResult(RESULT_OK, deletePlaceIntent);

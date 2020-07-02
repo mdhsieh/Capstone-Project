@@ -30,11 +30,9 @@ import com.michaelhsieh.placetracker.model.PlaceModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
-import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_PLACE_POSITION;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -43,10 +41,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // key to get the saved places list when Activity recreated, ex. when device rotated
     private static final String STATE_PLACES = "places";
 
+    // key to get the clicked place's position when Activity recreated, ex. when device rotated
+    private static final String STATE_CLICKED_POSITION = "position";
+
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
-    // key of the selected place when user clicks a place in list
-    public static final String EXTRA_CLICKED_POSITION = "position";
 
     // request code when opening DetailActivity
     public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
@@ -58,6 +57,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // TextView displaying empty list message
     TextView emptyListDisplay;
+
+    // key of the selected place when user clicks a place in list
+    private int clickedPlacePos = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         if (savedInstanceState != null) {
             // Restore places list from saved state
             places = savedInstanceState.getParcelableArrayList(STATE_PLACES);
+
+            // restore clicked place position from saved state
+            clickedPlacePos = savedInstanceState.getInt(STATE_CLICKED_POSITION);
         } else {
             // initialize places list
             places = new ArrayList<>();
@@ -176,8 +181,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
-        intent.putExtra(EXTRA_CLICKED_POSITION, position);
-        // startActivity(intent);
+        // get the position that was clicked
+        // This will be used to save or delete the place from the DetailActivity buttons
+        clickedPlacePos = position;
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 
@@ -189,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             if (data != null) {
                 String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
                 if (buttonType != null && buttonType.equals(DELETE)) {
-                    removeSingleItem(data.getIntExtra(EXTRA_PLACE_POSITION, -1));
+                    removeSingleItem(clickedPlacePos);
                 }
             }
         }
@@ -205,6 +211,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Save the user's current list of places
         savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
+
+        // Save the position of a place that's been clicked
+        savedInstanceState.putInt(STATE_CLICKED_POSITION, clickedPlacePos);
     }
 
     /** Check if connected to Wi-Fi or cellular network.
