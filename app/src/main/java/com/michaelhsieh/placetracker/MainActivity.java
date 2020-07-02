@@ -201,13 +201,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 }
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
-                    Log.d(TAG, "updated place id: " + updatedPlace.getId());
-                    Log.d(TAG, "updated place name: " + updatedPlace.getName());
-                    Log.d(TAG, "updated place address: " + updatedPlace.getAddress());
-                    Log.d(TAG, "updated place num visits: " + updatedPlace.getNumVisits());
-                    Log.d(TAG, "updated place visits: " + updatedPlace.getVisits());
-                    Log.d(TAG, "updated place notes: " + updatedPlace.getNotes());
-                    updateSingleItem(clickedPlacePos, updatedPlace);
+                    if (updatedPlace != null) {
+                        updateSingleItem(clickedPlacePos, updatedPlace);
+                    }
                 }
             }
         }

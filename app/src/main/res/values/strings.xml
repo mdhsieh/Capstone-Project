@@ -23,4 +23,7 @@
     <string name="desc_down_arrow">down arrow</string>
     <!--used in last visit TextView, ex. June 30, 2020 at 5:20 pm-->
     <string name="at">" at "</string>
+    <!--used by alert dialog-->
+    <string name="delete_place_title">Delete place</string>
+    <string name="delete_place_message">Are you sure you want to delete this place?</string>
 </resources>

@@ -1,11 +1,13 @@
 package com.michaelhsieh.placetracker;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -78,20 +80,23 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 int numVisits = place.getNumVisits();
                 String notes = place.getNotes();
 
-                Log.d(TAG, "Place ID: " + placeId);
-                Log.d(TAG, "name: " + name);
-                Log.d(TAG, "address: " + address);
-                Log.d(TAG, "number of visits: " + numVisits);
+//                Log.d(TAG, "Place ID: " + placeId);
+//                Log.d(TAG, "name: " + name);
+//                Log.d(TAG, "address: " + address);
+//                Log.d(TAG, "number of visits: " + numVisits);
                 // visits and notes should be empty on first startup
-                Log.d(TAG, "notes: " + notes);
+//                Log.d(TAG, "notes: " + notes);
 
-                nameDisplay.setText(place.getName());
-                addressDisplay.setText(place.getAddress());
-                notesDisplay.setText(place.getNotes());
+//                nameDisplay.setText(place.getName());
+//                addressDisplay.setText(place.getAddress());
+//                notesDisplay.setText(place.getNotes());
+                nameDisplay.setText(name);
+                addressDisplay.setText(address);
+                notesDisplay.setText(notes);
 
                 // initialize the visit group and visits
                 visits = place.getVisits();
-                Log.d(TAG, "visits: " + visits);
+//                Log.d(TAG, "visits: " + visits);
 
                 // list of visit groups which will only contain one group at position 0
                 List<VisitGroup> visitGroupList =
@@ -137,12 +142,35 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        Intent deletePlaceIntent = new Intent();
+                        /*Intent deletePlaceIntent = new Intent();
                         // button is used to delete this place from place list
                         buttonType = DELETE;
                         deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                         setResult(RESULT_OK, deletePlaceIntent);
-                        finish();
+                        finish();*/
+
+                        new AlertDialog.Builder(DetailActivity.this)
+                                .setTitle(R.string.delete_place_title)
+                                .setMessage(R.string.delete_place_message)
+
+                                // Specifying a listener allows you to take an action before dismissing the dialog.
+                                // The dialog is automatically dismissed when a dialog button is clicked.
+                                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Continue with delete operation
+                                        Intent deletePlaceIntent = new Intent();
+                                        // button is used to delete this place from place list
+                                        buttonType = DELETE;
+                                        deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
+                                        setResult(RESULT_OK, deletePlaceIntent);
+                                        finish();
+                                    }
+                                })
+
+                                // A null listener allows the button to dismiss the dialog and take no further action.
+                                .setNegativeButton(android.R.string.no, null)
+                                .setIcon(android.R.drawable.ic_dialog_alert)
+                                .show();
                     }
                 });
 
@@ -155,13 +183,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         buttonType = SAVE;
                         savePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                         // save the user's current EditText data for name, address, and notes
+                        // visits should already be added and Place ID should stay the same
                         place.setName(nameDisplay.getText().toString());
                         place.setAddress(addressDisplay.getText().toString());
-                        Log.d(TAG, "notes display text: " + notesDisplay.getText().toString());
                         place.setNotes(notesDisplay.getText().toString());
-                        Log.d(TAG, "notes: " + place.getNotes());
-                        // visits should already be added and Place ID should stay the same
-                        Log.d(TAG, "visits when save button clicked: " + place.getVisits());
                         savePlaceIntent.putExtra(EXTRA_SAVED_PLACE, place);
                         setResult(RESULT_OK, savePlaceIntent);
                         finish();
