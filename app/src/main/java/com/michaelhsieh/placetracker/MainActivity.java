@@ -159,8 +159,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                //Log.i(TAG, "Place: " + name + ", " + id);
-                //Log.i(TAG, "Place address: " + address);
+                Log.i(TAG, "Place: " + name + ", " + id);
+                Log.i(TAG, "Place address: " + address);
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
@@ -276,7 +276,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private boolean isPlaceInList(PlaceModel place) {
         for (PlaceModel existingPlace: places) {
             // compare existing places with new place by Place ID
-            if (existingPlace.getId().equals(place.getId())) {
+            if (existingPlace.getPlaceId().equals(place.getPlaceId())) {
                 return true;
             }
         }

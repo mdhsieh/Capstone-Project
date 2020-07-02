@@ -19,7 +19,7 @@ https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-andro
  */
 public class PlaceModel implements Parcelable {
     // a place's unique Place ID
-    private String id;
+    private String placeId;
     private String name;
     private String address;
     // notes the user writes about the place
@@ -29,14 +29,14 @@ public class PlaceModel implements Parcelable {
     // initialize visits
     private List<Visit> visits = new ArrayList<>();
 
-    public PlaceModel(String id, String name, String address) {
-        this.id = id;
+    public PlaceModel(String placeId, String name, String address) {
+        this.placeId = placeId;
         this.name = name;
         this.address = address;
     }
 
-    public String getId() {
-        return id;
+    public String getPlaceId() {
+        return placeId;
     }
 
     public String getName() {
@@ -80,7 +80,7 @@ public class PlaceModel implements Parcelable {
     // write the object's data to the passed-in Parcel
     @Override
     public void writeToParcel(Parcel out, int flags) {
-        out.writeString(id);
+        out.writeString(placeId);
         out.writeString(name);
         out.writeString(address);
         out.writeList(visits);
@@ -103,7 +103,7 @@ public class PlaceModel implements Parcelable {
 
     // constructor that takes a Parcel and gives you an object populated with its values
     private PlaceModel(Parcel in) {
-        id = in.readString();
+        placeId = in.readString();
         name = in.readString();
         address = in.readString();
         in.readList(visits, Visit.class.getClassLoader());

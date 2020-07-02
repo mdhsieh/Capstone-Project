@@ -74,22 +74,19 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
-                String placeId = place.getId();
+                String placeId = place.getPlaceId();
                 String name = place.getName();
                 String address = place.getAddress();
                 int numVisits = place.getNumVisits();
                 String notes = place.getNotes();
 
-//                Log.d(TAG, "Place ID: " + placeId);
+                Log.d(TAG, "Place ID: " + placeId);
 //                Log.d(TAG, "name: " + name);
 //                Log.d(TAG, "address: " + address);
 //                Log.d(TAG, "number of visits: " + numVisits);
                 // visits and notes should be empty on first startup
 //                Log.d(TAG, "notes: " + notes);
 
-//                nameDisplay.setText(place.getName());
-//                addressDisplay.setText(place.getAddress());
-//                notesDisplay.setText(place.getNotes());
                 nameDisplay.setText(name);
                 addressDisplay.setText(address);
                 notesDisplay.setText(notes);
@@ -142,12 +139,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        /*Intent deletePlaceIntent = new Intent();
-                        // button is used to delete this place from place list
-                        buttonType = DELETE;
-                        deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
-                        setResult(RESULT_OK, deletePlaceIntent);
-                        finish();*/
 
                         new AlertDialog.Builder(DetailActivity.this)
                                 .setTitle(R.string.delete_place_title)
