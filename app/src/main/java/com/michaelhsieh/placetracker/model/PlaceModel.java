@@ -67,6 +67,10 @@ public class PlaceModel implements Parcelable {
         this.address = address;
     }
 
+    public void setNotes(String notes) {
+        this.notes = notes;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {
@@ -80,6 +84,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(name);
         out.writeString(address);
         out.writeList(visits);
+        out.writeString(notes);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -102,6 +107,7 @@ public class PlaceModel implements Parcelable {
         name = in.readString();
         address = in.readString();
         in.readList(visits, Visit.class.getClassLoader());
+        notes = in.readString();
     }
 
 

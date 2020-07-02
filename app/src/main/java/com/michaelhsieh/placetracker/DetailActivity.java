@@ -31,6 +31,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     // key of String used to determine which button was clicked
     public static final String EXTRA_BUTTON_TYPE = "button_type";
+    // key of place with updated info when save button clicked
+    public static final String EXTRA_SAVED_PLACE = "place";
 
     // Strings to either save or delete the place depending on what button is clicked
     public static final String DELETE = "delete";
@@ -58,12 +60,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        EditText nameDisplay = findViewById(R.id.et_name);
-        EditText addressDisplay = findViewById(R.id.et_address);
+        final EditText nameDisplay = findViewById(R.id.et_name);
+        final EditText addressDisplay = findViewById(R.id.et_address);
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
-        EditText notesDisplay = findViewById(R.id.et_notes);
+        final EditText notesDisplay = findViewById(R.id.et_notes);
 
         // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
@@ -140,6 +142,28 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         buttonType = DELETE;
                         deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                         setResult(RESULT_OK, deletePlaceIntent);
+                        finish();
+                    }
+                });
+
+                Button saveButton = findViewById(R.id.btn_save);
+                saveButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent savePlaceIntent = new Intent();
+                        // button is used to save this place's info
+                        buttonType = SAVE;
+                        savePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
+                        // save the user's current EditText data for name, address, and notes
+                        place.setName(nameDisplay.getText().toString());
+                        place.setAddress(addressDisplay.getText().toString());
+                        Log.d(TAG, "notes display text: " + notesDisplay.getText().toString());
+                        place.setNotes(notesDisplay.getText().toString());
+                        Log.d(TAG, "notes: " + place.getNotes());
+                        // visits should already be added and Place ID should stay the same
+                        Log.d(TAG, "visits when save button clicked: " + place.getVisits());
+                        savePlaceIntent.putExtra(EXTRA_SAVED_PLACE, place);
+                        setResult(RESULT_OK, savePlaceIntent);
                         finish();
                     }
                 });

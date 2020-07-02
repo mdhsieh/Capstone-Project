@@ -33,6 +33,8 @@ import java.util.List;
 
 import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
+import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
+import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -196,6 +198,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
                 if (buttonType != null && buttonType.equals(DELETE)) {
                     removeSingleItem(clickedPlacePos);
+                }
+                else if (buttonType != null && buttonType.equals(SAVE)) {
+                    PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
+                    Log.d(TAG, "updated place id: " + updatedPlace.getId());
+                    Log.d(TAG, "updated place name: " + updatedPlace.getName());
+                    Log.d(TAG, "updated place address: " + updatedPlace.getAddress());
+                    Log.d(TAG, "updated place num visits: " + updatedPlace.getNumVisits());
+                    Log.d(TAG, "updated place visits: " + updatedPlace.getVisits());
+                    Log.d(TAG, "updated place notes: " + updatedPlace.getNotes());
+                    updateSingleItem(clickedPlacePos, updatedPlace);
                 }
             }
         }
