@@ -30,8 +30,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
-    // key of this place's position in MainActivity to delete
-    public static final String EXTRA_DELETE_POSITION = "delete_position";
+    // key of this place's position in MainActivity's places list
+    public static final String EXTRA_PLACE_POSITION = "place_position";
 
     // position of the place in MainActivity's places list
     private int placePos;
@@ -139,7 +139,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     @Override
                     public void onClick(View view) {
                         Intent deletePlaceIntent = new Intent();
-                        deletePlaceIntent.putExtra(EXTRA_DELETE_POSITION, placePos);
+                        deletePlaceIntent.putExtra(EXTRA_PLACE_POSITION, placePos);
                         setResult(RESULT_OK, deletePlaceIntent);
                         finish();
                     }

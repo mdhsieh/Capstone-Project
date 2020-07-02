@@ -31,7 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_DELETE_POSITION;
+import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_PLACE_POSITION;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -45,8 +45,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // key of the selected place when user clicks a place in list
     public static final String EXTRA_CLICKED_POSITION = "position";
 
-    // request code when deleting a place
-    public static final int DELETE_PLACE_REQUEST_CODE = 0;
+    // request code when opening DetailActivity
+    public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -169,12 +169,22 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     }
 
     @Override
+    public void onItemClick(View view, int position) {
+        // start DetailActivity
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
+        intent.putExtra(EXTRA_CLICKED_POSITION, position);
+        // startActivity(intent);
+        startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == DELETE_PLACE_REQUEST_CODE && resultCode == RESULT_OK) {
+        if (requestCode == DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-                removeSingleItem(data.getIntExtra(EXTRA_DELETE_POSITION, -1));
+                removeSingleItem(data.getIntExtra(EXTRA_PLACE_POSITION, -1));
             }
         }
     }
@@ -233,16 +243,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         } else {
             emptyListDisplay.setVisibility(View.GONE);
         }
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        // start DetailActivity
-        Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
-        intent.putExtra(EXTRA_CLICKED_POSITION, position);
-        // startActivity(intent);
-        startActivityForResult(intent, DELETE_PLACE_REQUEST_CODE);
     }
 
     /** Checks if user is trying to add a place that already exists in places list
