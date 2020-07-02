@@ -27,3 +27,10 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+// This block encapsulates custom properties and makes them available to all
+// modules in the project.
+ext {
+    roomVersion = '2.2.5'
+    archLifecycleVersion = '2.2.0'
+}
