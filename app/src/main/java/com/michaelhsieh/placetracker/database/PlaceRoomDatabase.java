@@ -2,6 +2,7 @@ package com.michaelhsieh.placetracker.database;
 
 import android.content.Context;
 
+import com.michaelhsieh.placetracker.VisitTypeConverter;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.util.concurrent.ExecutorService;
@@ -10,8 +11,10 @@ import java.util.concurrent.Executors;
 import androidx.room.Database;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 @Database(entities = {PlaceModel.class}, version = 1, exportSchema = false)
+@TypeConverters({VisitTypeConverter.class})
 public abstract class PlaceRoomDatabase extends RoomDatabase {
     public abstract PlaceDao placeDao();
 
