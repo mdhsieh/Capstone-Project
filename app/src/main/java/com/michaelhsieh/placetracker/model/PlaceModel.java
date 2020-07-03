@@ -12,7 +12,7 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-/** Model class to hold place information.
+/** Model class to hold place information. This is also the Entity for the Room database.
  * This is named PlaceModel to avoid confusion with the existing Place class in the
  * Google Places SDK.
  */
@@ -35,6 +35,7 @@ public class PlaceModel implements Parcelable {
     // notes the user writes about the place
     // default empty text
     private String notes = "";
+
     // each visit contains a day and a time
     // initialize visits
     private List<Visit> visits = new ArrayList<>();
@@ -74,6 +75,14 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -84,6 +93,10 @@ public class PlaceModel implements Parcelable {
 
     public void setNotes(String notes) {
         this.notes = notes;
+    }
+
+    public void setVisits(List<Visit> visits) {
+        this.visits = visits;
     }
 
     /* everything below here is for implementing Parcelable */
@@ -124,6 +137,4 @@ public class PlaceModel implements Parcelable {
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
     }
-
-
 }
