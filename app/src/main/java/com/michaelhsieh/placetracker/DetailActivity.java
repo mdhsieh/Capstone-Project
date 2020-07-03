@@ -106,7 +106,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 // show last visit if PlaceModel already has visits,
                 // otherwise hide last visit text and label
-                showOrHideMostRecentVisit();
+                showOrHideLastVisit();
 
                 // initialize expanding RecyclerView
                 RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
@@ -232,11 +232,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
 
         // update last visit
-        showOrHideMostRecentVisit();
+        showOrHideLastVisit();
     }
 
     // show or hide the most recent date visited label and text
-    private void showOrHideMostRecentVisit() {
+    private void showOrHideLastVisit() {
         if (place.getNumVisits() == 0) {
             lastVisitLabel.setVisibility(View.GONE);
             lastVisitDisplay.setVisibility(View.GONE);
