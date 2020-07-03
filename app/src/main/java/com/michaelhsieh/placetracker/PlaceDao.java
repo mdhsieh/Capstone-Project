@@ -4,6 +4,7 @@ import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.util.List;
 
+import androidx.lifecycle.LiveData;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
@@ -20,5 +21,5 @@ public interface PlaceDao {
     void deleteAll();
 
     @Query("SELECT * from place_table")
-    List<PlaceModel> getPlaces();
+    LiveData<List<PlaceModel>> getPlaces();
 }
