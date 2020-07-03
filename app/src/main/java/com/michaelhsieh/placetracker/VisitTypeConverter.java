@@ -9,6 +9,11 @@ import java.util.List;
 
 import androidx.room.TypeConverter;
 
+/** Converts a list of Visits into a JSON String that can
+ *  be saved into PlaceRoomDatabase.
+ *
+ *  The Room database can't save Lists.
+ */
 public class VisitTypeConverter {
 
     private static Gson gson =  new Gson();
