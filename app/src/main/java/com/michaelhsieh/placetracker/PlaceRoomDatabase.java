@@ -17,7 +17,8 @@ public abstract class PlaceRoomDatabase extends RoomDatabase {
 
     private static final String DATABASE_NAME = "place_database";
 
-    private static volatile PlaceRoomDatabase INSTANCE;
+    // an instance of the PlaceRoomDatabase
+    private static volatile PlaceRoomDatabase placeRoomInstance;
 
     private static final int NUMBER_OF_THREADS = 1;
 
@@ -25,16 +26,16 @@ public abstract class PlaceRoomDatabase extends RoomDatabase {
             Executors.newFixedThreadPool(NUMBER_OF_THREADS);
 
     static PlaceRoomDatabase getDatabase(final Context context) {
-        if (INSTANCE == null) {
+        if (placeRoomInstance == null) {
             synchronized (PlaceRoomDatabase.class) {
-                if (INSTANCE == null) {
+                if (placeRoomInstance == null) {
                     // Creating new database instance
-                    INSTANCE = Room.databaseBuilder(context.getApplicationContext(),
+                    placeRoomInstance = Room.databaseBuilder(context.getApplicationContext(),
                             PlaceRoomDatabase.class, DATABASE_NAME)
                             .build();
                 }
             }
         }
-        return INSTANCE;
+        return placeRoomInstance;
     }
 }
