@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.database;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
