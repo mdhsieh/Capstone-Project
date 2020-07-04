@@ -85,17 +85,22 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
             // restore clicked place position from saved state
             clickedPlacePos = savedInstanceState.getInt(STATE_CLICKED_POSITION);
-        } else {
+        }
+        /*else {
             // initialize places list
             places = new ArrayList<>();
-        }
+        }*/
+
+        // initialize places list
+//        places = new ArrayList<>();
+        Log.d(TAG, "onCreate places list is: " + places);
 
         // get TextView displaying empty list message
         emptyListDisplay = findViewById(R.id.tv_empty_list);
 
         // Check if empty list message should be displayed.
         // must call checkEmpty() here because adapter is not created yet
-        checkEmpty();
+        // checkEmpty();
 
         // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
@@ -119,7 +124,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         wonsuc
         https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
          */
-        adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        /*adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
 
             @Override
             public void onChanged() {
@@ -139,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 checkEmpty();
             }
 
-        });
+        });*/
 
         placeViewModel = new ViewModelProvider(this).get(PlaceViewModel.class);
 
@@ -147,13 +152,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // The onChanged() method fires when the observed data changes and the activity is in the foreground
         placeViewModel.getAllPlaces().observe(this, new Observer<List<PlaceModel>>() {
             @Override
-            public void onChanged(@Nullable final List<PlaceModel> places) {
+            public void onChanged(@Nullable final List<PlaceModel> updatedPlaces) {
+
+                // set places list to updated places list
+                places = updatedPlaces;
+
                 Log.d(TAG, "places list changed");
                 for (int i = 0; places != null && i < places.size(); i++) {
                     Log.d(TAG, i + ": " + places.get(i).getName());
                 }
+
                 // Update the cached copy of the places in the adapter.
                 adapter.setPlaces(places);
+
+                // Display empty list message if list is empty.
+                checkEmpty();
+                Log.d(TAG, "checked if empty");
+
             }
         });
 
@@ -286,7 +301,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      */
     private void checkEmpty() {
         // place can be null before first LiveData update
-        if (places != null && places.size() == 0) {
+        // ex. when app first started or screen rotated, places is null in onCreate
+        Log.d(TAG, "places list: " + places);
+        if (places == null) {
+            Log.d(TAG, "places is null");
+            emptyListDisplay.setVisibility(View.GONE);
+        }
+        else if (places.size() == 0) {
             emptyListDisplay.setVisibility(View.VISIBLE);
         } else {
             emptyListDisplay.setVisibility(View.GONE);
@@ -324,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         places.add(insertIndex, place);
         // Observer's onChanged() method updates the adapter
         // adapter.notifyItemInserted(insertIndex);
+        Log.d(TAG, "places list after adding: " + places);
 
         // insert place into the database
         placeViewModel.insert(place);

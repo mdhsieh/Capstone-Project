@@ -8,7 +8,6 @@ import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
