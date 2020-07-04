@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -22,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
  */
 public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> {
 
+    // if not initialized, place is null before first LiveData update
     private List<PlaceModel> places;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
@@ -51,8 +53,25 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // total number of rows
     @Override
     public int getItemCount() {
-        return places.size();
+        // when getItemCount() is first called, places has not been updated.
+        // Initially, places is null, and we can't return null.
+        if (places == null) {
+            return 0;
+        } else {
+            return places.size();
+        }
     }
+
+    /** Set the adapter data to a list of PlaceModels
+     *
+     * @param newPlaces the list of places observed
+     * by LiveData
+     */
+    public void setPlaces(List<PlaceModel> newPlaces){
+        places = newPlaces;
+        notifyDataSetChanged();
+    }
+
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {

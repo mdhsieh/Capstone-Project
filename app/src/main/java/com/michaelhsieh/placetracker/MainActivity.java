@@ -2,6 +2,8 @@ package com.michaelhsieh.placetracker;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,6 +27,7 @@ import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.util.ArrayList;
@@ -63,6 +66,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // key of the selected place when user clicks a place in list
     private int clickedPlacePos = -1;
 
+    private PlaceViewModel placeViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
             // Restore places list from saved state
-            places = savedInstanceState.getParcelableArrayList(STATE_PLACES);
+            // places = savedInstanceState.getParcelableArrayList(STATE_PLACES);
 
             // restore clicked place position from saved state
             clickedPlacePos = savedInstanceState.getInt(STATE_CLICKED_POSITION);
@@ -134,6 +139,22 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 checkEmpty();
             }
 
+        });
+
+        placeViewModel = new ViewModelProvider(this).get(PlaceViewModel.class);
+
+        // add an observer for the LiveData returned by getAllPlaces()
+        // The onChanged() method fires when the observed data changes and the activity is in the foreground
+        placeViewModel.getAllPlaces().observe(this, new Observer<List<PlaceModel>>() {
+            @Override
+            public void onChanged(@Nullable final List<PlaceModel> places) {
+                Log.d(TAG, "places list changed");
+                for (int i = 0; places != null && i < places.size(); i++) {
+                    Log.d(TAG, i + ": " + places.get(i).getName());
+                }
+                // Update the cached copy of the places in the adapter.
+                adapter.setPlaces(places);
+            }
         });
 
         // Initialize the SDK
@@ -197,11 +218,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             if (data != null) {
                 String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
                 if (buttonType != null && buttonType.equals(DELETE)) {
+                    // remove from the list of places
                     removeSingleItem(clickedPlacePos);
                 }
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
+                        // update the place
                         updateSingleItem(clickedPlacePos, updatedPlace);
                     }
                 }
@@ -218,7 +241,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         super.onSaveInstanceState(savedInstanceState);
 
         // Save the user's current list of places
-        savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
+        // savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
 
         // Save the position of a place that's been clicked
         savedInstanceState.putInt(STATE_CLICKED_POSITION, clickedPlacePos);
@@ -258,10 +281,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return false;
     }
 
-    /** Display empty list message if list is empty,
-            otherwise hide message */
+    /** Display empty list message if list is empty, otherwise hide message
+     *
+     */
     private void checkEmpty() {
-        if (places.size() == 0) {
+        // place can be null before first LiveData update
+        if (places != null && places.size() == 0) {
             emptyListDisplay.setVisibility(View.VISIBLE);
         } else {
             emptyListDisplay.setVisibility(View.GONE);
@@ -297,7 +322,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         int insertIndex = places.size();
         // add place to list
         places.add(insertIndex, place);
-        adapter.notifyItemInserted(insertIndex);
+        // Observer's onChanged() method updates the adapter
+        // adapter.notifyItemInserted(insertIndex);
+
+        // insert place into the database
+        placeViewModel.insert(place);
+        Log.d(TAG, "inserted " + place.getName() + " into database");
     }
 
     /** Remove an item from the RecyclerView

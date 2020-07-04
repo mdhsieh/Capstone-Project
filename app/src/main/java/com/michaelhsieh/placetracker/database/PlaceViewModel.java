@@ -23,7 +23,7 @@ public class PlaceViewModel extends AndroidViewModel {
         allPlaces = repository.getAllPlaces();
     }
 
-    LiveData<List<PlaceModel>> getAllPlaces() {
+    public LiveData<List<PlaceModel>> getAllPlaces() {
         return allPlaces;
     }
 
