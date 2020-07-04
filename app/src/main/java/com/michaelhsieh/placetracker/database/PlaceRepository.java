@@ -32,4 +32,16 @@ public class PlaceRepository {
             placeDao.insert(place);
         });
     }
+
+    void delete(PlaceModel place) {
+        PlaceRoomDatabase.databaseWriteExecutor.execute(() -> {
+            placeDao.delete(place);
+        });
+    }
+
+    void update(PlaceModel place) {
+        PlaceRoomDatabase.databaseWriteExecutor.execute(() -> {
+            placeDao.update(place);
+        });
+    }
 }

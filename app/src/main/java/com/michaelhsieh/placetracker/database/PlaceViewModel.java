@@ -30,4 +30,12 @@ public class PlaceViewModel extends AndroidViewModel {
     public void insert(PlaceModel place) {
         repository.insert(place);
     }
+
+    public void delete(PlaceModel place) {
+        repository.delete(place);
+    }
+
+    public void update(PlaceModel place) {
+        repository.update(place);
+    }
 }

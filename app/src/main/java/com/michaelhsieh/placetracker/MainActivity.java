@@ -44,7 +44,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private static final String TAG = MainActivity.class.getSimpleName();
 
     // key to get the saved places list when Activity recreated, ex. when device rotated
-    private static final String STATE_PLACES = "places";
+    // private static final String STATE_PLACES = "places";
 
     // key to get the clicked place's position when Activity recreated, ex. when device rotated
     private static final String STATE_CLICKED_POSITION = "position";
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // initialize places list
 //        places = new ArrayList<>();
-        Log.d(TAG, "onCreate places list is: " + places);
+//        Log.d(TAG, "onCreate places list is: " + places);
 
         // get TextView displaying empty list message
         emptyListDisplay = findViewById(R.id.tv_empty_list);
@@ -154,6 +154,20 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             @Override
             public void onChanged(@Nullable final List<PlaceModel> updatedPlaces) {
 
+                Log.d(TAG, "updated places list: " + updatedPlaces);
+//                Log.d(TAG, "updated places list");
+//                for (int i = 0; updatedPlaces != null && i < updatedPlaces.size(); i++) {
+//                    Log.d(TAG, i + ": " + updatedPlaces.get(i).getName());
+//                }
+
+//                if (places == null) {
+//                    Log.d(TAG, "places is null before setting to updated list");
+//                }
+
+//                if (updatedPlaces == null) {
+//                    Log.d(TAG, "updated places list is null");
+//                }
+
                 // set places list to updated places list
                 places = updatedPlaces;
 
@@ -167,8 +181,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // Display empty list message if list is empty.
                 checkEmpty();
-                Log.d(TAG, "checked if empty");
-
             }
         });
 
@@ -202,7 +214,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
                     // add to the list of places
-                    insertSingleItem(newPlace);
+                    // insertSingleItem(newPlace);
+
+                    // Observer's onChanged() method updates the adapter
+                    // insert place into the database
+                    placeViewModel.insert(newPlace);
+                    Log.d(TAG, "inserted " + place.getName() + " into database");
                 }
             }
 
@@ -234,13 +251,27 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
                 if (buttonType != null && buttonType.equals(DELETE)) {
                     // remove from the list of places
-                    removeSingleItem(clickedPlacePos);
+                    // removeSingleItem(clickedPlacePos);
+
+                    // Observer's onChanged() method updates the adapter
+                    // delete place from the database
+                    PlaceModel placeToDelete = places.get(clickedPlacePos);
+                    placeViewModel.delete(placeToDelete);
+                    Log.d(TAG, "deleted " + placeToDelete.getName() + " from database");
                 }
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
                         // update the place
-                        updateSingleItem(clickedPlacePos, updatedPlace);
+                        // updateSingleItem(clickedPlacePos, updatedPlace);
+
+                        // update in dao uses the primary key of the place
+                        Log.d(TAG, "clicked place's entity id: " + places.get(clickedPlacePos).getEntityId());
+                        updatedPlace.setEntityId(places.get(clickedPlacePos).getEntityId());
+                        // Observer's onChanged() method updates the adapter
+                        // update place in the database
+                        placeViewModel.update(updatedPlace);
+                        Log.d(TAG, "updated " + updatedPlace.getName() + " in database");
                     }
                 }
             }
@@ -302,9 +333,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private void checkEmpty() {
         // place can be null before first LiveData update
         // ex. when app first started or screen rotated, places is null in onCreate
-        Log.d(TAG, "places list: " + places);
         if (places == null) {
-            Log.d(TAG, "places is null");
+            Log.e(TAG, "places is null");
             emptyListDisplay.setVisibility(View.GONE);
         }
         else if (places.size() == 0) {
@@ -338,36 +368,30 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     /** Insert an item into the RecyclerView
      * @param place The place being inserted
     */
-    private void insertSingleItem(PlaceModel place) {
+    /*private void insertSingleItem(PlaceModel place) {
         // insert at the very end of the list
         int insertIndex = places.size();
         // add place to list
         places.add(insertIndex, place);
-        // Observer's onChanged() method updates the adapter
-        // adapter.notifyItemInserted(insertIndex);
-        Log.d(TAG, "places list after adding: " + places);
-
-        // insert place into the database
-        placeViewModel.insert(place);
-        Log.d(TAG, "inserted " + place.getName() + " into database");
-    }
+        adapter.notifyItemInserted(insertIndex);
+    }*/
 
     /** Remove an item from the RecyclerView
      * @param removeIndex The index of the place to be removed
      */
-    private void removeSingleItem(int removeIndex) {
+    /*private void removeSingleItem(int removeIndex) {
         // remove place from list
         places.remove(removeIndex);
         adapter.notifyItemRemoved(removeIndex);
-    }
+    }*/
 
     /** Update an item in the RecyclerView
      * @param updateIndex The index of the place which will be updated
      * @param place The new place which will replace the existing place
      */
-    private void updateSingleItem(int updateIndex, PlaceModel place) {
+    /*private void updateSingleItem(int updateIndex, PlaceModel place) {
         // update place at index in list
         places.set(updateIndex, place);
         adapter.notifyItemChanged(updateIndex);
-    }
+    }*/
 }
