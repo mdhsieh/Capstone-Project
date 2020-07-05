@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
@@ -220,7 +218,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public void onItemClick(View view, int position) {
         Visit visit = visits.get(position);
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
-        showDateTimePicker();
+        // show the date and time pickers
+        // param is the clicked position so button click can update visit
+        showDateTimePicker(position);
     }
 
     /** Insert an item into the RecyclerView
@@ -237,6 +237,23 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
 
         // update last visit
+        showOrHideLastVisit();
+    }
+
+    /** Update an item in the RecyclerView
+     * @param visit The visit being updated
+     */
+    private void updateSingleItem(int updateIndex, Visit visit) {
+        // add visit
+        visits.set(updateIndex, visit);
+        // notify adapter that VisitGroup has changed
+        // adapter.notifyItemChanged(0);
+        Log.d(TAG, "position notify changed: " + updateIndex + 1);
+        adapter.notifyItemChanged(updateIndex + 1);
+        Log.d(TAG, "adapter size: " + adapter.getItemCount());
+
+        // update last visit
+        // need this method if the visit that was updated was the last visit
         showOrHideLastVisit();
     }
 
@@ -359,63 +376,36 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         return time;
     }
 
-    private void showDateTimePicker() {
+    /** Display the date and time picker layout so user can edit a clicked Visit's
+     * date and time. Updates the Visit if the user clicks the set button.
+     *
+     * @param pos The position of the clicked Visit.
+     */
+    private void showDateTimePicker(int pos) {
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
         DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
         TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
 
-        // date which will be converted to a readable date String and time String
+        // Calendar whose Date object will be converted to a readable date String and time String
         // initially set to the current date and time
         Calendar calendar = Calendar.getInstance();
-
-        /*timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
-            @Override
-            public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
-                String AM_PM ;
-                if(hourOfDay < 12) {
-                    AM_PM = "AM";
-                } else {
-                    AM_PM = "PM";
-                }
-
-                Log.d(TAG, "on time set callback: " + hourOfDay + " : " + minute + " " + AM_PM);
-            }
-        });*/
 
         dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                /*Calendar calendar = new GregorianCalendar(datePicker.getYear(),
-                        datePicker.getMonth(),
-                        datePicker.getDayOfMonth(),
-                        timePicker.getCurrentHour(),
-                        timePicker.getCurrentMinute());
-
-                long time = calendar.getTimeInMillis();
-                Log.d(TAG, "time set: " + time);*/
-
                 int month = datePicker.getMonth();
-                Log.d(TAG, "picked month: " + month);
+//                Log.d(TAG, "picked month: " + month);
                 int day = datePicker.getDayOfMonth();
-                Log.d(TAG, "picked day of month: " + day);
+//                Log.d(TAG, "picked day of month: " + day);
                 int year = datePicker.getYear();
-                Log.d(TAG, "picked year: " + year);
+//                Log.d(TAG, "picked year: " + year);
                 int hour = timePicker.getCurrentHour();
-                Log.d(TAG, "picked hour: " + hour);
+//                Log.d(TAG, "picked hour: " + hour);
                 int minute = timePicker.getCurrentMinute();
-                Log.d(TAG, "picked minute: " + minute);
-
-                String AM_PM ;
-                if(timePicker.getCurrentHour() < 12) {
-                    AM_PM = "AM";
-                } else {
-                    AM_PM = "PM";
-                }
-
-                Log.d(TAG, "picked time: " + hour + " : " + minute + " " + AM_PM);
+//                Log.d(TAG, "picked minute: " + minute);
 
                 // don't retain previous calendar field values from when Calendar was
                 // first initialized with getInstance()
@@ -425,11 +415,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // get picked calendar date
                 Date date = calendar.getTime();
                 // format date to show only hours and minutes
-                String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+                String newTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
                 // format date to show day of week, month, day, year
                 String newDate = DateFormat.getDateInstance(DateFormat.FULL).format(date);
-                Log.d(TAG, "time: " + time);
-                Log.d(TAG, "month etc: " + newDate);
+                Log.d(TAG, "time: " + newTime);
+                Log.d(TAG, "date: " + newDate);
+
+                // create a new Visit with the user's picked date and time
+                Visit updatedVisit = new Visit(newDate, newTime);
+                // update the original Visit by replacing it with the new one
+                updateSingleItem(pos, updatedVisit);
 
                 alertDialog.dismiss();
             }});
