@@ -155,8 +155,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-//                Log.i(TAG, "Place: " + name + ", " + id);
-//                Log.i(TAG, "Place address: " + address);
+                Log.i(TAG, "Place: " + name + ", " + id);
+                Log.i(TAG, "Place address: " + address);
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
@@ -204,10 +204,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
-                        // update() in dao uses the primary key of the place, which is the Entity ID
+                        // update() in dao uses the primary key of the place, which is the Place ID
+                        Log.d(TAG, "clicked place's String id: " + places.get(clickedPlacePos).getPlaceId());
+                        Log.d(TAG, "updated place's String id: " + updatedPlace.getPlaceId());
                         // set the updated place's ID to the original place's ID
-                        Log.d(TAG, "clicked place's entity id: " + places.get(clickedPlacePos).getEntityId());
-                        updatedPlace.setEntityId(places.get(clickedPlacePos).getEntityId());
+                        // Log.d(TAG, "clicked place's entity id: " + places.get(clickedPlacePos).getEntityId());
+                        // updatedPlace.setEntityId(places.get(clickedPlacePos).getEntityId());
                         // update place in the database
                         placeViewModel.update(updatedPlace);
                         Log.d(TAG, "updated " + updatedPlace.getName() + " in database");

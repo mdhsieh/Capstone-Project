@@ -8,6 +8,7 @@ import com.michaelhsieh.placetracker.Visit;
 import java.util.ArrayList;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
@@ -25,11 +26,13 @@ https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-andro
 public class PlaceModel implements Parcelable {
 
     // the ID that identifies this Entity, NOT the same as Place ID
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "entity_id")
-    private int entityId;
+//    @PrimaryKey(autoGenerate = true)
+//    @ColumnInfo(name = "entity_id")
+//    private int entityId;
 
     // a place's unique Place ID, which is a String
+    @PrimaryKey
+    @NonNull
     @ColumnInfo(name = "place_id")
     private String placeId;
     private String name;
@@ -49,9 +52,9 @@ public class PlaceModel implements Parcelable {
     }
 
     // get the ID of this particular Entity
-    public int getEntityId() {
-        return entityId;
-    }
+//    public int getEntityId() {
+//        return entityId;
+//    }
 
     public String getPlaceId() {
         return placeId;
@@ -77,9 +80,9 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
-    public void setEntityId(int entityId) {
-        this.entityId = entityId;
-    }
+//    public void setEntityId(int entityId) {
+//        this.entityId = entityId;
+//    }
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
