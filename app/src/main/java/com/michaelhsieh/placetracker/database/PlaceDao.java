@@ -14,7 +14,7 @@ import androidx.room.Update;
 
 @Dao
 public interface PlaceDao {
-    // allowing the insert of the same word multiple times by passing a
+    // allowing the insert of the same place multiple times by passing a
     // conflict resolution strategy
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(PlaceModel place);

@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
     }
 
-    /** Save the state of this Activity, ex. when device rotated
+    /** Save the state of this Activity, ex. when device rotated.
      *
      */
     @Override
@@ -255,7 +255,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return false;
     }
 
-    /** Display empty list message if list is empty, otherwise hide message
+    /** Display empty list message if list is empty, otherwise hide message.
      *
      */
     private void checkEmpty() {
@@ -266,7 +266,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
     }
 
-    /** Checks if user is trying to add a place that already exists in places list
+    /** Checks if user is trying to add a place that already exists in places list.
      *
      * @param place The place that is being added
      * @return boolean indicating if the place is already in the list

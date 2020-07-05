@@ -7,14 +7,17 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
@@ -23,6 +26,7 @@ import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
@@ -74,13 +78,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
-                String placeId = place.getPlaceId();
+//                String placeId = place.getPlaceId();
                 String name = place.getName();
                 String address = place.getAddress();
                 int numVisits = place.getNumVisits();
                 String notes = place.getNotes();
 
-                Log.d(TAG, "Place ID: " + placeId);
+//                Log.d(TAG, "Place ID: " + placeId);
 //                Log.d(TAG, "name: " + name);
 //                Log.d(TAG, "address: " + address);
 //                Log.d(TAG, "number of visits: " + numVisits);
@@ -216,6 +220,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public void onItemClick(View view, int position) {
         Visit visit = visits.get(position);
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        showDateTimePicker();
     }
 
     /** Insert an item into the RecyclerView
@@ -348,5 +353,51 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
 
         return time;
+    }
+
+    private void showDateTimePicker() {
+        final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
+        final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+
+        TimePickerDialog.OnTimeSetListener onStartTimeListener = new TimePickerDialog.OnTimeSetListener() {
+
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                String AM_PM ;
+                if(hourOfDay < 12) {
+                    AM_PM = "AM";
+                } else {
+                    AM_PM = "PM";
+                }
+
+                Log.d(TAG, "on time set callback: " + hourOfDay + " : " + minute + " " + AM_PM);
+            }
+        };
+
+        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
+                TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
+
+                /*Calendar calendar = new GregorianCalendar(datePicker.getYear(),
+                        datePicker.getMonth(),
+                        datePicker.getDayOfMonth(),
+                        timePicker.getCurrentHour(),
+                        timePicker.getCurrentMinute());
+
+                long time = calendar.getTimeInMillis();
+                Log.d(TAG, "time set: " + time);*/
+                Log.d(TAG, "picked month: " + datePicker.getMonth());
+                Log.d(TAG, "picked day of month: " + datePicker.getDayOfMonth());
+                Log.d(TAG, "picked hour: " + timePicker.getCurrentHour());
+                Log.d(TAG, "picked minute: " + timePicker.getCurrentMinute());
+
+                Log.d(TAG, "24 hour view? " + timePicker.is24HourView());
+
+                alertDialog.dismiss();
+            }});
+        alertDialog.setView(dialogView);
+        alertDialog.show();
     }
 }
