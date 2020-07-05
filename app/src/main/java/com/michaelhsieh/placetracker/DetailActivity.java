@@ -250,7 +250,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // adapter.notifyItemChanged(0);
         Log.d(TAG, "position notify changed: " + updateIndex + 1);
         adapter.notifyItemChanged(updateIndex + 1);
-        Log.d(TAG, "adapter size: " + adapter.getItemCount());
+//        Log.d(TAG, "adapter size: " + adapter.getItemCount());
 
         // update last visit
         // need this method if the visit that was updated was the last visit
