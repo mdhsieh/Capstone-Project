@@ -24,12 +24,6 @@ https://stackoverflow.com/questions/2139134/how-to-send-an-object-from-one-andro
  */
 @Entity(tableName = "place_table")
 public class PlaceModel implements Parcelable {
-
-    // the ID that identifies this Entity, NOT the same as Place ID
-//    @PrimaryKey(autoGenerate = true)
-//    @ColumnInfo(name = "entity_id")
-//    private int entityId;
-
     // a place's unique Place ID, which is a String
     @PrimaryKey
     @NonNull
@@ -50,11 +44,6 @@ public class PlaceModel implements Parcelable {
         this.name = name;
         this.address = address;
     }
-
-    // get the ID of this particular Entity
-//    public int getEntityId() {
-//        return entityId;
-//    }
 
     public String getPlaceId() {
         return placeId;
@@ -79,10 +68,6 @@ public class PlaceModel implements Parcelable {
     public List<Visit> getVisits() {
         return visits;
     }
-
-//    public void setEntityId(int entityId) {
-//        this.entityId = entityId;
-//    }
 
     public void setPlaceId(String placeId) {
         this.placeId = placeId;

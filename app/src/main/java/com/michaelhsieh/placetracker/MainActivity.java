@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
@@ -30,7 +31,6 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -86,11 +86,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // place can be null before first LiveData update
         // ex. when app first started or screen rotated, places is null in onCreate
-        if (places == null) {
-            Log.d(TAG, "onCreate, places is null");
-        }
 
-            // set up the RecyclerView
+        // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -114,9 +111,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // updatedPlaces should be an empty list in onCreate, ex. when app first
                 // starts up and after rotation, not null
-                Log.d(TAG, "updated places list: " + updatedPlaces);
                 if (updatedPlaces != null) {
-                    Log.d(TAG, "size of updated places list: " + updatedPlaces.size());
                     // set places list to updated places list
                     places = updatedPlaces;
 
@@ -148,28 +143,27 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
             @Override
-            public void onPlaceSelected(Place place) {
+            public void onPlaceSelected(@NonNull Place place) {
 
                 String name = place.getName();
                 String id = place.getId();
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                Log.i(TAG, "Place: " + name + ", " + id);
-                Log.i(TAG, "Place address: " + address);
+//                Log.i(TAG, "Place: " + name + ", " + id);
+//                Log.i(TAG, "Place address: " + address);
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
                     // insert place into the database
                     placeViewModel.insert(newPlace);
-                    Log.d(TAG, "inserted " + place.getName() + " into database");
                     // Observer's onChanged() method updates the adapter
                 }
             }
 
             @Override
-            public void onError(Status status) {
+            public void onError(@NonNull Status status) {
                 Log.e(TAG, "An error occurred: " + status);
             }
         });
@@ -198,21 +192,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     // delete place from the database
                     PlaceModel placeToDelete = places.get(clickedPlacePos);
                     placeViewModel.delete(placeToDelete);
-                    Log.d(TAG, "deleted " + placeToDelete.getName() + " from database");
                     // Observer's onChanged() method updates the adapter
                 }
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
-                        // update() in dao uses the primary key of the place, which is the Place ID
-                        Log.d(TAG, "clicked place's String id: " + places.get(clickedPlacePos).getPlaceId());
-                        Log.d(TAG, "updated place's String id: " + updatedPlace.getPlaceId());
-                        // set the updated place's ID to the original place's ID
-                        // Log.d(TAG, "clicked place's entity id: " + places.get(clickedPlacePos).getEntityId());
-                        // updatedPlace.setEntityId(places.get(clickedPlacePos).getEntityId());
+                        // update() in dao uses the primary key of the original clicked place,
+                        // which is the Place ID
+
                         // update place in the database
                         placeViewModel.update(updatedPlace);
-                        Log.d(TAG, "updated " + updatedPlace.getName() + " in database");
                         // Observer's onChanged() method updates the adapter
                     }
                 }
@@ -224,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      *
      */
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
 
