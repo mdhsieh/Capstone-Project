@@ -344,6 +344,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     // get the current hours and minutes as a single String
+    /* Source:
+
+    Dany Pop
+    https://stackoverflow.com/questions/454315/how-to-format-date-and-time-in-android */
     private String getCurrentTime() {
         String time = "";
         Calendar rightNow = Calendar.getInstance();
@@ -359,9 +363,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
-        TimePickerDialog.OnTimeSetListener onStartTimeListener = new TimePickerDialog.OnTimeSetListener() {
+        DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
+        TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
 
-            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        // date which will be converted to a readable date String and time String
+        // initially set to the current date and time
+        Calendar calendar = Calendar.getInstance();
+
+        /*timePicker.setOnTimeChangedListener(new TimePicker.OnTimeChangedListener() {
+            @Override
+            public void onTimeChanged(TimePicker timePicker, int hourOfDay, int minute) {
                 String AM_PM ;
                 if(hourOfDay < 12) {
                     AM_PM = "AM";
@@ -371,14 +382,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 Log.d(TAG, "on time set callback: " + hourOfDay + " : " + minute + " " + AM_PM);
             }
-        };
+        });*/
 
         dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
-                DatePicker datePicker = (DatePicker) dialogView.findViewById(R.id.date_picker);
-                TimePicker timePicker = (TimePicker) dialogView.findViewById(R.id.time_picker);
 
                 /*Calendar calendar = new GregorianCalendar(datePicker.getYear(),
                         datePicker.getMonth(),
@@ -388,12 +396,40 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 long time = calendar.getTimeInMillis();
                 Log.d(TAG, "time set: " + time);*/
-                Log.d(TAG, "picked month: " + datePicker.getMonth());
-                Log.d(TAG, "picked day of month: " + datePicker.getDayOfMonth());
-                Log.d(TAG, "picked hour: " + timePicker.getCurrentHour());
-                Log.d(TAG, "picked minute: " + timePicker.getCurrentMinute());
 
-                Log.d(TAG, "24 hour view? " + timePicker.is24HourView());
+                int month = datePicker.getMonth();
+                Log.d(TAG, "picked month: " + month);
+                int day = datePicker.getDayOfMonth();
+                Log.d(TAG, "picked day of month: " + day);
+                int year = datePicker.getYear();
+                Log.d(TAG, "picked year: " + year);
+                int hour = timePicker.getCurrentHour();
+                Log.d(TAG, "picked hour: " + hour);
+                int minute = timePicker.getCurrentMinute();
+                Log.d(TAG, "picked minute: " + minute);
+
+                String AM_PM ;
+                if(timePicker.getCurrentHour() < 12) {
+                    AM_PM = "AM";
+                } else {
+                    AM_PM = "PM";
+                }
+
+                Log.d(TAG, "picked time: " + hour + " : " + minute + " " + AM_PM);
+
+                // don't retain previous calendar field values from when Calendar was
+                // first initialized with getInstance()
+                calendar.clear();
+                // set Calendar to user's picked date and time
+                calendar.set(year, month, day, hour, minute);
+                // get picked calendar date
+                Date date = calendar.getTime();
+                // format date to show only hours and minutes
+                String time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+                // format date to show day of week, month, day, year
+                String newDate = DateFormat.getDateInstance(DateFormat.FULL).format(date);
+                Log.d(TAG, "time: " + time);
+                Log.d(TAG, "month etc: " + newDate);
 
                 alertDialog.dismiss();
             }});
