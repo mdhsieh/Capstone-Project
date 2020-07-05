@@ -43,9 +43,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    // key to get the saved places list when Activity recreated, ex. when device rotated
-    // private static final String STATE_PLACES = "places";
-
     // key to get the clicked place's position when Activity recreated, ex. when device rotated
     private static final String STATE_CLICKED_POSITION = "position";
 
@@ -80,29 +77,20 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
-            // Restore places list from saved state
-            // places = savedInstanceState.getParcelableArrayList(STATE_PLACES);
-
             // restore clicked place position from saved state
             clickedPlacePos = savedInstanceState.getInt(STATE_CLICKED_POSITION);
         }
-        /*else {
-            // initialize places list
-            places = new ArrayList<>();
-        }*/
-
-        // initialize places list
-//        places = new ArrayList<>();
-//        Log.d(TAG, "onCreate places list is: " + places);
 
         // get TextView displaying empty list message
         emptyListDisplay = findViewById(R.id.tv_empty_list);
 
-        // Check if empty list message should be displayed.
-        // must call checkEmpty() here because adapter is not created yet
-        // checkEmpty();
+        // place can be null before first LiveData update
+        // ex. when app first started or screen rotated, places is null in onCreate
+        if (places == null) {
+            Log.d(TAG, "onCreate, places is null");
+        }
 
-        // set up the RecyclerView
+            // set up the RecyclerView
         RecyclerView recyclerView = findViewById(R.id.rv_places);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
@@ -116,36 +104,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        /* Display empty list message if no places have been added yet.
-        Register an Observer that checks if an empty list message needs
-        to be displayed whenever the RecyclerView updates, inserts items, or removes items.
-
-        Source:
-        wonsuc
-        https://stackoverflow.com/questions/28217436/how-to-show-an-empty-view-with-a-recyclerview
-         */
-        /*adapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-
-            @Override
-            public void onChanged() {
-                super.onChanged();
-                checkEmpty();
-            }
-
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                checkEmpty();
-            }
-
-            @Override
-            public void onItemRangeRemoved(int positionStart, int itemCount) {
-                super.onItemRangeRemoved(positionStart, itemCount);
-                checkEmpty();
-            }
-
-        });*/
-
         placeViewModel = new ViewModelProvider(this).get(PlaceViewModel.class);
 
         // add an observer for the LiveData returned by getAllPlaces()
@@ -154,33 +112,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             @Override
             public void onChanged(@Nullable final List<PlaceModel> updatedPlaces) {
 
+                // updatedPlaces should be an empty list in onCreate, ex. when app first
+                // starts up and after rotation, not null
                 Log.d(TAG, "updated places list: " + updatedPlaces);
-//                Log.d(TAG, "updated places list");
-//                for (int i = 0; updatedPlaces != null && i < updatedPlaces.size(); i++) {
-//                    Log.d(TAG, i + ": " + updatedPlaces.get(i).getName());
-//                }
+                if (updatedPlaces != null) {
+                    Log.d(TAG, "size of updated places list: " + updatedPlaces.size());
+                    // set places list to updated places list
+                    places = updatedPlaces;
 
-//                if (places == null) {
-//                    Log.d(TAG, "places is null before setting to updated list");
-//                }
+                    // Update the cached copy of the places in the adapter.
+                    adapter.setPlaces(places);
 
-//                if (updatedPlaces == null) {
-//                    Log.d(TAG, "updated places list is null");
-//                }
-
-                // set places list to updated places list
-                places = updatedPlaces;
-
-                Log.d(TAG, "places list changed");
-                for (int i = 0; places != null && i < places.size(); i++) {
-                    Log.d(TAG, i + ": " + places.get(i).getName());
+                    // Display empty list message if list is empty.
+                    checkEmpty();
+                } else {
+                    Log.e(TAG, "updated places list is null!");
                 }
 
-                // Update the cached copy of the places in the adapter.
-                adapter.setPlaces(places);
-
-                // Display empty list message if list is empty.
-                checkEmpty();
             }
         });
 
@@ -207,19 +155,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-                Log.i(TAG, "Place: " + name + ", " + id);
-                Log.i(TAG, "Place address: " + address);
+//                Log.i(TAG, "Place: " + name + ", " + id);
+//                Log.i(TAG, "Place address: " + address);
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
-                    // add to the list of places
-                    // insertSingleItem(newPlace);
-
-                    // Observer's onChanged() method updates the adapter
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     Log.d(TAG, "inserted " + place.getName() + " into database");
+                    // Observer's onChanged() method updates the adapter
                 }
             }
 
@@ -250,28 +195,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             if (data != null) {
                 String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
                 if (buttonType != null && buttonType.equals(DELETE)) {
-                    // remove from the list of places
-                    // removeSingleItem(clickedPlacePos);
-
-                    // Observer's onChanged() method updates the adapter
                     // delete place from the database
                     PlaceModel placeToDelete = places.get(clickedPlacePos);
                     placeViewModel.delete(placeToDelete);
                     Log.d(TAG, "deleted " + placeToDelete.getName() + " from database");
+                    // Observer's onChanged() method updates the adapter
                 }
                 else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
-                        // update the place
-                        // updateSingleItem(clickedPlacePos, updatedPlace);
-
-                        // update in dao uses the primary key of the place
+                        // update() in dao uses the primary key of the place, which is the Entity ID
+                        // set the updated place's ID to the original place's ID
                         Log.d(TAG, "clicked place's entity id: " + places.get(clickedPlacePos).getEntityId());
                         updatedPlace.setEntityId(places.get(clickedPlacePos).getEntityId());
-                        // Observer's onChanged() method updates the adapter
                         // update place in the database
                         placeViewModel.update(updatedPlace);
                         Log.d(TAG, "updated " + updatedPlace.getName() + " in database");
+                        // Observer's onChanged() method updates the adapter
                     }
                 }
             }
@@ -285,9 +225,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public void onSaveInstanceState(Bundle savedInstanceState) {
         // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(savedInstanceState);
-
-        // Save the user's current list of places
-        // savedInstanceState.putParcelableArrayList(STATE_PLACES, new ArrayList<>(places));
 
         // Save the position of a place that's been clicked
         savedInstanceState.putInt(STATE_CLICKED_POSITION, clickedPlacePos);
@@ -331,13 +268,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      *
      */
     private void checkEmpty() {
-        // place can be null before first LiveData update
-        // ex. when app first started or screen rotated, places is null in onCreate
-        if (places == null) {
-            Log.e(TAG, "places is null");
-            emptyListDisplay.setVisibility(View.GONE);
-        }
-        else if (places.size() == 0) {
+        if (places.size() == 0) {
             emptyListDisplay.setVisibility(View.VISIBLE);
         } else {
             emptyListDisplay.setVisibility(View.GONE);
@@ -358,40 +289,4 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
         return false;
     }
-
-    /* Methods to update RecyclerView data.
-
-    Source:
-    Suragch
-    https://stackoverflow.com/questions/31367599/how-to-update-recyclerview-adapter-data/48959184#48959184  */
-
-    /** Insert an item into the RecyclerView
-     * @param place The place being inserted
-    */
-    /*private void insertSingleItem(PlaceModel place) {
-        // insert at the very end of the list
-        int insertIndex = places.size();
-        // add place to list
-        places.add(insertIndex, place);
-        adapter.notifyItemInserted(insertIndex);
-    }*/
-
-    /** Remove an item from the RecyclerView
-     * @param removeIndex The index of the place to be removed
-     */
-    /*private void removeSingleItem(int removeIndex) {
-        // remove place from list
-        places.remove(removeIndex);
-        adapter.notifyItemRemoved(removeIndex);
-    }*/
-
-    /** Update an item in the RecyclerView
-     * @param updateIndex The index of the place which will be updated
-     * @param place The new place which will replace the existing place
-     */
-    /*private void updateSingleItem(int updateIndex, PlaceModel place) {
-        // update place at index in list
-        places.set(updateIndex, place);
-        adapter.notifyItemChanged(updateIndex);
-    }*/
 }
