@@ -41,6 +41,11 @@ public class Visit implements Parcelable {
 
     /** Get the date from Calendar's Date object, ex. Saturday. July 4, 2020.
      *
+     * Source:
+     *
+     * Dany Pop
+     * https://stackoverflow.com/questions/454315/how-to-format-date-and-time-in-android
+     *
      * @return A String containing the day of week, month, day, and year
      */
     public String getDate() {

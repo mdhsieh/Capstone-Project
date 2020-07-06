@@ -17,14 +17,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
-import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
@@ -80,18 +77,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE)) {
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
-//                String placeId = place.getPlaceId();
+
                 String name = place.getName();
                 String address = place.getAddress();
                 int numVisits = place.getNumVisits();
                 String notes = place.getNotes();
-
-//                Log.d(TAG, "Place ID: " + placeId);
-//                Log.d(TAG, "name: " + name);
-//                Log.d(TAG, "address: " + address);
-//                Log.d(TAG, "number of visits: " + numVisits);
-                // visits and notes should be empty on first startup
-//                Log.d(TAG, "notes: " + notes);
 
                 nameDisplay.setText(name);
                 addressDisplay.setText(address);
@@ -99,7 +89,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 // initialize the visit group and visits
                 visits = place.getVisits();
-//                Log.d(TAG, "visits: " + visits);
 
                 // list of visit groups which will only contain one group at position 0
                 List<VisitGroup> visitGroupList =
@@ -223,7 +212,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     @Override
     public void onItemClick(View view, int position) {
         Visit visit = visits.get(position);
-        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
+        // Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // show the date and time pickers
         // param is the clicked position so button click can update visit
         showDateTimePicker(position, visit);
@@ -276,111 +265,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             lastVisitDisplay.setText(lastVisitString);
         }
     }
-
-    // get the current week, month, and day as a single String
-    /*private String getCurrentDate() {
-        String date = "";
-        // object whose calendar fields have been initialized with the current date and time
-        Calendar rightNow = Calendar.getInstance();
-        // get calendar fields
-        int weekField = rightNow.get(Calendar.DAY_OF_WEEK);
-        int monthField = rightNow.get(Calendar.MONTH);
-        int dayField = rightNow.get(Calendar.DAY_OF_MONTH);
-        int yearField = rightNow.get(Calendar.YEAR);
-
-        // get names of week and month fields to show to user
-        String week;
-        switch (weekField) {
-            case Calendar.MONDAY:
-                week = "Monday";
-                break;
-            case Calendar.TUESDAY:
-                week = "Tuesday";
-                break;
-            case Calendar.WEDNESDAY:
-                week = "Wednesday";
-                break;
-            case Calendar.THURSDAY:
-                week = "Thursday";
-                break;
-            case Calendar.FRIDAY:
-                week = "Friday";
-                break;
-            case Calendar.SATURDAY:
-                week = "Saturday";
-                break;
-            case Calendar.SUNDAY:
-                week = "Sunday";
-                break;
-            default:
-                week = "Invalid week";
-                Log.e(TAG, "Unexpected value for week: " + weekField);
-        }
-        
-        String month;
-        switch (monthField) {
-            case Calendar.JANUARY:
-                month = "January";
-                break;
-            case Calendar.FEBRUARY:
-                month = "February";
-                break;
-            case Calendar.MARCH:
-                month = "March";
-                break;
-            case Calendar.APRIL:
-                month = "April";
-                break;
-            case Calendar.MAY:
-                month = "May";
-                break;
-            case Calendar.JUNE:
-                month = "June";
-                break;
-            case Calendar.JULY:
-                month = "July";
-                break;
-            case Calendar.AUGUST:
-                month = "August";
-                break;
-            case Calendar.SEPTEMBER:
-                month = "September";
-                break;
-            case Calendar.OCTOBER:
-                month = "October";
-                break;
-            case Calendar.NOVEMBER:
-                month = "November";
-                break;
-            case Calendar.DECEMBER:
-                month = "December";
-                break;
-            default: month = "Invalid month";
-                Log.e(TAG, "Unexpected value for month: " + monthField);
-        }
-
-        // combine into a single String
-        date = week + ", " + month + " " + dayField + ", " + yearField;
-
-        return date;
-    }*/
-
-    // get the current hours and minutes as a single String
-    /* Source:
-
-    Dany Pop
-    https://stackoverflow.com/questions/454315/how-to-format-date-and-time-in-android */
-    /*private String getCurrentTime() {
-        String time = "";
-        Calendar rightNow = Calendar.getInstance();
-        // get current date
-        Date date = rightNow.getTime();
-        // format date to show only hours and minutes
-        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
-
-        return time;
-    }*/
-
     /** Display the date and time picker layout so user can edit a clicked Visit's
      * date and time. Updates the Visit if the user clicks the set button.
      *
@@ -396,49 +280,25 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // update date and time pickers by setting them to current Visit's date and time
         Calendar visitCalendar = visit.getCalendar();
         int yearField = visitCalendar.get(Calendar.YEAR);
-        Log.d(TAG, "year: " + yearField);
         int monthField = visitCalendar.get(Calendar.MONTH);
-        Log.d(TAG, "month: " + monthField);
         int dayField = visitCalendar.get(Calendar.DAY_OF_MONTH);
-        Log.d(TAG, "day: " + dayField);
         datePicker.updateDate(yearField, monthField, dayField);
+        // get hours in 24-hour format
         int hourField = visitCalendar.get(Calendar.HOUR_OF_DAY);
-        Log.d(TAG, "hour: " + hourField);
         timePicker.setCurrentHour(hourField);
         int minuteField = visitCalendar.get(Calendar.MINUTE);
-        Log.d(TAG, "minute: " + minuteField);
         timePicker.setCurrentMinute(minuteField);
 
-        // test updating time picker by setting date and time pickers to current date and time
-        /*int yearField = calendar.get(Calendar.YEAR);
-        Log.d(TAG, "year: " + yearField);
-        int monthField = calendar.get(Calendar.MONTH);
-        Log.d(TAG, "month: " + monthField);
-        int dayField = calendar.get(Calendar.DAY_OF_MONTH);
-        Log.d(TAG, "day: " + dayField);
-        datePicker.updateDate(yearField, monthField, dayField);
-        int hourField = calendar.get(Calendar.HOUR_OF_DAY);
-        Log.d(TAG, "hour: " + hourField);
-        timePicker.setCurrentHour(hourField);
-        int minuteField = calendar.get(Calendar.MINUTE);
-        Log.d(TAG, "minute: " + minuteField);
-        timePicker.setCurrentMinute(minuteField);*/
-
-
+        // update Visit with user's picked date and time when set button clicked
         dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 int month = datePicker.getMonth();
-//                Log.d(TAG, "picked month: " + month);
                 int day = datePicker.getDayOfMonth();
-//                Log.d(TAG, "picked day of month: " + day);
                 int year = datePicker.getYear();
-//                Log.d(TAG, "picked year: " + year);
                 int hour = timePicker.getCurrentHour();
-//                Log.d(TAG, "picked hour: " + hour);
                 int minute = timePicker.getCurrentMinute();
-//                Log.d(TAG, "picked minute: " + minute);
 
                 // Calendar whose Date object will be converted to a readable date String and time String
                 // initially set to the current date and time
@@ -450,16 +310,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // set Calendar to user's picked date and time
                 calendar.set(year, month, day, hour, minute);
 
-                // get picked calendar date
-                // Date date = calendar.getTime();
-                // format date to show only hours and minutes
-                // String newTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
-                // format date to show day of week, month, day, year
-                // String newDate = DateFormat.getDateInstance(DateFormat.FULL).format(date);
-//                Log.d(TAG, "time: " + newTime);
-//                Log.d(TAG, "date: " + newDate);
-
-                // create a new Visit with the user's picked date and time
+                // create a new Visit with the Calendar matching user's picked date and time
                 Visit updatedVisit = new Visit(calendar);
                 // update the original Visit by replacing it with the new one
                 updateSingleItem(pos, updatedVisit);
