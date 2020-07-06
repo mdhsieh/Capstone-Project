@@ -42,6 +42,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public static final String DELETE = "delete";
     public static final String SAVE = "save";
 
+    /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter position.
+     The visits list starts at position 1. */
+    private static final int NUM_VISIT_GROUPS = 1;
+
     // type of button clicked, which is either the save or delete button
     private String buttonType;
 
@@ -248,8 +252,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         visits.set(updateIndex, visit);
         // notify adapter that VisitGroup has changed
         // adapter.notifyItemChanged(0);
-        Log.d(TAG, "position notify changed: " + updateIndex + 1);
-        adapter.notifyItemChanged(updateIndex + 1);
+        Log.d(TAG, "position notify changed: " + updateIndex + NUM_VISIT_GROUPS);
+        // add 1 to get the correct index of the visits list, since the visits list
+        // starts at position 1 of the adapter
+        adapter.notifyItemChanged(updateIndex + NUM_VISIT_GROUPS);
 //        Log.d(TAG, "adapter size: " + adapter.getItemCount());
 
         // update last visit
@@ -391,6 +397,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // Calendar whose Date object will be converted to a readable date String and time String
         // initially set to the current date and time
         Calendar calendar = Calendar.getInstance();
+
+        // test updating time picker to current date and time
+        /*int yearField = calendar.get(Calendar.YEAR);
+        int monthField = calendar.get(Calendar.MONTH);
+        int dayField = calendar.get(Calendar.DAY_OF_MONTH);
+        datePicker.updateDate(yearField, monthField, dayField);
+        int hourField = calendar.get(Calendar.HOUR_OF_DAY);
+        timePicker.setCurrentHour(hourField);
+        int minuteField = calendar.get(Calendar.MINUTE);
+        timePicker.setCurrentMinute(minuteField);*/
+
 
         dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
             @Override
