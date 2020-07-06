@@ -137,7 +137,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 addVisitButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        insertSingleItem(new Visit(getCurrentDate(), getCurrentTime()));
+                        // object whose calendar fields have been initialized with the current date and time
+                        Calendar rightNow = Calendar.getInstance();
+                        insertSingleItem(new Visit(rightNow));
                     }
                 });
 
@@ -224,7 +226,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // show the date and time pickers
         // param is the clicked position so button click can update visit
-        showDateTimePicker(position);
+        showDateTimePicker(position, visit);
     }
 
     /** Insert an item into the RecyclerView
@@ -250,13 +252,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     private void updateSingleItem(int updateIndex, Visit visit) {
         // add visit
         visits.set(updateIndex, visit);
-        // notify adapter that VisitGroup has changed
-        // adapter.notifyItemChanged(0);
-        Log.d(TAG, "position notify changed: " + updateIndex + NUM_VISIT_GROUPS);
+        // notify adapter that visit at clicked position has changed
         // add 1 to get the correct index of the visits list, since the visits list
         // starts at position 1 of the adapter
         adapter.notifyItemChanged(updateIndex + NUM_VISIT_GROUPS);
-//        Log.d(TAG, "adapter size: " + adapter.getItemCount());
 
         // update last visit
         // need this method if the visit that was updated was the last visit
@@ -279,7 +278,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     // get the current week, month, and day as a single String
-    private String getCurrentDate() {
+    /*private String getCurrentDate() {
         String date = "";
         // object whose calendar fields have been initialized with the current date and time
         Calendar rightNow = Calendar.getInstance();
@@ -364,14 +363,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         date = week + ", " + month + " " + dayField + ", " + yearField;
 
         return date;
-    }
+    }*/
 
     // get the current hours and minutes as a single String
     /* Source:
 
     Dany Pop
     https://stackoverflow.com/questions/454315/how-to-format-date-and-time-in-android */
-    private String getCurrentTime() {
+    /*private String getCurrentTime() {
         String time = "";
         Calendar rightNow = Calendar.getInstance();
         // get current date
@@ -380,32 +379,49 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
 
         return time;
-    }
+    }*/
 
     /** Display the date and time picker layout so user can edit a clicked Visit's
      * date and time. Updates the Visit if the user clicks the set button.
      *
      * @param pos The position of the clicked Visit.
      */
-    private void showDateTimePicker(int pos) {
+    private void showDateTimePicker(int pos, Visit visit) {
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
         DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
         TimePicker timePicker = dialogView.findViewById(R.id.time_picker);
 
-        // Calendar whose Date object will be converted to a readable date String and time String
-        // initially set to the current date and time
-        Calendar calendar = Calendar.getInstance();
+        // update date and time pickers by setting them to current Visit's date and time
+        Calendar visitCalendar = visit.getCalendar();
+        int yearField = visitCalendar.get(Calendar.YEAR);
+        Log.d(TAG, "year: " + yearField);
+        int monthField = visitCalendar.get(Calendar.MONTH);
+        Log.d(TAG, "month: " + monthField);
+        int dayField = visitCalendar.get(Calendar.DAY_OF_MONTH);
+        Log.d(TAG, "day: " + dayField);
+        datePicker.updateDate(yearField, monthField, dayField);
+        int hourField = visitCalendar.get(Calendar.HOUR_OF_DAY);
+        Log.d(TAG, "hour: " + hourField);
+        timePicker.setCurrentHour(hourField);
+        int minuteField = visitCalendar.get(Calendar.MINUTE);
+        Log.d(TAG, "minute: " + minuteField);
+        timePicker.setCurrentMinute(minuteField);
 
-        // test updating time picker to current date and time
+        // test updating time picker by setting date and time pickers to current date and time
         /*int yearField = calendar.get(Calendar.YEAR);
+        Log.d(TAG, "year: " + yearField);
         int monthField = calendar.get(Calendar.MONTH);
+        Log.d(TAG, "month: " + monthField);
         int dayField = calendar.get(Calendar.DAY_OF_MONTH);
+        Log.d(TAG, "day: " + dayField);
         datePicker.updateDate(yearField, monthField, dayField);
         int hourField = calendar.get(Calendar.HOUR_OF_DAY);
+        Log.d(TAG, "hour: " + hourField);
         timePicker.setCurrentHour(hourField);
         int minuteField = calendar.get(Calendar.MINUTE);
+        Log.d(TAG, "minute: " + minuteField);
         timePicker.setCurrentMinute(minuteField);*/
 
 
@@ -424,22 +440,27 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 int minute = timePicker.getCurrentMinute();
 //                Log.d(TAG, "picked minute: " + minute);
 
+                // Calendar whose Date object will be converted to a readable date String and time String
+                // initially set to the current date and time
+                Calendar calendar = Calendar.getInstance();
+
                 // don't retain previous calendar field values from when Calendar was
                 // first initialized with getInstance()
                 calendar.clear();
                 // set Calendar to user's picked date and time
                 calendar.set(year, month, day, hour, minute);
+
                 // get picked calendar date
-                Date date = calendar.getTime();
+                // Date date = calendar.getTime();
                 // format date to show only hours and minutes
-                String newTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
+                // String newTime = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
                 // format date to show day of week, month, day, year
-                String newDate = DateFormat.getDateInstance(DateFormat.FULL).format(date);
-                Log.d(TAG, "time: " + newTime);
-                Log.d(TAG, "date: " + newDate);
+                // String newDate = DateFormat.getDateInstance(DateFormat.FULL).format(date);
+//                Log.d(TAG, "time: " + newTime);
+//                Log.d(TAG, "date: " + newDate);
 
                 // create a new Visit with the user's picked date and time
-                Visit updatedVisit = new Visit(newDate, newTime);
+                Visit updatedVisit = new Visit(calendar);
                 // update the original Visit by replacing it with the new one
                 updateSingleItem(pos, updatedVisit);
 
