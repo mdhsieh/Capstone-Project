@@ -137,6 +137,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     @Override
                     public void onClick(View view) {
 
+                        // alert dialog to confirm user wants to delete this place
                         new AlertDialog.Builder(DetailActivity.this)
                                 .setTitle(R.string.delete_place_title)
                                 .setMessage(R.string.delete_place_message)
@@ -236,18 +237,38 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     /** Update an item in the RecyclerView
+     *
+     * @param updateIndex The visit list index of the visit being updated
      * @param visit The visit being updated
      */
     private void updateSingleItem(int updateIndex, Visit visit) {
-        // add visit
+        // update visit
         visits.set(updateIndex, visit);
         // notify adapter that visit at clicked position has changed
-        // add 1 to get the correct index of the visits list, since the visits list
-        // starts at position 1 of the adapter
+        // add 1 to get the correct index relative to adapter,
+        // since the visits list starts at position 1 of the adapter
         adapter.notifyItemChanged(updateIndex + NUM_VISIT_GROUPS);
 
         // update last visit
         // need this method if the visit that was updated was the last visit
+        showOrHideLastVisit();
+    }
+
+    /** Delete an item from the RecyclerView
+     * @param removeIndex The visit list index of the visit being removed
+     */
+    private void removeSingleItem(int removeIndex) {
+        // remove visit
+        visits.remove(removeIndex);
+        // notify adapter that visit at clicked position has been removed
+        // add 1 to get the correct index relative to adapter, since the visits list
+        // starts at position 1 of the adapter
+        adapter.notifyItemRemoved(removeIndex + NUM_VISIT_GROUPS);
+        // decreased number of visits by 1, so
+        // display updated text
+        numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
+
+        // update last visit
         showOrHideLastVisit();
     }
 
@@ -267,8 +288,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
     /** Display the date and time picker layout so user can edit a clicked Visit's
      * date and time. Updates the Visit if the user clicks the set button.
+     * Deletes the Visit if the user clicks the delete visit button.
      *
-     * @param pos The position of the clicked Visit.
+     * @param pos The position of the clicked Visit. Used to update or delete the Visit.
+     * @param visit The visit that was clicked. Used to update the Visit.
      */
     private void showDateTimePicker(int pos, Visit visit) {
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
@@ -323,6 +346,32 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             @Override
             public void onClick(View view) {
                 alertDialog.dismiss();
+            }
+        });
+
+        // show confirmation dialog and delete visit if delete button clicked
+        dialogView.findViewById(R.id.btn_delete_visit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                new AlertDialog.Builder(DetailActivity.this)
+                        .setTitle(R.string.delete_visit_title)
+                        .setMessage(R.string.delete_visit_message)
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                removeSingleItem(pos);
+                                // dismiss date and time picker dialog
+                                alertDialog.dismiss();
+                            }
+                        })
+
+                        // A null listener allows the button to dismiss the dialog and take no further action.
+                        .setNegativeButton(android.R.string.no, null)
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
             }
         });
 
