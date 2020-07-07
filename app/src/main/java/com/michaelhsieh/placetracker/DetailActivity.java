@@ -290,7 +290,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         timePicker.setCurrentMinute(minuteField);
 
         // update Visit with user's picked date and time when set button clicked
-        dialogView.findViewById(R.id.date_time_set).setOnClickListener(new View.OnClickListener() {
+        dialogView.findViewById(R.id.btn_date_time_set).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -317,6 +317,15 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 alertDialog.dismiss();
             }});
+
+        // cancel dialog if cancel button clicked
+        dialogView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+
         alertDialog.setView(dialogView);
         alertDialog.show();
     }
