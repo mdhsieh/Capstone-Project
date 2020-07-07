@@ -166,6 +166,28 @@
             app:layout_constraintTop_toBottomOf="@+id/expanding_rv_visits" />
 
         <Button
+            android:id="@+id/btn_save"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/save"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_notes" />
+
+        <Button
+            android:id="@+id/btn_delete"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginEnd="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/delete"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/btn_save" />
+
+        <!--<Button
             android:id="@+id/btn_delete"
             style="@style/PrimaryButtonStyle"
             android:layout_marginTop="64dp"
@@ -185,7 +207,8 @@
             android:layout_marginBottom="16dp"
             android:text="@string/save"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/btn_delete" />
+            app:layout_constraintEnd_toStartOf="@+id/btn_delete" />-->
+
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
