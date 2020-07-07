@@ -72,6 +72,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
+        // display up button
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
+
         final EditText nameDisplay = findViewById(R.id.et_name);
         final EditText addressDisplay = findViewById(R.id.et_address);
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
