@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Scrollable date and time picker layout.-->
 <ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -24,6 +25,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/date_picker" />
 
+        <!--buttons to set visit to picked date and time or cancel picker dialog-->
         <LinearLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
@@ -68,6 +70,7 @@
 
         </LinearLayout>
 
+        <!--delete clicked visit button-->
         <Button
             android:id="@+id/btn_delete_visit"
             android:layout_width="match_parent"

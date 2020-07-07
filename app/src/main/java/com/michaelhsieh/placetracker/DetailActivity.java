@@ -39,7 +39,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public static final String DELETE = "delete";
     public static final String SAVE = "save";
 
-    /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter position.
+    /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
      The visits list starts at position 1. */
     private static final int NUM_VISIT_GROUPS = 1;
 
@@ -189,7 +189,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
-    /* to save the expand and collapse state of the adapter,
+    /* To save the expand and collapse state of the adapter,
     you have to explicitly call through to the adapter's
     onSaveInstanceState() and onRestoreInstanceState() in the calling Activity */
     @Override
@@ -227,7 +227,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         int insertIndex = place.getNumVisits();
         // add visit
         visits.add(insertIndex, visit);
-        adapter.notifyItemChanged(0);
+        // adapter.notifyItemChanged(0);
+        // notify adapter that visit has been added
+        // add 1 to get the correct adapter position of the visit,
+        // since the visits list starts at position 1 of the adapter
+        adapter.notifyItemInserted(insertIndex + NUM_VISIT_GROUPS);
         // increased number of visits by 1, so
         // display updated text
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
@@ -244,8 +248,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     private void updateSingleItem(int updateIndex, Visit visit) {
         // update visit
         visits.set(updateIndex, visit);
-        // notify adapter that visit at clicked position has changed
-        // add 1 to get the correct index relative to adapter,
+        // notify adapter that visit has changed
+        // add 1 to get the correct adapter position of the visit,
         // since the visits list starts at position 1 of the adapter
         adapter.notifyItemChanged(updateIndex + NUM_VISIT_GROUPS);
 
@@ -260,8 +264,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     private void removeSingleItem(int removeIndex) {
         // remove visit
         visits.remove(removeIndex);
-        // notify adapter that visit at clicked position has been removed
-        // add 1 to get the correct index relative to adapter, since the visits list
+        // notify adapter that visit has been removed
+        // add 1 to get the correct adapter position of the visit, since the visits list
         // starts at position 1 of the adapter
         adapter.notifyItemRemoved(removeIndex + NUM_VISIT_GROUPS);
         // decreased number of visits by 1, so
