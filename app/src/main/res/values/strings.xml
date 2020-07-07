@@ -26,7 +26,7 @@
     <!--used by place delete alert dialog-->
     <string name="delete_place_title">Delete place</string>
     <string name="delete_place_message">Are you sure you want to delete this place?</string>
-    <!--date time picker button-->
+    <!--date time picker buttons-->
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
     <string name="delete_visit">Delete Visit</string>

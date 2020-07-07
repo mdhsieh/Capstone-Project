@@ -17,7 +17,6 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -41,7 +40,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public static final String SAVE = "save";
 
     /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
-     The visits list starts at position 1. */
+    The visits list starts at position 1.
+
+    Need to get a clicked visit's adapter position - 1 to get the visit's list position.
+    For example first visit is at adapter position 1 but visit list position 0.
+    The visit list position is used as a parameter to update, delete, and add visits.
+
+    Need to get visit's list position + 1 to get the visit's adapter position.
+    The adapter position is used to notify the adapter of changes to the visit list.*/
     private static final int NUM_VISIT_GROUPS = 1;
 
     // type of button clicked, which is either the save or delete button
@@ -209,25 +215,23 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
-    // called whenever a visit in the list is clicked
-    // position param is the adapter position of the Visit clicked, calculated by getAdapterPosition()
+    /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
+     *
+     * @param view The View displaying this visit's date and time
+     * @param position The adapter position of the Visit clicked, calculated by getAdapterPosition()
+     */
     @Override
     public void onItemClick(View view, int position) {
-        // Visit visit = visits.get(position);
-
         /* Subtract by 1 to get the correct visit list position of the Visit clicked.
          * Since position 0 is already occupied by the VisitGroup parent, the first Visit
-         * is really at adapter position 1.
+         * is at adapter position 1.
          * Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
         int positionInVisitList = position - NUM_VISIT_GROUPS;
 
         Visit visit = visits.get(positionInVisitList);
-        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + positionInVisitList, Toast.LENGTH_LONG).show();
 
-        // Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // show the date and time pickers
         // param is the clicked position so button click can update visit
-        // showDateTimePicker(position, visit);
         showDateTimePicker(positionInVisitList, visit);
     }
 
@@ -239,7 +243,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         int insertIndex = place.getNumVisits();
         // add visit
         visits.add(insertIndex, visit);
-        // adapter.notifyItemChanged(0);
         // notify adapter that visit has been added
         // add 1 to get the correct adapter position of the visit,
         // since the visit list starts at position 1 of the adapter
@@ -302,11 +305,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             lastVisitDisplay.setText(lastVisitString);
         }
     }
-    /** Display the date and time picker layout so user can edit a clicked Visit's
+    /** Display the date and time picker dialog so user can edit a clicked Visit's
      * date and time. Updates the Visit if the user clicks the set button.
      * Deletes the Visit if the user clicks the delete visit button.
      *
-     * @param pos The position of the clicked Visit. Used to update or delete the Visit.
+     * @param pos The visit list position of the clicked Visit. Used to update or delete the Visit.
      * @param visit The visit that was clicked. Used to update the Visit.
      */
     private void showDateTimePicker(int pos, Visit visit) {

@@ -18,10 +18,6 @@ import static android.view.animation.Animation.RELATIVE_TO_SELF;
 
 public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupAdapter.VisitGroupViewHolder, VisitGroupAdapter.VisitViewHolder> {
 
-    /* There's only one parent, which is at position 0 of the adapter position.
-    * Its first child will be at position 1. */
-    // private static final int NUM_VISIT_GROUPS = 1;
-
     private VisitItemClickListener clickListener;
 
     public VisitGroupAdapter(List<? extends ExpandableGroup> groups) {
@@ -90,7 +86,6 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
         public void onClick(View view) {
             if (clickListener != null) {
                 clickListener.onItemClick(view, getAdapterPosition());
-//                clickListener.onItemClick(view, getAdapterPosition() - NUM_VISIT_GROUPS);
             }
         }
     }
