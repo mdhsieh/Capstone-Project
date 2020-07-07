@@ -17,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -209,14 +210,25 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     // called whenever a visit in the list is clicked
-    // position param is the position of the Visit clicked, calculated by getAdapterPosition() - 1
+    // position param is the adapter position of the Visit clicked, calculated by getAdapterPosition()
     @Override
     public void onItemClick(View view, int position) {
-        Visit visit = visits.get(position);
+        // Visit visit = visits.get(position);
+
+        /* Subtract by 1 to get the correct visit list position of the Visit clicked.
+         * Since position 0 is already occupied by the VisitGroup parent, the first Visit
+         * is really at adapter position 1.
+         * Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
+        int positionInVisitList = position - NUM_VISIT_GROUPS;
+
+        Visit visit = visits.get(positionInVisitList);
+        Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + positionInVisitList, Toast.LENGTH_LONG).show();
+
         // Toast.makeText(this, "You clicked " + visit.getDate() + ", " + visit.getTime() + " on row number " + position, Toast.LENGTH_SHORT).show();
         // show the date and time pickers
         // param is the clicked position so button click can update visit
-        showDateTimePicker(position, visit);
+        // showDateTimePicker(position, visit);
+        showDateTimePicker(positionInVisitList, visit);
     }
 
     /** Insert an item into the RecyclerView
@@ -230,7 +242,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // adapter.notifyItemChanged(0);
         // notify adapter that visit has been added
         // add 1 to get the correct adapter position of the visit,
-        // since the visits list starts at position 1 of the adapter
+        // since the visit list starts at position 1 of the adapter
         adapter.notifyItemInserted(insertIndex + NUM_VISIT_GROUPS);
         // increased number of visits by 1, so
         // display updated text
@@ -250,7 +262,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         visits.set(updateIndex, visit);
         // notify adapter that visit has changed
         // add 1 to get the correct adapter position of the visit,
-        // since the visits list starts at position 1 of the adapter
+        // since the visit list starts at position 1 of the adapter
         adapter.notifyItemChanged(updateIndex + NUM_VISIT_GROUPS);
 
         // update last visit
@@ -265,7 +277,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // remove visit
         visits.remove(removeIndex);
         // notify adapter that visit has been removed
-        // add 1 to get the correct adapter position of the visit, since the visits list
+        // add 1 to get the correct adapter position of the visit, since the visit list
         // starts at position 1 of the adapter
         adapter.notifyItemRemoved(removeIndex + NUM_VISIT_GROUPS);
         // decreased number of visits by 1, so

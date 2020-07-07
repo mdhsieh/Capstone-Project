@@ -20,7 +20,7 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
 
     /* There's only one parent, which is at position 0 of the adapter position.
     * Its first child will be at position 1. */
-    private static final int NUM_VISIT_GROUPS = 1;
+    // private static final int NUM_VISIT_GROUPS = 1;
 
     private VisitItemClickListener clickListener;
 
@@ -89,11 +89,8 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
         @Override
         public void onClick(View view) {
             if (clickListener != null) {
-                /* Subtract by 1 to get the correct adapter position of the Visit clicked.
-                * Since position 0 is already occupied by the VisitGroup parent, the first Visit
-                * is really at adapter position 1.
-                * Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
-                clickListener.onItemClick(view, getAdapterPosition() - NUM_VISIT_GROUPS);
+                clickListener.onItemClick(view, getAdapterPosition());
+//                clickListener.onItemClick(view, getAdapterPosition() - NUM_VISIT_GROUPS);
             }
         }
     }
