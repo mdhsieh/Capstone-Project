@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkCapabilities;
@@ -25,15 +26,19 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.net.FetchPhotoRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -67,6 +72,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private int clickedPlacePos = -1;
 
     private PlaceViewModel placeViewModel;
+
+    // list of selected place photos
+    List<Bitmap> bitmaps;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,7 +149,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 getSupportFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
         // Specify the types of place data to return.
-        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS));
+        autocompleteFragment.setPlaceFields(Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS));
 
         // Set up a PlaceSelectionListener to handle the response.
         autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
@@ -155,6 +163,20 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 PlaceModel newPlace = new PlaceModel(id, name, address);
 //                Log.i(TAG, "Place: " + name + ", " + id);
 //                Log.i(TAG, "Place address: " + address);
+
+
+                // Get the photo metadata.
+                final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
+                // initialize bitmap list to empty list
+                bitmaps = new ArrayList<>();
+                if (metadata == null || metadata.isEmpty()) {
+                    Log.v(TAG, "No photo metadata.");
+                } else {
+                    // get the first photo as a Bitmap and add to place bitmap list
+                    final PhotoMetadata photoMetadata = metadata.get(0);
+                    fetchPhoto(placesClient, newPlace, photoMetadata);
+                }
+
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
@@ -300,5 +322,32 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             }
         }
         return false;
+    }
+
+
+    private void fetchPhoto(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
+        // Get the attribution text.
+        final String attributions = photoMetadata.getAttributions();
+        Log.d(TAG, "attributions: " + attributions);
+
+        // Create a FetchPhotoRequest.
+        final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+//                .setMaxWidth(500) // Optional.
+//                .setMaxHeight(300) // Optional.
+                .build();
+        placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+            Bitmap bitmap = fetchPhotoResponse.getBitmap();
+//            imageView.setImageBitmap(bitmap);
+            bitmaps.add(bitmap);
+            placeModel.setBitmaps(bitmaps);
+            Log.d(TAG, "added first bitmap and set bitmap list");
+        }).addOnFailureListener((exception) -> {
+            if (exception instanceof ApiException) {
+                final ApiException apiException = (ApiException) exception;
+                Log.e(TAG, "Place not found: " + exception.getMessage());
+                final int statusCode = apiException.getStatusCode();
+                // TODO: Handle error with given status code.
+            }
+        });
     }
 }

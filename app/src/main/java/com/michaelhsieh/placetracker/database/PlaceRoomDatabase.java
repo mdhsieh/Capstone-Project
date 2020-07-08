@@ -2,6 +2,7 @@ package com.michaelhsieh.placetracker.database;
 
 import android.content.Context;
 
+import com.michaelhsieh.placetracker.BitmapTypeConverter;
 import com.michaelhsieh.placetracker.VisitTypeConverter;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -14,7 +15,7 @@ import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 
 @Database(entities = {PlaceModel.class}, version = 1, exportSchema = false)
-@TypeConverters({VisitTypeConverter.class})
+@TypeConverters({VisitTypeConverter.class, BitmapTypeConverter.class})
 public abstract class PlaceRoomDatabase extends RoomDatabase {
     public abstract PlaceDao placeDao();
 

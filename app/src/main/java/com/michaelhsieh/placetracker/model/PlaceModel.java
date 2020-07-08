@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker.model;
 
+import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -39,12 +40,16 @@ public class PlaceModel implements Parcelable {
     // initialize visits
     private List<Visit> visits = new ArrayList<>();
 
+    // photo metadata is used to get photos of the place as Bitmaps
+    private List<Bitmap> bitmaps = new ArrayList<>();
+
     public PlaceModel(String placeId, String name, String address) {
         this.placeId = placeId;
         this.name = name;
         this.address = address;
     }
 
+    // Room requires all fields to have getters and setters
     public String getPlaceId() {
         return placeId;
     }
@@ -69,6 +74,10 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
+    public List<Bitmap> getBitmaps() {
+        return bitmaps;
+    }
+
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
     }
@@ -89,6 +98,10 @@ public class PlaceModel implements Parcelable {
         this.visits = visits;
     }
 
+    public void setBitmaps(List<Bitmap> bitmaps) {
+        this.bitmaps = bitmaps;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {
@@ -103,6 +116,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(address);
         out.writeList(visits);
         out.writeString(notes);
+        out.writeList(bitmaps);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -126,5 +140,6 @@ public class PlaceModel implements Parcelable {
         address = in.readString();
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
+        in.readList(bitmaps, Bitmap.class.getClassLoader());
     }
 }
