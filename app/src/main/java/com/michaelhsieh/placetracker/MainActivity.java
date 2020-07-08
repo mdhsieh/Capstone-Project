@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_manual:
-                Toast.makeText(this, "add manual place item selected", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "add a place manually selected", Toast.LENGTH_LONG).show();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
