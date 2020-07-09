@@ -161,17 +161,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 String address = place.getAddress();
 
                 PlaceModel newPlace = new PlaceModel(id, name, address);
-//                Log.i(TAG, "Place: " + name + ", " + id);
-//                Log.i(TAG, "Place address: " + address);
-
 
                 // Get the photo metadata.
                 final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
                 // initialize bitmap list to empty list or
                 // clear the bitmap list if a different place was previously selected
-                if (bitmaps != null && bitmaps.size() > 0) {
-                    Log.d(TAG, "existing bitmaps list will be cleared");
-                }
+//                if (bitmaps != null && bitmaps.size() > 0) {
+//                    Log.d(TAG, "existing bitmaps list will be cleared");
+//                }
                 Log.d(TAG, "created new bitmap ArrayList");
                 bitmaps = new ArrayList<>();
                 if (metadata == null || metadata.isEmpty()) {
@@ -212,7 +209,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_manual:
-                Toast.makeText(this, "add a place manually selected", Toast.LENGTH_LONG).show();
+                // Toast.makeText(this, "add a place manually selected", Toast.LENGTH_LONG).show();
+                // start ManualPlaceDetailsActivity
+                Intent intent = new Intent(this, ManualPlaceDetailActivity.class);
+                startActivity(intent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -338,12 +338,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-//                .setMaxWidth(500) // Optional.
-//                .setMaxHeight(300) // Optional.
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
-//            imageView.setImageBitmap(bitmap);
             bitmaps.add(bitmap);
             placeModel.setBitmaps(bitmaps);
             Log.d(TAG, "added first bitmap and set bitmap list");

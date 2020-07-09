@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Scrollable manual place details screen.-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ManualPlaceDetailActivity">
+
+    <!--Don't make EditText focusable on startup and
+    don't show virtual keyboard by
+    adding descendantFocusability and
+    focusableInTouchMode properties-->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true">
+
+        <TextView
+            android:id="@+id/tv_label_manual_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/name_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_manual_name"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_label_manual_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/address_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_manual_address"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_label_manual_num_visits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/num_visits_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/tv_manual_num_visits"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/et_manual_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autofillHints="@string/name_hint"
+            android:ems="10"
+            android:hint="@string/name_hint"
+            android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_manual_name"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/et_manual_address"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS"
+            android:ems="10"
+            android:hint="@string/address_hint"
+            android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_manual_address"
+            app:layout_constraintTop_toBottomOf="@+id/et_manual_name" />
+
+        <TextView
+            android:id="@+id/tv_manual_num_visits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/btn_manual_add_visit"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_manual_num_visits"
+            tools:text="0" />
+
+        <Button
+            android:id="@+id/btn_manual_add_visit"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginStart="32dp"
+            android:layout_marginLeft="32dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/add_visit"
+            app:layout_constraintStart_toEndOf="@+id/tv_manual_num_visits"
+            app:layout_constraintTop_toBottomOf="@+id/et_manual_address" />
+
+        <TextView
+            android:id="@+id/tv_label_manual_last_visit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/last_visit"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/tv_manual_last_visit"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_manual_last_visit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:textSize="18sp"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_manual_last_visit"
+            app:layout_constraintTop_toBottomOf="@+id/btn_manual_add_visit"
+            tools:text="Tuesday, June 30, 2020 at 11:00 am" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/expanding_rv_manual_visits"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginTop="24dp"
+            app:layout_constraintTop_toBottomOf="@+id/tv_manual_last_visit"
+            tools:layout_editor_absoluteX="0dp" />
+
+        <TextView
+            android:id="@+id/tv_label_manual_notes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:text="@string/notes_label"
+            android:textSize="18sp"
+            app:layout_constraintBaseline_toBaselineOf="@+id/et_manual_notes"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/et_manual_notes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:autofillHints=""
+            android:ems="10"
+            android:gravity="start|top"
+            android:hint="@string/notes_hint"
+            android:inputType="textMultiLine"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/tv_label_manual_notes"
+            app:layout_constraintTop_toBottomOf="@+id/expanding_rv_manual_visits" />
+
+        <Button
+            android:id="@+id/btn_manual_add_place"
+            style="@style/PrimaryButtonStyle"
+            android:layout_marginTop="64dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="@string/add"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_manual_notes" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
