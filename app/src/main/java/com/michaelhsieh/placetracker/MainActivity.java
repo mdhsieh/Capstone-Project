@@ -18,6 +18,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,6 +39,7 @@ import com.google.android.libraries.places.widget.listener.PlaceSelectionListene
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,8 +75,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private PlaceViewModel placeViewModel;
 
-    // list of selected place photos
-    List<Bitmap> bitmaps;
+    // list of selected place photos encoded as Base64 Strings
+    List<String> base64Images;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,26 +166,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // Get the photo metadata.
                 final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
-                // initialize bitmap list to empty list or
-                // clear the bitmap list if a different place was previously selected
-//                if (bitmaps != null && bitmaps.size() > 0) {
-//                    Log.d(TAG, "existing bitmaps list will be cleared");
-//                }
-                Log.d(TAG, "created new bitmap ArrayList");
-                bitmaps = new ArrayList<>();
+                // initialize base64 String list to empty list or
+                // clear the list if a different place was previously selected
+                Log.d(TAG, "created new base64 String ArrayList");
+                base64Images = new ArrayList<>();
                 if (metadata == null || metadata.isEmpty()) {
                     Log.v(TAG, "No photo metadata.");
                 } else {
-                    // get the first photo as a Bitmap and add to place bitmap list
+                    // get the first photo as a Bitmap encoded as Base64 String
+                    // and add to place base64 String list
                     final PhotoMetadata photoMetadata = metadata.get(0);
-                    fetchPhoto(placesClient, newPlace, photoMetadata);
+                    fetchPhotoAndUpdatePlace(placesClient, newPlace, photoMetadata);
                 }
-
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
-                    Log.d(TAG, "place model has empty bitmaps list? " + newPlace.getBitmaps().isEmpty());
+                    Log.d(TAG, "place model has empty base64 String list? " + newPlace.getBase64Strings().isEmpty());
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
@@ -331,25 +330,50 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     }
 
 
-    private void fetchPhoto(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
+    private void fetchPhotoAndUpdatePlace(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         Log.d(TAG, "attributions: " + attributions);
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
+                .setMaxWidth(500) // Optional.
+                .setMaxHeight(300) // Optional.
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
-            bitmaps.add(bitmap);
-            placeModel.setBitmaps(bitmaps);
-            Log.d(TAG, "added first bitmap and set bitmap list");
+
+            // convert bitmap to Base64 String
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
+            byte[] bai = baos.toByteArray();
+
+            String base64Image = Base64.encodeToString(bai, Base64.DEFAULT);
+
+            base64Images.add(base64Image);
+            placeModel.setBase64Strings(base64Images);
+            Log.d(TAG, "added first base64 String and set base64String list");
+            Log.d(TAG, "base64 String: " + base64Image);
+            // Log.d(TAG, "base64String list: " + base64Images);
+
+            placeViewModel.update(placeModel);
+            Log.d(TAG, "updated selected place");
+
+            /*if (isPlaceInList(placeModel)) {
+                    Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
+            } else {
+                Log.d(TAG, "place model has empty bitmaps list? " + placeModel.getBitmaps().isEmpty());
+                // insert place into the database
+                placeViewModel.insert(placeModel);
+                // Observer's onChanged() method updates the adapter
+            }*/
+
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 final ApiException apiException = (ApiException) exception;
                 Log.e(TAG, "Place not found: " + exception.getMessage());
                 final int statusCode = apiException.getStatusCode();
-                // TODO: Handle error with given status code.
+                Log.e(TAG, "Status code: " + statusCode);
             }
         });
     }

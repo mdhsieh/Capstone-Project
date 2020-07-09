@@ -1,6 +1,5 @@
 package com.michaelhsieh.placetracker.model;
 
-import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -40,8 +39,10 @@ public class PlaceModel implements Parcelable {
     // initialize visits
     private List<Visit> visits = new ArrayList<>();
 
-    // photo metadata is used to get photos of the place as Bitmaps
-    private List<Bitmap> bitmaps = new ArrayList<>();
+    /* Photos of the place are Bitmaps, but store each Bitmap as a Base64 String
+       in Room database to avoid transferring too much
+       data, ex. large Bitmaps, and causing TransactionTooLarge exception */
+    private List<String> base64Strings = new ArrayList<>();
 
     public PlaceModel(String placeId, String name, String address) {
         this.placeId = placeId;
@@ -74,8 +75,8 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
-    public List<Bitmap> getBitmaps() {
-        return bitmaps;
+    public List<String> getBase64Strings() {
+        return base64Strings;
     }
 
     public void setPlaceId(String placeId) {
@@ -98,8 +99,8 @@ public class PlaceModel implements Parcelable {
         this.visits = visits;
     }
 
-    public void setBitmaps(List<Bitmap> bitmaps) {
-        this.bitmaps = bitmaps;
+    public void setBase64Strings(List<String> base64Strings) {
+        this.base64Strings = base64Strings;
     }
 
     /* everything below here is for implementing Parcelable */
@@ -116,7 +117,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(address);
         out.writeList(visits);
         out.writeString(notes);
-        out.writeList(bitmaps);
+        out.writeList(base64Strings);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -140,6 +141,6 @@ public class PlaceModel implements Parcelable {
         address = in.readString();
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
-        in.readList(bitmaps, Bitmap.class.getClassLoader());
+        in.readList(base64Strings, String.class.getClassLoader());
     }
 }

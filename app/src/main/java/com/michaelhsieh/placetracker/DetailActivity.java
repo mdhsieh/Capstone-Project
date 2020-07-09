@@ -10,7 +10,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -141,13 +143,23 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 recyclerView.setAdapter(adapter);
 
                 // test display bitmap photo if available
-                List<Bitmap> bitmaps = place.getBitmaps();
-                if (bitmaps != null && !bitmaps.isEmpty()) {
+                List<String> base64Strings = place.getBase64Strings();
+                if (base64Strings != null && !base64Strings.isEmpty()) {
                     Log.d(TAG, "bitmap available");
+
+                    String base64Image = base64Strings.get(0);
+
+                    // decode Base64 String to bitmap
+                    byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
+                    Bitmap bitmap;
+                    BitmapFactory.Options opt = new BitmapFactory.Options();
+                    opt.inMutable = true;
+                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
+
                     photo.setVisibility(View.VISIBLE);
-                    photo.setImageBitmap(bitmaps.get(0));
+                    photo.setImageBitmap(bitmap);
                 } else {
-                    Log.d(TAG, "bitmaps is: " + bitmaps);
+                    Log.d(TAG, "base64Strings is: " + base64Strings);
                     photo.setVisibility(View.GONE);
                 }
 
