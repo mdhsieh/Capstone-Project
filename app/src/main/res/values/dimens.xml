@@ -3,4 +3,5 @@
     <dimen name="list_item_height">48dp</dimen>
     <dimen name="horizontal_margin">8dp</dimen>
     <dimen name="list_item_left_margin">32dp</dimen>
+    <dimen name="photo_height">300dp</dimen>
 </resources>

@@ -9,12 +9,14 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -67,6 +69,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     TextView lastVisitLabel;
     TextView lastVisitDisplay;
 
+    // test ImageView to display place's first photo
+    ImageView photo;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,6 +88,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
         final EditText notesDisplay = findViewById(R.id.et_notes);
+
+        photo = findViewById(R.id.iv_photo);
 
         // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
@@ -132,6 +139,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // set the click listener for clicks on individual visits
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
+
+                // test display bitmap photo if available
+                List<Bitmap> bitmaps = place.getBitmaps();
+                if (bitmaps != null && !bitmaps.isEmpty()) {
+                    Log.d(TAG, "bitmap available");
+                    photo.setVisibility(View.VISIBLE);
+                    photo.setImageBitmap(bitmaps.get(0));
+                } else {
+                    Log.d(TAG, "bitmaps is: " + bitmaps);
+                    photo.setVisibility(View.GONE);
+                }
 
                 // add visit when the add visit button is clicked
                 Button addVisitButton = findViewById(R.id.btn_add_visit);

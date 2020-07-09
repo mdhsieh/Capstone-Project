@@ -103,7 +103,9 @@
             android:layout_marginTop="24dp"
             android:text="@string/add_visit"
             app:layout_constraintStart_toEndOf="@+id/tv_num_visits"
-            app:layout_constraintTop_toBottomOf="@+id/et_address" />
+            app:layout_constraintTop_toBottomOf="@+id/iv_photo" />
+
+        <!--app:layout_constraintTop_toBottomOf="@+id/et_address"-->
 
         <TextView
             android:id="@+id/tv_label_last_visit"
@@ -186,6 +188,16 @@
             android:text="@string/delete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_save" />
+
+        <ImageView
+            android:id="@+id/iv_photo"
+            android:layout_width="@dimen/photo_height"
+            android:layout_height="@dimen/photo_height"
+            android:layout_marginTop="24dp"
+            android:contentDescription="@string/desc_place_photo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/et_address"
+            app:srcCompat="@android:drawable/picture_frame" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

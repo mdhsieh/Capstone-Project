@@ -167,7 +167,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // Get the photo metadata.
                 final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
-                // initialize bitmap list to empty list
+                // initialize bitmap list to empty list or
+                // clear the bitmap list if a different place was previously selected
+                if (bitmaps != null && bitmaps.size() > 0) {
+                    Log.d(TAG, "existing bitmaps list will be cleared");
+                }
+                Log.d(TAG, "created new bitmap ArrayList");
                 bitmaps = new ArrayList<>();
                 if (metadata == null || metadata.isEmpty()) {
                     Log.v(TAG, "No photo metadata.");
@@ -181,6 +186,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
+                    Log.d(TAG, "place model has empty bitmaps list? " + newPlace.getBitmaps().isEmpty());
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
