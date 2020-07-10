@@ -156,6 +156,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     Log.d(TAG, "bitmaps available");
 
                     int base64StringsSize = base64Strings.size();
+                    Log.d(TAG, "size of base64 list: " + base64StringsSize);
                     for (int i = 0; i < base64StringsSize && i < MAX_NUM_PHOTOS; i++) {
                         String base64Image = base64Strings.get(i);
 
@@ -166,11 +167,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         opt.inMutable = true;
                         bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
                         bitmaps.add(decodeBitmapToBase64String(base64Image));
+                        Log.d(TAG, "added bitmap decoded from base64 String");
                     }
 
                     photo.setVisibility(View.VISIBLE);
                     photo.setImageBitmap(bitmaps.get(0));
                     if (base64StringsSize >= 2) {
+                        Log.d(TAG, "photo 2 visible");
                         photo2.setVisibility(View.VISIBLE);
                         photo.setImageBitmap(bitmaps.get(1));
                     } else {

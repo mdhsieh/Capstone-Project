@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
 
     // max number of photos a selected place can display
-    public static final int MAX_NUM_PHOTOS = 3;
+    public static final int MAX_NUM_PHOTOS = 2;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // list of selected place photos encoded as Base64 Strings
     List<String> base64Images;
+
+    // int to update selected place once last photo has been fetched
+    private int photoCounter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,7 +179,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 if (metadata == null || metadata.isEmpty()) {
                     Log.v(TAG, "No photo metadata.");
                 } else {
-//                    boolean isLastPhoto = false;
+                    // fetched photo counter set to 0
+                    // updates selected place after last photo has been fetched
+                    photoCounter = 0;
                     for (int i = 0; i < metadata.size() && i <  MAX_NUM_PHOTOS; i++) {
                         // get the photo's metadata,
                         // which will be used to get a bitmap and attribution text
@@ -184,12 +189,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         /* This method uses fetchPhoto(), an asynchronous method.
                         The method will finish after the place has already been inserted, so
                         update the place once all photos have been fetched. */
-                        if (i == metadata.size() - 1 || i == MAX_NUM_PHOTOS - 1) {
-                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata, true);
-                            break;
-                        } else {
-                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata, false);
-                        }
+                        fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata, metadata.size());
                     }
                 }
 
@@ -352,11 +352,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      * @param placeModel The selected place
      * @param photoMetadata The photo metadata of a place, used to get a single photo's
      *                      Bitmap and attribution text
-     * @param isLastPhoto True if this photo metadata contains the
-     *                    last photo that will be displayed, false otherwise.
-     *                    Used to avoid updating the place too frequently.
+     * @param metadataSize The size of the List of photo metadata. Used to
+     *                     update the selected place once the last photo has been fetched and
+     *                     added as a Base64 Sting
      */
-    private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata, boolean isLastPhoto) {
+    private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata, int metadataSize) {
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         Log.d(TAG, "attributions: " + attributions);
@@ -383,20 +383,26 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
             base64Images.add(base64Image);
             Log.d(TAG, "added base64 String");
-            // placeModel.setBase64Strings(base64Images);
-            // Log.d(TAG, "set base64String list");
-            Log.d(TAG, "is last photo? " + isLastPhoto);
+
+//            placeModel.setBase64Strings(base64Images);
+//            Log.d(TAG, "set base64String list");
 //            Log.d(TAG, "added base64 String and set base64String list");
             // Log.d(TAG, "base64 String: " + base64Image);
             // Log.d(TAG, "base64String list: " + base64Images);
 
             // update the selected place with the list of Base64 Strings
-            if (isLastPhoto) {
+            if (photoCounter == metadataSize - 1 || photoCounter == MAX_NUM_PHOTOS - 1) {
+                Log.d(TAG, "last photo counter is: " + photoCounter);
                 placeModel.setBase64Strings(base64Images);
                 Log.d(TAG, "set base64String list");
+                Log.d(TAG, "size of base64 list is: " + placeModel.getBase64Strings().size());
                 placeViewModel.update(placeModel);
                 Log.d(TAG, "updated selected place");
             }
+
+            // finished fetching this photo
+            incrementPhotoCounter();
+            Log.d(TAG, "photo counter is: " + photoCounter);
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -418,5 +424,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
         byte[] byteArrayInput = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArrayInput, Base64.DEFAULT);
+    }
+
+    private void incrementPhotoCounter() {
+        photoCounter += 1;
     }
 }
