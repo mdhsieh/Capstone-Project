@@ -162,17 +162,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // Get the photo metadata.
                 final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
-                /*if (metadata == null || metadata.isEmpty()) {
-                    Log.v(TAG, "No photo metadata.");
-                } else {
-                    // get the photo's metadata,
-                    // which will be used to get a bitmap and attribution text
-                    final PhotoMetadata photoMetadata = metadata.get(0);
-                    *//* This method uses fetchPhoto(), an asynchronous method.
-                    The method will finish after the place has already been inserted, so
-                    update the place once all photos have been fetched. *//*
-                    fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata);
-                }*/
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
@@ -358,28 +347,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
                 .setMaxWidth(500)
                 .setMaxHeight(300)
-                // .setMaxWidth(300)
-                // .setMaxHeight(100)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
             // convert bitmap to Base64 String
-            /*ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
-            byte[] bai = baos.toByteArray();
-
-            String base64Image = Base64.encodeToString(bai, Base64.DEFAULT);*/
-
-            // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
             // update the selected place with the Base64 String
             placeModel.setBase64String(base64Image);
-            Log.d(TAG, "set base64String");
             placeViewModel.update(placeModel);
-            Log.d(TAG, "updated selected place");
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -391,7 +369,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         });
     }
 
-    /** Encode Bitmap to Base64 String
+    /** Encode Bitmap to Base64 String.
      *
      * @param bitmap The Bitmap to be encoded into a String
      * @return A String that's in Base64 format. Used to store Bitmap into Room database

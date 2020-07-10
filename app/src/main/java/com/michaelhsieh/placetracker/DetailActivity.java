@@ -146,23 +146,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // display bitmap photo if available
                 String base64String = place.getBase64String();
                 if (base64String != null && !base64String.isEmpty()) {
-                    Log.d(TAG, "bitmap available");
-
-                    // decode Base64 String to bitmap
-                    /*byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
-                    Bitmap bitmap;
-                    BitmapFactory.Options opt = new BitmapFactory.Options();
-                    opt.inMutable = true;
-                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
-
                     // decode Base64 String to bitmap
                     Bitmap bitmap = decodeBitmapToBase64String(base64String);
-                    Log.d(TAG, "bitmap decoded from base64 String");
 
                     photo.setVisibility(View.VISIBLE);
                     photo.setImageBitmap(bitmap);
                 } else {
-                    Log.d(TAG, "base64String is: " + base64String);
+                    Log.v(TAG, "base64String is: " + base64String);
                     photo.setVisibility(View.GONE);
                 }
 

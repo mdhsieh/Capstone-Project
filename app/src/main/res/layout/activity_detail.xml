@@ -187,40 +187,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_save" />
 
-        <!--<HorizontalScrollView
-            android:id="@+id/scroll_view_images"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/et_address">
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-                <ImageView
-                    android:id="@+id/iv_photo"
-                    android:layout_width="@dimen/photo_height"
-                    android:layout_height="@dimen/photo_height"
-                    android:contentDescription="@string/desc_place_photo"
-                    tools:srcCompat="@android:drawable/picture_frame"/>
-
-                <ImageView
-                    android:id="@+id/iv_photo2"
-                    android:layout_width="@dimen/photo_height"
-                    android:layout_height="@dimen/photo_height"
-                    android:contentDescription="@string/desc_place_photo_2"
-                    tools:srcCompat="@android:drawable/picture_frame" />
-
-                <ImageView
-                    android:id="@+id/iv_photo3"
-                    android:layout_width="@dimen/photo_height"
-                    android:layout_height="@dimen/photo_height"
-                    tools:srcCompat="@android:drawable/picture_frame"
-                    android:contentDescription="@string/desc_place_photo_3" />
-            </LinearLayout>
-        </HorizontalScrollView>-->
-
         <ImageView
             android:id="@+id/iv_photo"
             android:layout_width="@dimen/photo_height"
