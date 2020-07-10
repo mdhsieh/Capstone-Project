@@ -103,7 +103,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/add_visit"
             app:layout_constraintStart_toEndOf="@+id/tv_num_visits"
-            app:layout_constraintTop_toBottomOf="@+id/iv_photo" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_attributions" />
 
         <TextView
             android:id="@+id/tv_label_last_visit"
@@ -198,6 +198,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_address"
             tools:srcCompat="@android:drawable/picture_frame" />
+
+        <TextView
+            android:id="@+id/tv_attributions"
+            android:layout_width="@dimen/photo_height"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            tools:text="Attributions"
+            android:textSize="14sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_photo" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

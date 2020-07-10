@@ -11,7 +11,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
@@ -73,6 +75,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     // ImageViews to display place's photos
     ImageView photo;
+    // TextView to display photo's attributions text
+    TextView attributionsText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +97,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         // find ImageView that display photo
         photo = findViewById(R.id.iv_photo);
+        // fine TextView that displays attribution text
+        attributionsText = findViewById(R.id.tv_attributions);
 
         // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
@@ -145,15 +151,32 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 // display bitmap photo if available
                 String base64String = place.getBase64String();
+                // display photo's attribution text if available
+                String attributions = place.getAttributions();
                 if (base64String != null && !base64String.isEmpty()) {
                     // decode Base64 String to bitmap
-                    Bitmap bitmap = decodeBitmapToBase64String(base64String);
+                    Bitmap bitmap = decodeBase64StringToBitmap(base64String);
 
                     photo.setVisibility(View.VISIBLE);
                     photo.setImageBitmap(bitmap);
+
+                    // make attributions text visible and display
+                    if (attributions != null && !attributions.isEmpty()) {
+                        attributionsText.setVisibility(View.VISIBLE);
+                        // setText(Html.fromHtml(bodyData)) is deprecated after api 24
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            attributionsText.setText(Html.fromHtml(attributions, Html.FROM_HTML_MODE_COMPACT));
+                        } else {
+                            attributionsText.setText(Html.fromHtml(attributions));
+                        }
+                    } else {
+                        Log.v(TAG, "attributions is: " + attributions);
+                        attributionsText.setVisibility(View.GONE);
+                    }
                 } else {
                     Log.v(TAG, "base64String is: " + base64String);
                     photo.setVisibility(View.GONE);
+                    attributionsText.setVisibility(View.GONE);
                 }
 
                 // add visit when the add visit button is clicked
@@ -431,7 +454,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      * @param base64Image The Base64 String to be decoded into a Bitmap
      * @return A Bitmap
      */
-    private Bitmap decodeBitmapToBase64String(String base64Image) {
+    private Bitmap decodeBase64StringToBitmap(String base64Image) {
         byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
         Bitmap bitmap;
         BitmapFactory.Options opt = new BitmapFactory.Options();

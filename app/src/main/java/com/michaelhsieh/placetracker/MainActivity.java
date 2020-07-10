@@ -339,6 +339,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         Log.d(TAG, "attributions: " + attributions);
+        placeModel.setAttributions(attributions);
 
         // must set max width and height in pixels. The image's default width and height
         // causes a TransactionTooLargeException and the app crashes

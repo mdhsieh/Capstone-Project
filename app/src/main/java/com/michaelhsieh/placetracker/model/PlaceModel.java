@@ -47,6 +47,9 @@ public class PlaceModel implements Parcelable {
        which will crash the app. */
     private String base64String;
 
+    // the attributions text of the photo
+    private String attributions;
+
     public PlaceModel(String placeId, String name, String address) {
         this.placeId = placeId;
         this.name = name;
@@ -82,6 +85,10 @@ public class PlaceModel implements Parcelable {
         return base64String;
     }
 
+    public String getAttributions() {
+        return attributions;
+    }
+
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
     }
@@ -106,6 +113,10 @@ public class PlaceModel implements Parcelable {
         this.base64String = base64String;
     }
 
+    public void setAttributions(String attributions) {
+        this.attributions = attributions;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {
@@ -121,6 +132,7 @@ public class PlaceModel implements Parcelable {
         out.writeList(visits);
         out.writeString(notes);
         out.writeString(base64String);
+        out.writeString(attributions);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -145,5 +157,6 @@ public class PlaceModel implements Parcelable {
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
         base64String = in.readString();
+        attributions = in.readString();
     }
 }
