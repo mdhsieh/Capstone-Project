@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
-import static com.michaelhsieh.placetracker.MainActivity.MAX_NUM_PHOTOS;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
@@ -75,8 +74,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     // ImageViews to display place's photos
     ImageView photo;
-    ImageView photo2;
-    ImageView photo3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,10 +92,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
         final EditText notesDisplay = findViewById(R.id.et_notes);
 
-        // find ImageViews that display photos
+        // find ImageView that display photo
         photo = findViewById(R.id.iv_photo);
-        photo2 = findViewById(R.id.iv_photo2);
-        photo3 = findViewById(R.id.iv_photo3);
 
         // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
@@ -149,47 +144,28 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
 
-                // display bitmap photos if available
+                // display bitmap photo if available
                 List<String> base64Strings = place.getBase64Strings();
                 List<Bitmap> bitmaps = new ArrayList<>();
                 if (base64Strings != null && !base64Strings.isEmpty()) {
-                    Log.d(TAG, "bitmaps available");
+                    Log.d(TAG, "bitmap available");
 
-                    int base64StringsSize = base64Strings.size();
-                    Log.d(TAG, "size of base64 list: " + base64StringsSize);
-                    for (int i = 0; i < base64StringsSize && i < MAX_NUM_PHOTOS; i++) {
-                        String base64Image = base64Strings.get(i);
+                    String base64Image = base64Strings.get(0);
 
-                        // decode Base64 String to bitmap
-                        /*byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
-                        Bitmap bitmap;
-                        BitmapFactory.Options opt = new BitmapFactory.Options();
-                        opt.inMutable = true;
-                        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
-                        bitmaps.add(decodeBitmapToBase64String(base64Image));
-                        Log.d(TAG, "added bitmap decoded from base64 String");
-                    }
+                    // decode Base64 String to bitmap
+                    /*byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
+                    Bitmap bitmap;
+                    BitmapFactory.Options opt = new BitmapFactory.Options();
+                    opt.inMutable = true;
+                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
+                    bitmaps.add(decodeBitmapToBase64String(base64Image));
+                    Log.d(TAG, "added bitmap decoded from base64 String");
 
                     photo.setVisibility(View.VISIBLE);
                     photo.setImageBitmap(bitmaps.get(0));
-                    if (base64StringsSize >= 2) {
-                        Log.d(TAG, "photo 2 visible");
-                        photo2.setVisibility(View.VISIBLE);
-                        photo.setImageBitmap(bitmaps.get(1));
-                    } else {
-                        photo2.setVisibility(View.GONE);
-                    }
-                    if (base64StringsSize >= 3) {
-                        photo3.setVisibility(View.VISIBLE);
-                        photo3.setImageBitmap(bitmaps.get(2));
-                    } else {
-                        photo3.setVisibility(View.GONE);
-                    }
                 } else {
                     Log.d(TAG, "base64Strings is: " + base64Strings);
                     photo.setVisibility(View.GONE);
-                    photo2.setVisibility(View.GONE);
-                    photo3.setVisibility(View.GONE);
                 }
 
                 // add visit when the add visit button is clicked

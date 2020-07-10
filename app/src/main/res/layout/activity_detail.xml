@@ -103,11 +103,7 @@
             android:layout_marginTop="16dp"
             android:text="@string/add_visit"
             app:layout_constraintStart_toEndOf="@+id/tv_num_visits"
-            app:layout_constraintTop_toBottomOf="@+id/scroll_view_images" />
-
-        <!--app:layout_constraintTop_toBottomOf="@+id/et_address"-->
-
-        <!--app:layout_constraintTop_toBottomOf="@+id/iv_photo"-->
+            app:layout_constraintTop_toBottomOf="@+id/iv_photo" />
 
         <TextView
             android:id="@+id/tv_label_last_visit"
@@ -191,7 +187,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/btn_save" />
 
-        <HorizontalScrollView
+        <!--<HorizontalScrollView
             android:id="@+id/scroll_view_images"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -223,10 +219,9 @@
                     tools:srcCompat="@android:drawable/picture_frame"
                     android:contentDescription="@string/desc_place_photo_3" />
             </LinearLayout>
-        </HorizontalScrollView>
+        </HorizontalScrollView>-->
 
-
-        <!--<ImageView
+        <ImageView
             android:id="@+id/iv_photo"
             android:layout_width="@dimen/photo_height"
             android:layout_height="@dimen/photo_height"
@@ -235,26 +230,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_address"
             tools:srcCompat="@android:drawable/picture_frame"/>
-
-        <ImageView
-            android:id="@+id/iv_photo2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:contentDescription="@string/desc_place_photo_2"
-            app:layout_constraintStart_toEndOf="@+id/iv_photo"
-            app:layout_constraintTop_toBottomOf="@+id/et_address"
-            tools:srcCompat="@android:drawable/picture_frame" />
-
-        <ImageView
-            android:id="@+id/iv_photo_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            app:layout_constraintStart_toEndOf="@+id/iv_photo2"
-            app:layout_constraintTop_toBottomOf="@+id/et_address"
-            app:srcCompat="@android:drawable/picture_frame"
-            android:contentDescription="@string/desc_place_photo_3" />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
