@@ -40,7 +40,6 @@ import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -74,9 +73,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private int clickedPlacePos = -1;
 
     private PlaceViewModel placeViewModel;
-
-    // list of selected place photos encoded as Base64 Strings
-    List<String> base64Images;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -166,25 +162,34 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
                 // Get the photo metadata.
                 final List<PhotoMetadata> metadata = place.getPhotoMetadatas();
-                // initialize base64 String list to empty list or
-                // clear the list if a different place was previously selected
-                Log.d(TAG, "created new base64 String ArrayList");
-                base64Images = new ArrayList<>();
-                if (metadata == null || metadata.isEmpty()) {
+                /*if (metadata == null || metadata.isEmpty()) {
                     Log.v(TAG, "No photo metadata.");
                 } else {
                     // get the photo's metadata,
                     // which will be used to get a bitmap and attribution text
                     final PhotoMetadata photoMetadata = metadata.get(0);
-                    /* This method uses fetchPhoto(), an asynchronous method.
+                    *//* This method uses fetchPhoto(), an asynchronous method.
                     The method will finish after the place has already been inserted, so
-                    update the place once all photos have been fetched. */
+                    update the place once all photos have been fetched. *//*
                     fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata);
-                }
+                }*/
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
+
+                    if (metadata == null || metadata.isEmpty()) {
+                        Log.v(TAG, "No photo metadata.");
+                    } else {
+                        // get the photo's metadata,
+                        // which will be used to get a bitmap and attribution text
+                        final PhotoMetadata photoMetadata = metadata.get(0);
+                        /* This method uses fetchPhoto(), an asynchronous method.
+                        The method will finish after the place has already been inserted, so
+                        update the place once all photos have been fetched. */
+                        fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata);
+                    }
+
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
@@ -332,13 +337,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     }
 
     /** Get the photo from place metadata as a Bitmap encoded as Base64 String and
-     * add to place Base64 String list. This uses an asynchronous method fetchPhoto(), so
+     * set as place Base64 String. This uses an asynchronous method fetchPhoto(), so
      * by the time it finishes the place has already been inserted.
-     * When the last Base64 String has been added the place should be updated.
+     * When the Base64 String has been added the place should be updated.
      *
      * @param placesClient The places client required to initialize the Google Places SDK
      * @param placeModel The selected place
-     * @param photoMetadata The photo metadata of a place, used to get a single photo's
+     * @param photoMetadata The photo metadata of a place, used to get a single
      *                      Bitmap and attribution text
      */
     private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
@@ -366,21 +371,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             byte[] bai = baos.toByteArray();
 
             String base64Image = Base64.encodeToString(bai, Base64.DEFAULT);*/
+
+            // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
-            base64Images.add(base64Image);
-            Log.d(TAG, "added base64 String");
-
-//            placeModel.setBase64Strings(base64Images);
-//            Log.d(TAG, "set base64String list");
-//            Log.d(TAG, "added base64 String and set base64String list");
-            // Log.d(TAG, "base64 String: " + base64Image);
-            // Log.d(TAG, "base64String list: " + base64Images);
-
-            // update the selected place with the list of Base64 Strings
-            placeModel.setBase64Strings(base64Images);
-            Log.d(TAG, "set base64String list");
-            Log.d(TAG, "size of base64 list is: " + placeModel.getBase64Strings().size());
+            // update the selected place with the Base64 String
+            placeModel.setBase64String(base64Image);
+            Log.d(TAG, "set base64String");
             placeViewModel.update(placeModel);
             Log.d(TAG, "updated selected place");
 

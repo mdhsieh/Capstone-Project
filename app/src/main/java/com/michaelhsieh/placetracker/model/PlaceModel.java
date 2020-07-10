@@ -39,10 +39,13 @@ public class PlaceModel implements Parcelable {
     // initialize visits
     private List<Visit> visits = new ArrayList<>();
 
-    /* Photos of the place are Bitmaps, but store each Bitmap as a Base64 String
-       in Room database to avoid transferring too much
-       data, ex. large Bitmaps, and causing TransactionTooLarge exception */
-    private List<String> base64Strings = new ArrayList<>();
+    /* The first photo available from the place.
+       Photos of the place are Bitmaps, but store the Bitmap as a Base64 String
+       in Room database to avoid transferring too much data
+       between Activities via Parcelable,
+       ex. large Bitmaps, and causing TransactionTooLarge exception,
+       which will crash the app. */
+    private String base64String;
 
     public PlaceModel(String placeId, String name, String address) {
         this.placeId = placeId;
@@ -75,8 +78,8 @@ public class PlaceModel implements Parcelable {
         return visits;
     }
 
-    public List<String> getBase64Strings() {
-        return base64Strings;
+    public String getBase64String() {
+        return base64String;
     }
 
     public void setPlaceId(String placeId) {
@@ -99,8 +102,8 @@ public class PlaceModel implements Parcelable {
         this.visits = visits;
     }
 
-    public void setBase64Strings(List<String> base64Strings) {
-        this.base64Strings = base64Strings;
+    public void setBase64String(String base64String) {
+        this.base64String = base64String;
     }
 
     /* everything below here is for implementing Parcelable */
@@ -117,7 +120,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(address);
         out.writeList(visits);
         out.writeString(notes);
-        out.writeList(base64Strings);
+        out.writeString(base64String);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -141,6 +144,6 @@ public class PlaceModel implements Parcelable {
         address = in.readString();
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
-        in.readList(base64Strings, String.class.getClassLoader());
+        base64String = in.readString();
     }
 }

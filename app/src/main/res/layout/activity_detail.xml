@@ -225,11 +225,13 @@
             android:id="@+id/iv_photo"
             android:layout_width="@dimen/photo_height"
             android:layout_height="@dimen/photo_height"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
             android:layout_marginTop="16dp"
             android:contentDescription="@string/desc_place_photo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_address"
-            tools:srcCompat="@android:drawable/picture_frame"/>
+            tools:srcCompat="@android:drawable/picture_frame" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -37,6 +37,4 @@
     <string name="desc_place_photo">place photo</string>
     <!--add manual place-->
     <string name="add">Add</string>
-    <string name="desc_place_photo_2">place photo 2</string>
-    <string name="desc_place_photo_3">place photo 3</string>
 </resources>

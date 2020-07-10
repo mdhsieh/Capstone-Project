@@ -24,7 +24,6 @@ import android.widget.TimePicker;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -145,12 +144,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 recyclerView.setAdapter(adapter);
 
                 // display bitmap photo if available
-                List<String> base64Strings = place.getBase64Strings();
-                List<Bitmap> bitmaps = new ArrayList<>();
-                if (base64Strings != null && !base64Strings.isEmpty()) {
+                String base64String = place.getBase64String();
+                if (base64String != null && !base64String.isEmpty()) {
                     Log.d(TAG, "bitmap available");
-
-                    String base64Image = base64Strings.get(0);
 
                     // decode Base64 String to bitmap
                     /*byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
@@ -158,13 +154,15 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     BitmapFactory.Options opt = new BitmapFactory.Options();
                     opt.inMutable = true;
                     bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
-                    bitmaps.add(decodeBitmapToBase64String(base64Image));
-                    Log.d(TAG, "added bitmap decoded from base64 String");
+
+                    // decode Base64 String to bitmap
+                    Bitmap bitmap = decodeBitmapToBase64String(base64String);
+                    Log.d(TAG, "bitmap decoded from base64 String");
 
                     photo.setVisibility(View.VISIBLE);
-                    photo.setImageBitmap(bitmaps.get(0));
+                    photo.setImageBitmap(bitmap);
                 } else {
-                    Log.d(TAG, "base64Strings is: " + base64Strings);
+                    Log.d(TAG, "base64String is: " + base64String);
                     photo.setVisibility(View.GONE);
                 }
 
