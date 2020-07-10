@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // request code when opening DetailActivity
     public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
 
+    // max number of photos a selected place can display
+    public static final int MAX_NUM_PHOTOS = 3;
+
     // list of places user selects from search results
     private List<PlaceModel> places;
 
@@ -173,16 +176,27 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 if (metadata == null || metadata.isEmpty()) {
                     Log.v(TAG, "No photo metadata.");
                 } else {
-                    // get the first photo as a Bitmap encoded as Base64 String
-                    // and add to place base64 String list
-                    final PhotoMetadata photoMetadata = metadata.get(0);
-                    fetchPhotoAndUpdatePlace(placesClient, newPlace, photoMetadata);
+//                    boolean isLastPhoto = false;
+                    for (int i = 0; i < metadata.size() && i <  MAX_NUM_PHOTOS; i++) {
+                        // get the photo's metadata,
+                        // which will be used to get a bitmap and attribution text
+                        final PhotoMetadata photoMetadata = metadata.get(i);
+                        /* This method uses fetchPhoto(), an asynchronous method.
+                        The method will finish after the place has already been inserted, so
+                        update the place once all photos have been fetched. */
+                        if (i == metadata.size() - 1 || i == MAX_NUM_PHOTOS - 1) {
+                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata, true);
+                            break;
+                        } else {
+                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata, false);
+                        }
+                    }
                 }
 
                 if (isPlaceInList(newPlace)) {
                     Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
                 } else {
-                    Log.d(TAG, "place model has empty base64 String list? " + newPlace.getBase64Strings().isEmpty());
+                    // Log.d(TAG, "place model has empty base64 String list? " + newPlace.getBase64Strings().isEmpty());
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
@@ -329,44 +343,60 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return false;
     }
 
-
-    private void fetchPhotoAndUpdatePlace(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
+    /** Get the photo from place metadata as a Bitmap encoded as Base64 String and
+     * add to place Base64 String list. This uses an asynchronous method fetchPhoto(), so
+     * by the time it finishes the place has already been inserted.
+     * When the last Base64 String has been added the place should be updated.
+     *
+     * @param placesClient The places client required to initialize the Google Places SDK
+     * @param placeModel The selected place
+     * @param photoMetadata The photo metadata of a place, used to get a single photo's
+     *                      Bitmap and attribution text
+     * @param isLastPhoto True if this photo metadata contains the
+     *                    last photo that will be displayed, false otherwise.
+     *                    Used to avoid updating the place too frequently.
+     */
+    private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata, boolean isLastPhoto) {
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         Log.d(TAG, "attributions: " + attributions);
 
+        // must set max width and height in pixels. The image's default width and height
+        // causes a TransactionTooLargeException and the app crashes
+
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(500) // Optional.
-                .setMaxHeight(300) // Optional.
+                .setMaxWidth(500)
+                .setMaxHeight(300)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
+
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
             // convert bitmap to Base64 String
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            /*ByteArrayOutputStream baos = new ByteArrayOutputStream();
             bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
             byte[] bai = baos.toByteArray();
 
-            String base64Image = Base64.encodeToString(bai, Base64.DEFAULT);
+            String base64Image = Base64.encodeToString(bai, Base64.DEFAULT);*/
+            String base64Image = encodeBitmapToBase64String(bitmap);
 
             base64Images.add(base64Image);
-            placeModel.setBase64Strings(base64Images);
-            Log.d(TAG, "added first base64 String and set base64String list");
-            Log.d(TAG, "base64 String: " + base64Image);
+            Log.d(TAG, "added base64 String");
+            // placeModel.setBase64Strings(base64Images);
+            // Log.d(TAG, "set base64String list");
+            Log.d(TAG, "is last photo? " + isLastPhoto);
+//            Log.d(TAG, "added base64 String and set base64String list");
+            // Log.d(TAG, "base64 String: " + base64Image);
             // Log.d(TAG, "base64String list: " + base64Images);
 
-            placeViewModel.update(placeModel);
-            Log.d(TAG, "updated selected place");
-
-            /*if (isPlaceInList(placeModel)) {
-                    Toast.makeText(getApplicationContext(), R.string.existing_place_message, Toast.LENGTH_LONG).show();
-            } else {
-                Log.d(TAG, "place model has empty bitmaps list? " + placeModel.getBitmaps().isEmpty());
-                // insert place into the database
-                placeViewModel.insert(placeModel);
-                // Observer's onChanged() method updates the adapter
-            }*/
+            // update the selected place with the list of Base64 Strings
+            if (isLastPhoto) {
+                placeModel.setBase64Strings(base64Images);
+                Log.d(TAG, "set base64String list");
+                placeViewModel.update(placeModel);
+                Log.d(TAG, "updated selected place");
+            }
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -376,5 +406,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 Log.e(TAG, "Status code: " + statusCode);
             }
         });
+    }
+
+    /** Encode Bitmap to Base64 String
+     *
+     * @param bitmap The Bitmap to be encoded into a String
+     * @return A String that's in Base64 format. Used to store Bitmap into Room database
+     */
+    private String encodeBitmapToBase64String(Bitmap bitmap) {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
+        byte[] byteArrayInput = byteArrayOutputStream.toByteArray();
+        return Base64.encodeToString(byteArrayInput, Base64.DEFAULT);
     }
 }

@@ -24,11 +24,13 @@ import android.widget.TimePicker;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
+import static com.michaelhsieh.placetracker.MainActivity.MAX_NUM_PHOTOS;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
@@ -71,8 +73,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     TextView lastVisitLabel;
     TextView lastVisitDisplay;
 
-    // test ImageView to display place's first photo
+    // ImageViews to display place's photos
     ImageView photo;
+    ImageView photo2;
+    ImageView photo3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +95,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
         final EditText notesDisplay = findViewById(R.id.et_notes);
 
+        // find ImageViews that display photos
         photo = findViewById(R.id.iv_photo);
+        photo2 = findViewById(R.id.iv_photo2);
+        photo3 = findViewById(R.id.iv_photo3);
 
         // get the PlaceModel from the Intent that started this Activity
         Intent intent = getIntent();
@@ -142,25 +149,44 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 adapter.setClickListener(this);
                 recyclerView.setAdapter(adapter);
 
-                // test display bitmap photo if available
+                // display bitmap photos if available
                 List<String> base64Strings = place.getBase64Strings();
+                List<Bitmap> bitmaps = new ArrayList<>();
                 if (base64Strings != null && !base64Strings.isEmpty()) {
-                    Log.d(TAG, "bitmap available");
+                    Log.d(TAG, "bitmaps available");
 
-                    String base64Image = base64Strings.get(0);
+                    int base64StringsSize = base64Strings.size();
+                    for (int i = 0; i < base64StringsSize && i < MAX_NUM_PHOTOS; i++) {
+                        String base64Image = base64Strings.get(i);
 
-                    // decode Base64 String to bitmap
-                    byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
-                    Bitmap bitmap;
-                    BitmapFactory.Options opt = new BitmapFactory.Options();
-                    opt.inMutable = true;
-                    bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
+                        // decode Base64 String to bitmap
+                        /*byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
+                        Bitmap bitmap;
+                        BitmapFactory.Options opt = new BitmapFactory.Options();
+                        opt.inMutable = true;
+                        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);*/
+                        bitmaps.add(decodeBitmapToBase64String(base64Image));
+                    }
 
                     photo.setVisibility(View.VISIBLE);
-                    photo.setImageBitmap(bitmap);
+                    photo.setImageBitmap(bitmaps.get(0));
+                    if (base64StringsSize >= 2) {
+                        photo2.setVisibility(View.VISIBLE);
+                        photo.setImageBitmap(bitmaps.get(1));
+                    } else {
+                        photo2.setVisibility(View.GONE);
+                    }
+                    if (base64StringsSize >= 3) {
+                        photo3.setVisibility(View.VISIBLE);
+                        photo3.setImageBitmap(bitmaps.get(2));
+                    } else {
+                        photo3.setVisibility(View.GONE);
+                    }
                 } else {
                     Log.d(TAG, "base64Strings is: " + base64Strings);
                     photo.setVisibility(View.GONE);
+                    photo2.setVisibility(View.GONE);
+                    photo3.setVisibility(View.GONE);
                 }
 
                 // add visit when the add visit button is clicked
@@ -431,5 +457,19 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         alertDialog.setView(dialogView);
         alertDialog.show();
+    }
+
+    /** Decode Base64 String to Bitmap
+     *
+     * @param base64Image The Base64 String to be decoded into a Bitmap
+     * @return A Bitmap
+     */
+    private Bitmap decodeBitmapToBase64String(String base64Image) {
+        byte[] data = Base64.decode(base64Image, Base64.DEFAULT);
+        Bitmap bitmap;
+        BitmapFactory.Options opt = new BitmapFactory.Options();
+        opt.inMutable = true;
+        bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
+        return bitmap;
     }
 }
