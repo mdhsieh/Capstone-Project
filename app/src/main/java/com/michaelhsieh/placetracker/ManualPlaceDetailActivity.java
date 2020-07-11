@@ -164,10 +164,6 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
                     place.setName(nameDisplay.getText().toString());
                     place.setAddress(addressDisplay.getText().toString());
                     place.setNotes(notesDisplay.getText().toString());
-                    Log.d(TAG, "Place ID: " + place.getPlaceId());
-                    Log.d(TAG, "name: " + place.getName());
-                    Log.d(TAG, "address: " + place.getAddress());
-                    Log.d(TAG, "notes: " + place.getNotes());
                     addManualPlaceIntent.putExtra(EXTRA_MANUAL_ADDED_PLACE, place);
                     setResult(RESULT_OK, addManualPlaceIntent);
                     finish();
@@ -244,7 +240,6 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         // increased number of visits by 1, so
         // display updated text
         numVisitsDisplay.setText(String.valueOf(place.getNumVisits()));
-        Log.d(TAG, "num visits after insert: " + place.getNumVisits());
 
         // update last visit
         showOrHideLastVisit();
@@ -298,8 +293,6 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
             Visit lastVisit = visits.get(lastIndex);
             String lastVisitString = lastVisit.getDate() + getString(R.string.at) + lastVisit.getTime();
             lastVisitDisplay.setText(lastVisitString);
-//            Log.d(TAG, "num visits: " + place.getNumVisits());
-            Log.d(TAG, "visits: " + place.getVisits());
         }
     }
     /** Display the date and time picker dialog so user can edit a clicked Visit's
