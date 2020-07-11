@@ -189,7 +189,7 @@
 
         <ImageView
             android:id="@+id/iv_photo"
-            android:layout_width="@dimen/photo_height"
+            android:layout_width="@dimen/photo_width"
             android:layout_height="@dimen/photo_height"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
@@ -201,7 +201,7 @@
 
         <TextView
             android:id="@+id/tv_attributions"
-            android:layout_width="@dimen/photo_height"
+            android:layout_width="@dimen/photo_width"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"

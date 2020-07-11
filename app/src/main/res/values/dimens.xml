@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--Expanding RecyclerView dimensions-->
     <dimen name="list_item_height">48dp</dimen>
     <dimen name="horizontal_margin">8dp</dimen>
     <dimen name="list_item_left_margin">32dp</dimen>
+    <!--place photo dimensions-->
+    <!--<dimen name="photo_width">300dp</dimen>
+    <dimen name="photo_height">180dp</dimen>-->
+    <dimen name="photo_width">300dp</dimen>
     <dimen name="photo_height">300dp</dimen>
 </resources>
