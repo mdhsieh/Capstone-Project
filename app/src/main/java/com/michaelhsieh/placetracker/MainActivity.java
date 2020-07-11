@@ -47,6 +47,7 @@ import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
 import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
+import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -60,6 +61,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // request code when opening DetailActivity
     public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
+
+    // request code when opening ManualPlaceDetailActivity
+    public static final int MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE = 1;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -207,7 +211,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // Toast.makeText(this, "add a place manually selected", Toast.LENGTH_LONG).show();
                 // start ManualPlaceDetailsActivity
                 Intent intent = new Intent(this, ManualPlaceDetailActivity.class);
-                startActivity(intent);
+                // get result when Activity finishes
+                startActivityForResult(intent, MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -249,6 +254,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         // Observer's onChanged() method updates the adapter
                     }
                 }
+            }
+        } else if (requestCode == MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
+            if (data != null) {
+                PlaceModel manualPlace = data.getParcelableExtra(EXTRA_MANUAL_ADDED_PLACE);
+                // insert place into the database
+                placeViewModel.insert(manualPlace);
+                // Observer's onChanged() method updates the adapter
             }
         }
     }
