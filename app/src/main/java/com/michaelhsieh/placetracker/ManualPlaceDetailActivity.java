@@ -20,18 +20,23 @@ import android.widget.TimePicker;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
-// Activity where user can enter info to add a place manually. Very similar to DetailActivity.
+/** Activity where user can enter info to add a place manually. Very similar to DetailActivity.
+ *
+ */
 public class ManualPlaceDetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener{
 
     private static final String TAG = ManualPlaceDetailActivity.class.getSimpleName();
 
-    // key of place with updated info when add button clicked
+    // key to get manually added place when Activity recreated, ex. device rotated
+    private static final String STATE_MANUAL_PLACE = "manual_place";
+
+    // key of place with user's manually entered info when add button clicked
+    // Used to send place to MainActivity
     public static final String EXTRA_MANUAL_ADDED_PLACE = "place";
 
     /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
@@ -70,7 +75,27 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         lastVisitDisplay = findViewById(R.id.tv_manual_last_visit);
         final EditText notesDisplay = findViewById(R.id.et_manual_notes);
 
-        // generate a unique String as the place's Place ID
+        // Check whether we're recreating a previously destroyed instance
+        if (savedInstanceState != null) {
+            // Restore place from saved state
+            place = savedInstanceState.getParcelable(STATE_MANUAL_PLACE);
+
+        } else {
+            // generate a unique String as the place's Place ID
+            String uniqueString = UUID.randomUUID().toString();
+
+            // create the manual place with randomly generated String PlaceID,
+            // empty name, and empty address
+            // Initialize place here because visit methods will need to use place's getNumVisits,
+            // avoid NullPointerException
+            place = new PlaceModel(uniqueString, "", "");
+
+            // initialize layout with empty texts and 0 visits
+            int numVisits = 0;
+            numVisitsDisplay.setText(String.valueOf(numVisits));
+        }
+
+        /*// generate a unique String as the place's Place ID
         String uniqueString = UUID.randomUUID().toString();
 
         // create the manual place with randomly generated String PlaceID,
@@ -81,83 +106,99 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
 
         // initialize layout with empty texts and 0 visits
         int numVisits = 0;
-        numVisitsDisplay.setText(String.valueOf(numVisits));
+        numVisitsDisplay.setText(String.valueOf(numVisits));*/
 
-        // initialize visits to place's list of visits
-//        visits = new ArrayList<>();
-        visits = place.getVisits();
+        if (place != null) {
 
-        // initialize list of visit groups which will only contain one group at position 0
-        List<VisitGroup> visitGroupList =
-                Arrays.asList
-                        (new VisitGroup(getResources().getString(R.string.dates_visited),
-                                visits)
-                        );
+            // initialize visits to place's list of visits
+            visits = place.getVisits();
 
-        // show last visit if PlaceModel already has visits,
-        // otherwise hide last visit text and label
-        showOrHideLastVisit();
+            // initialize list of visit groups which will only contain one group at position 0
+            List<VisitGroup> visitGroupList =
+                    Arrays.asList
+                            (new VisitGroup(getResources().getString(R.string.dates_visited),
+                                    visits)
+                            );
 
-        // initialize expanding RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.expanding_rv_manual_visits);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        // add a divider
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        // use custom white divider
-        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
-        recyclerView.addItemDecoration(dividerItemDecoration);
+            // show last visit if PlaceModel already has visits,
+            // otherwise hide last visit text and label
+            showOrHideLastVisit();
 
-        // instantiate the adapter with the list of visit groups.
-        // there's only one visit group
-        adapter = new VisitGroupAdapter(visitGroupList);
-        // set the click listener for clicks on individual visits
-        adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+            // initialize expanding RecyclerView
+            RecyclerView recyclerView = findViewById(R.id.expanding_rv_manual_visits);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            recyclerView.setLayoutManager(layoutManager);
+            // add a divider
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                    layoutManager.getOrientation());
+            // use custom white divider
+            dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
+            recyclerView.addItemDecoration(dividerItemDecoration);
 
-        // add visit when the add visit button is clicked
-        Button addVisitButton = findViewById(R.id.btn_manual_add_visit);
-        addVisitButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // object whose calendar fields have been initialized with the current date and time
-                Calendar rightNow = Calendar.getInstance();
-                insertSingleItem(new Visit(rightNow));
-            }
-        });
+            // instantiate the adapter with the list of visit groups.
+            // there's only one visit group
+            adapter = new VisitGroupAdapter(visitGroupList);
+            // set the click listener for clicks on individual visits
+            adapter.setClickListener(this);
+            recyclerView.setAdapter(adapter);
 
-        Button addManualPlaceButton = findViewById(R.id.btn_manual_add_place);
-        addManualPlaceButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent addManualPlaceIntent = new Intent();
+            // add visit when the add visit button is clicked
+            Button addVisitButton = findViewById(R.id.btn_manual_add_visit);
+            addVisitButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // object whose calendar fields have been initialized with the current date and time
+                    Calendar rightNow = Calendar.getInstance();
+                    insertSingleItem(new Visit(rightNow));
+                }
+            });
 
-                // save the user's current EditText data for name, address, and notes
-                // visits should already be added
-                place.setName(nameDisplay.getText().toString());
-                place.setAddress(addressDisplay.getText().toString());
-                place.setNotes(notesDisplay.getText().toString());
-                Log.d(TAG, "Place ID: " + place.getPlaceId());
-                Log.d(TAG, "name: " + place.getName());
-                Log.d(TAG, "address: " + place.getAddress());
-                Log.d(TAG, "notes: " + place.getNotes());
-                addManualPlaceIntent.putExtra(EXTRA_MANUAL_ADDED_PLACE, place);
-                setResult(RESULT_OK, addManualPlaceIntent);
-                finish();
-            }
-        });
+            Button addManualPlaceButton = findViewById(R.id.btn_manual_add_place);
+            addManualPlaceButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent addManualPlaceIntent = new Intent();
+
+                    // save the user's current EditText data for name, address, and notes
+                    // visits should already be added
+                    place.setName(nameDisplay.getText().toString());
+                    place.setAddress(addressDisplay.getText().toString());
+                    place.setNotes(notesDisplay.getText().toString());
+                    Log.d(TAG, "Place ID: " + place.getPlaceId());
+                    Log.d(TAG, "name: " + place.getName());
+                    Log.d(TAG, "address: " + place.getAddress());
+                    Log.d(TAG, "notes: " + place.getNotes());
+                    addManualPlaceIntent.putExtra(EXTRA_MANUAL_ADDED_PLACE, place);
+                    setResult(RESULT_OK, addManualPlaceIntent);
+                    finish();
+                }
+            });
+
+        } else {
+            Log.e(TAG, "manual place is null");
+        }
     }
 
+    /** Save the state of the adapter and the manually entered place on configuration change,
+     * ex. device rotation
+     *
+     * @param outState The Bundle that will store the adapter state and place
+     */
     /* To save the expand and collapse state of the adapter,
     you have to explicitly call through to the adapter's
-    onSaveInstanceState() and onRestoreInstanceState() in the calling Activity */
+    onSaveInstanceState() and onRestoreInstanceState() in the calling Activity
+
+    Source: https://github.com/thoughtbot/expandable-recycler-view */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
+        // Always call the superclass so it can save the view hierarchy state
         super.onSaveInstanceState(outState);
         if (adapter != null) {
             adapter.onSaveInstanceState(outState);
         }
+
+        // save the place that the user is manually adding
+        outState.putParcelable(STATE_MANUAL_PLACE, place);
     }
 
     @Override
