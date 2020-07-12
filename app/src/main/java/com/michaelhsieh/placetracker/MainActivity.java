@@ -43,6 +43,7 @@ import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -63,7 +64,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public static final String CHANNEL_ID = "refresh_places_list_channel";
 
     // key of test input String
-    public static final String EXTRA_SERVICE_INPUT = "inputExtra";
+    public static final String EXTRA_SERVICE_PLACES = "service_places";
 
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
@@ -432,11 +433,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      */
     private void refreshPlacesList() {
         Toast.makeText(this, R.string.refresh, Toast.LENGTH_SHORT).show();
-        // test input
-        String input = "hello";
 
         Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
-        serviceIntent.putExtra(EXTRA_SERVICE_INPUT, input);
+        // put ArrayList of all the user's places in Intent
+        // serviceIntent.putParcelableArrayListExtra(EXTRA_SERVICE_PLACES, new ArrayList<>(places));
+        serviceIntent.putExtra(EXTRA_SERVICE_PLACES, "hello");
 
         // use startForegroundService in API 26 and higher, otherwise startService on lower API
         ContextCompat.startForegroundService(this, serviceIntent);
