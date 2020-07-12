@@ -3,12 +3,15 @@ package com.michaelhsieh.placetracker;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -56,6 +59,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // key to get the clicked place's position when Activity recreated, ex. when device rotated
     private static final String STATE_CLICKED_POSITION = "position";
 
+    // refresh places list notification channel ID
+    public static final String CHANNEL_ID = "refresh_places_list_channel";
+
+    // key of test input String
+    public static final String EXTRA_SERVICE_INPUT = "inputExtra";
+
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
 
@@ -82,6 +91,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // create notification channel
+        createNotificationChannel();
 
         // show a Toast if there's no Internet connection (Wi-Fi or cellular network)
         if (!isNetworkConnected()) {
@@ -420,5 +432,34 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      */
     private void refreshPlacesList() {
         Toast.makeText(this, R.string.refresh, Toast.LENGTH_SHORT).show();
+        // test input
+        String input = "hello";
+
+        Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
+        serviceIntent.putExtra(EXTRA_SERVICE_INPUT, input);
+
+        // use startForegroundService in API 26 and higher, otherwise startService on lower API
+        ContextCompat.startForegroundService(this, serviceIntent);
+    }
+
+    /** Creates a notification channel.
+     *
+     */
+    private void createNotificationChannel() {
+        // API 26 and higher require notification channel
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel serviceChannel = new NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.refresh_notification_channel_name),
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            if (manager != null) {
+                manager.createNotificationChannel(serviceChannel);
+            } else {
+                Log.e(TAG, "notification manager is null");
+            }
+        }
     }
 }
