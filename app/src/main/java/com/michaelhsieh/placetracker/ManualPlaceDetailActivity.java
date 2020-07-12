@@ -95,19 +95,6 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
             numVisitsDisplay.setText(String.valueOf(numVisits));
         }
 
-        /*// generate a unique String as the place's Place ID
-        String uniqueString = UUID.randomUUID().toString();
-
-        // create the manual place with randomly generated String PlaceID,
-        // empty name, and empty address
-        // Initialize place here because visit methods will need to use place's getNumVisits,
-        // avoid NullPointerException
-        place = new PlaceModel(uniqueString, "", "");
-
-        // initialize layout with empty texts and 0 visits
-        int numVisits = 0;
-        numVisitsDisplay.setText(String.valueOf(numVisits));*/
-
         if (place != null) {
 
             // initialize visits to place's list of visits

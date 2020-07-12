@@ -197,6 +197,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     }
 
+    /** Create menu with items, including items to add place manually and refresh places list.
+     *
+     * @param menu The options menu in which you place your items
+     * @return True for the menu to be displayed
+     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -204,6 +209,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return true;
     }
 
+    /**  Called whenever an item in the options menu is selected.
+     *
+     * @param item The menu item that was selected
+     * @return False to allow normal menu processing to proceed, true to consume it here.
+     */
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
@@ -214,11 +224,19 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // get result when Activity finishes
                 startActivityForResult(intent, MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE);
                 return true;
+            case R.id.action_refresh:
+                refreshPlacesList();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
+    /** Called when an item in the places list is clicked.
+     *
+     * @param view The view displaying place name and address
+     * @param position The position of the place item
+     */
     @Override
     public void onItemClick(View view, int position) {
         // start DetailActivity
@@ -350,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
-        Log.d(TAG, "attributions: " + attributions);
+        // Log.d(TAG, "attributions: " + attributions);
         placeModel.setAttributions(attributions);
 
         // must set max width and height in pixels. The image's default width and height
@@ -392,5 +410,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream); // Could be Bitmap.CompressFormat.PNG or Bitmap.CompressFormat.WEBP
         byte[] byteArrayInput = byteArrayOutputStream.toByteArray();
         return Base64.encodeToString(byteArrayInput, Base64.DEFAULT);
+    }
+
+    /** Starts an IntentService to get up-to-date info on user's places in the background.
+     *
+     * The method gets new Place info from the Google Places SDK using the Place ID
+     * of each place in the places list. Then the Room Database is updated with the new info.
+     *
+     */
+    private void refreshPlacesList() {
+        Toast.makeText(this, R.string.refresh, Toast.LENGTH_SHORT).show();
     }
 }

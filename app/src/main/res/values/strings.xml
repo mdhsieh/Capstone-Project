@@ -3,8 +3,9 @@
     <string name="internet_connection_error">No Internet connection! Please connect to search.</string>
     <string name="empty_list">You have no places yet!\nAdd them with the search bar.</string>
     <string name="my_places">My Places</string>
-    <string name="or">or</string>
+    <!--menu text-->
     <string name="add_place_manually">Add a place manually</string>
+    <string name="refresh">Refresh my places</string>
     <!--EditText hints in DetailActivity-->
     <string name="name_hint">Name of place</string>
     <string name="address_hint">Address of place</string>
