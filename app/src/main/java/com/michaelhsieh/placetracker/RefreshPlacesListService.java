@@ -4,7 +4,7 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.os.Build;
+//import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -20,10 +20,10 @@ import java.util.List;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static com.michaelhsieh.placetracker.MainActivity.CHANNEL_ID;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_SERVICE_PLACE_IDS;
-//import static com.michaelhsieh.placetracker.MainActivity.EXTRA_SERVICE_PLACE_NAMES;
 
 /** An IntentService that refreshes the user's places list with new place info in the background.
  * A place is only refreshed if its Place ID can be found.
@@ -33,9 +33,18 @@ public class RefreshPlacesListService extends IntentService {
 
     private static final String TAG = RefreshPlacesListService.class.getSimpleName();
 
+    // key of all fetched place names to send to MainActivity
+    public static final String EXTRA_UPDATED_PLACE_NAMES = "updated_place_names";
+    public static final String EXTRA_UPDATED_PLACE_ADDRESSES = "updated_place_addresses";
+
     // notification ID must not be 0 or ANR will occur with log like
     // Reason: Context.startForegroundService() did not then call Service.startForeground()
     private static final int NOTIFICATION_ID = 2;
+
+    private ArrayList<String> updatedPlaceNames;
+    private ArrayList<String> updatedPlaceAddresses;
+
+    private int placeCounter = 0;
 
     public RefreshPlacesListService() {
         super("RefreshPlacesListService");
@@ -56,16 +65,17 @@ public class RefreshPlacesListService extends IntentService {
                 0, notificationIntent, 0);
 
         // display notification
-        /*Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.refresh_notification_title))
                 .setContentText(getString(R.string.refresh_notification_text))
                 .setSmallIcon(R.drawable.ic_notification_list_orange_24dp)
                 .setContentIntent(pendingIntent)
-                .build();*/
+                .setAutoCancel(true)
+                .build();
 
-        /*startForeground(NOTIFICATION_ID, notification);*/
+        startForeground(NOTIFICATION_ID, notification);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+        /*NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.refresh_notification_title))
                 .setContentText(getString(R.string.refresh_notification_text))
                 .setSmallIcon(R.drawable.ic_notification_list_orange_24dp)
@@ -80,12 +90,15 @@ public class RefreshPlacesListService extends IntentService {
         }
 
 
-        startForeground(NOTIFICATION_ID, builder.build());
+        startForeground(NOTIFICATION_ID, builder.build());*/
     }
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "onHandleIntent");
+
+        updatedPlaceNames = new ArrayList<>();
+        updatedPlaceAddresses = new ArrayList<>();
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -93,49 +106,11 @@ public class RefreshPlacesListService extends IntentService {
         if (intent != null) {
 
             ArrayList<String> allPlaceIds = intent.getStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS);
-//            if (allPlaceIds != null) {
-//                for (int i = 0; i < allPlaceIds.size(); i++) {
-//                    Log.d(TAG, "id: " + allPlaceIds.get(i));
-//                }
-//            }
-
-//            ArrayList<String> allPlaceNames = intent.getStringArrayListExtra(EXTRA_SERVICE_PLACE_NAMES);
-//            if (allPlaceNames != null) {
-//                for (int i = 0; i < allPlaceNames.size(); i++) {
-//                    Log.d(TAG, "name: " + allPlaceNames.get(i));
-//                }
-//            }
-
             if (allPlaceIds != null && !allPlaceIds.isEmpty()) {
-
-                for (int i = 0; i < allPlaceIds.size(); i++) {
-                    fetchAllPlacesById(placesClient, allPlaceIds.get(i));
+                int allPlaceIdsSize = allPlaceIds.size();
+                for (int i = 0; i < allPlaceIdsSize; i++) {
+                    fetchAllPlacesById(placesClient, allPlaceIds.get(i), allPlaceIdsSize);
                 }
-
-                /*// Define a Place ID.
-//            String placeId = "INSERT_PLACE_ID_HERE";
-                String placeId = allPlaceIds.get(0);
-
-                // Specify the fields to return.
-                List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
-
-                // Construct a request object, passing the place ID and fields array.
-                FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields)
-                        .build();
-
-                // Add a listener to handle the response.
-                placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
-                    Place place = response.getPlace();
-                    // Log.i(TAG, "Place found: " + place.getName());
-                    Log.i(TAG, "Place found: " + place.getName() + ", " + place.getId());
-                }).addOnFailureListener((exception) -> {
-                    if (exception instanceof ApiException) {
-                        ApiException apiException = (ApiException) exception;
-                        int statusCode = apiException.getStatusCode();
-                        // Handle error with given status code.
-                        Log.e(TAG, "Place not found: " + exception.getMessage());
-                    }
-                });*/
             }
 
 
@@ -148,9 +123,16 @@ public class RefreshPlacesListService extends IntentService {
 
     }
 
-    private void fetchAllPlacesById( PlacesClient placesClient, String placeId) {
+    /** Fetch up-to-date place info using the Place ID,
+     * or just log message if the Place ID can't be found.
+     *
+     * @param placesClient The places client, initialized by the Service
+     * @param placeId The Place ID of a place in user's places list
+     * @param listSize The size of the List of Place IDs
+     */
+    private void fetchAllPlacesById( PlacesClient placesClient, String placeId, int listSize) {
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
 
         // Construct a request object, passing the place ID and fields array.
         FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields)
@@ -161,6 +143,12 @@ public class RefreshPlacesListService extends IntentService {
             Place place = response.getPlace();
             // Log.i(TAG, "Place found: " + place.getName());
             Log.i(TAG, "Place found: " + place.getName() + ", " + place.getId());
+            updatedPlaceNames.add(place.getName());
+            updatedPlaceAddresses.add(place.getAddress());
+            if (placeCounter == listSize - 1) {
+                sendInfo();
+            }
+            incrementPlaceCounter();
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
                 ApiException apiException = (ApiException) exception;
@@ -169,6 +157,7 @@ public class RefreshPlacesListService extends IntentService {
                 Log.e(TAG, "Place not found: " + exception.getMessage());
                 Log.e(TAG, "status code: " +  statusCode);
             }
+            incrementPlaceCounter();
         });
     }
 
@@ -176,5 +165,25 @@ public class RefreshPlacesListService extends IntentService {
     public void onDestroy() {
         super.onDestroy();
         Log.d(TAG, "onDestroy");
+    }
+
+    private void incrementPlaceCounter() {
+        placeCounter += 1;
+//        Log.d(TAG, "place counter is: " + placeCounter);
+    }
+
+    private void sendInfo() {
+        Log.d(TAG, "finished getting updated place info");
+//        for (int i = 0; i < updatedPlaceNames.size(); i++) {
+//            Log.d(TAG, i + ": " + updatedPlaceNames.get(i));
+//        }
+//        for (int i = 0; i < updatedPlaceAddresses.size(); i++) {
+//            Log.d(TAG, i + ": " + updatedPlaceAddresses.get(i));
+//        }
+
+        Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
+        returnIntent.putExtra(EXTRA_UPDATED_PLACE_NAMES, updatedPlaceNames);
+        returnIntent.putExtra(EXTRA_UPDATED_PLACE_ADDRESSES, updatedPlaceAddresses);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);
     }
 }

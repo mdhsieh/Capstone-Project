@@ -6,14 +6,17 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -52,6 +55,8 @@ import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
 import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_ADDRESSES;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_NAMES;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -63,10 +68,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // refresh places list notification channel ID
     public static final String CHANNEL_ID = "refresh_places_list_channel";
 
-    // key of all place IDs to use in RefreshPlaceListService
+    // key of all Place IDs in places list to use in RefreshPlaceListService
     public static final String EXTRA_SERVICE_PLACE_IDS = "service_place_ids";
-    // key of all place names to use in RefreshPlaceListService
-//    public static final String EXTRA_SERVICE_PLACE_NAMES = "service_place_names";
 
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
@@ -76,6 +79,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // request code when opening ManualPlaceDetailActivity
     public static final int MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE = 1;
+
+    // MainActivity will respond to this action String
+    public static final String RECEIVE_REFRESHED_PLACES_INFO = "receive_refreshed_places_info";
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -90,6 +96,25 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private PlaceViewModel placeViewModel;
 
+    private LocalBroadcastManager broadcastManager;
+
+    // BroadcastReceiver to get refreshed place info from RefreshPlacesListService
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if(intent.getAction() != null && intent.getAction().equals(RECEIVE_REFRESHED_PLACES_INFO)) {
+                ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_NAMES);
+                ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_ADDRESSES);
+
+                if (updatedPlaceNames != null && updatedPlaceAddresses != null) {
+                    for (int i = 0; i < updatedPlaceNames.size(); i++) {
+                        Log.d(TAG, "onReceive: " + updatedPlaceNames.get(i) + ", " + updatedPlaceAddresses.get(i));
+                    }
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -97,6 +122,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // create notification channel
         createNotificationChannel();
+
+        // create broadcast manager and register receiver
+        broadcastManager = LocalBroadcastManager.getInstance(this);
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(RECEIVE_REFRESHED_PLACES_INFO);
+        broadcastManager.registerReceiver(broadcastReceiver, intentFilter);
 
         // show a Toast if there's no Internet connection (Wi-Fi or cellular network)
         if (!isNetworkConnected()) {
@@ -233,13 +264,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_add_manual:
-                // Toast.makeText(this, "add a place manually selected", Toast.LENGTH_LONG).show();
                 // start ManualPlaceDetailsActivity
                 Intent intent = new Intent(this, ManualPlaceDetailActivity.class);
                 // get result when Activity finishes
                 startActivityForResult(intent, MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE);
                 return true;
             case R.id.action_refresh:
+                // refresh places list with up-to-date place info
                 refreshPlacesList();
                 return true;
             default:
@@ -261,6 +292,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
+    }
+
+    /** Unregister the BroadcastReceiver
+     *
+     */
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        broadcastManager.unregisterReceiver(broadcastReceiver);
     }
 
     @Override
@@ -383,7 +423,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private void fetchPhotoAndUpdatePlaceWhenFinished(PlacesClient placesClient, PlaceModel placeModel, PhotoMetadata photoMetadata) {
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
-        // Log.d(TAG, "attributions: " + attributions);
         placeModel.setAttributions(attributions);
 
         // must set max width and height in pixels. The image's default width and height
@@ -439,19 +478,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
 
         ArrayList<String> placeIds = new ArrayList<>();
-//        ArrayList<String> placeNames = new ArrayList<>();
 
         PlaceModel place;
         for (int i = 0; i < places.size(); i++) {
             place = places.get(i);
             placeIds.add(place.getPlaceId());
-//            placeNames.add(place.getName());
         }
 
         // put ArrayList of all the user's Place IDs in Intent
         serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
-        // put ArrayList of all the user's place names in Intent
-//        serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_NAMES, placeNames);
 
         // use startForegroundService in API 26 and higher, otherwise startService on lower API
         ContextCompat.startForegroundService(this, serviceIntent);
