@@ -39,6 +39,6 @@
     <!--add manual place-->
     <string name="add">Add</string>
     <string name="refresh_notification_channel_name">Refresh Channel</string>
-    <string name="refresh_notification_title">Refreshing Your Places</string>
+    <string name="refresh_notification_title">Refreshing your places</string>
     <string name="refresh_notification_text">Refreshing…</string>
 </resources>

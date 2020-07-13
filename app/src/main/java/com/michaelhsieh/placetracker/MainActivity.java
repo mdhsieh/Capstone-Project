@@ -63,8 +63,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // refresh places list notification channel ID
     public static final String CHANNEL_ID = "refresh_places_list_channel";
 
-    // key of test input String
-    public static final String EXTRA_SERVICE_PLACES = "service_places";
+    // key of all place IDs to use in RefreshPlaceListService
+    public static final String EXTRA_SERVICE_PLACE_IDS = "service_place_ids";
+    // key of all place names to use in RefreshPlaceListService
+//    public static final String EXTRA_SERVICE_PLACE_NAMES = "service_place_names";
 
     // PlaceModel key when using Intent
     public static final String EXTRA_PLACE = "PlaceModel";
@@ -432,12 +434,24 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      *
      */
     private void refreshPlacesList() {
-        Toast.makeText(this, R.string.refresh, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
 
         Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
-        // put ArrayList of all the user's places in Intent
-        // serviceIntent.putParcelableArrayListExtra(EXTRA_SERVICE_PLACES, new ArrayList<>(places));
-        serviceIntent.putExtra(EXTRA_SERVICE_PLACES, "hello");
+
+        ArrayList<String> placeIds = new ArrayList<>();
+//        ArrayList<String> placeNames = new ArrayList<>();
+
+        PlaceModel place;
+        for (int i = 0; i < places.size(); i++) {
+            place = places.get(i);
+            placeIds.add(place.getPlaceId());
+//            placeNames.add(place.getName());
+        }
+
+        // put ArrayList of all the user's Place IDs in Intent
+        serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
+        // put ArrayList of all the user's place names in Intent
+//        serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_NAMES, placeNames);
 
         // use startForegroundService in API 26 and higher, otherwise startService on lower API
         ContextCompat.startForegroundService(this, serviceIntent);

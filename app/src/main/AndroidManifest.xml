@@ -4,8 +4,7 @@
     <!-- used to check Internet connection -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <!--<uses-permission android:name="android.permission.WAKE_LOCK"/>-->
-    <!--permission needed in Android Pie and higher-->
+    <!--permission needed in Android Pie (API 28) and higher-->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
     <application
