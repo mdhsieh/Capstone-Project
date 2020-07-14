@@ -4,8 +4,7 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-//import android.os.Build;
-import android.os.SystemClock;
+//import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
@@ -80,23 +79,6 @@ public class RefreshPlacesListService extends IntentService {
                 .build();
 
         startForeground(NOTIFICATION_ID, notification);
-
-        /*NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(getString(R.string.refresh_notification_title))
-                .setContentText(getString(R.string.refresh_notification_text))
-                .setSmallIcon(R.drawable.ic_notification_list_orange_24dp)
-                .setDefaults(Notification.DEFAULT_SOUND)
-                .setContentIntent(pendingIntent);
-
-        // make sure notification is shown and sound plays on older devices
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
-                && Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
-            builder.setPriority(NotificationCompat.PRIORITY_HIGH);
-//            builder.setDefaults(Notification.DEFAULT_SOUND);
-        }
-
-
-        startForeground(NOTIFICATION_ID, builder.build());*/
     }
 
     @Override
@@ -149,7 +131,6 @@ public class RefreshPlacesListService extends IntentService {
         // Add a listener to handle the response.
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
-            // Log.i(TAG, "Place found: " + place.getName());
             Log.i(TAG, "Place found: " + place.getName() + ", " + place.getId());
             updatedPlaceIds.add(place.getId());
             updatedPlaceNames.add(place.getName());
@@ -181,16 +162,10 @@ public class RefreshPlacesListService extends IntentService {
 
     private void incrementPlaceCounter() {
         placeCounter += 1;
-//        Log.d(TAG, "place counter is: " + placeCounter);
     }
 
     private void sendInfo() {
         Log.d(TAG, "finished getting updated place info");
-
-//        Log.d(TAG, "service refreshed ids, names, and addresses in bytes");
-//        MainActivity.testObjects(updatedPlaceIds);
-//        MainActivity.testObjects(updatedPlaceNames);
-//        MainActivity.testObjects(updatedPlaceAddresses);
 
         Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_IDS, updatedPlaceIds);

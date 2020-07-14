@@ -4,7 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LiveData;
+import androidx.core.graphics.BitmapCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -25,6 +25,8 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -47,8 +49,7 @@ import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -118,38 +119,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     String id;
                     String name;
                     String address;
-//                    LiveData<PlaceModel> originalPlace;
                     // update places list with refreshed info. new info should display in adapter
                     for (int i = 0; i < updatedPlaceIds.size(); i++) {
 
                         id = updatedPlaceIds.get(i);
                         name = updatedPlaceNames.get(i);
                         address = updatedPlaceAddresses.get(i);
-//                        Log.d(TAG, "onReceive: " + updatedPlaceIds.get(i) + ", " +
-//                                updatedPlaceNames.get(i) + ", " + updatedPlaceAddresses.get(i));
                         Log.d(TAG, "onReceive: " + id + ", " + name + ", " + address);
-
-                        // get the place in database by ID and
-                        // update the place's name and address
-//                        if (placeViewModel != null) {
-//                            placeViewModel.updateNameAndAddress(id, name, address);
-//                            Log.d(TAG, "updated " + name);
-//                        }
-
-//                        originalPlace = placeViewModel.getPlaceById(id);
-//                        originalPlace.getValue().setName(name);
-//                        originalPlace.getValue().setAddress(address);
-
-                        // loop through all places in user's list and set place's
-                        // name and address to refreshed name and address
-//                        if (places != null) {
-//                            for (PlaceModel place : places) {
-//                                if (place.getPlaceId().equals(id)) {
-//                                    place.setName(name);
-//                                    place.setAddress(address);
-//                                }
-//                            }
-//                        }
 
                         if (places != null) {
                             for (PlaceModel originalPlace : places) {
@@ -206,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // get TextView displaying empty list message
         emptyListDisplay = findViewById(R.id.tv_empty_list);
 
-        // place can be null before first LiveData update
+        // places can be null before first LiveData update
         // ex. when app first started or screen rotated, places is null in onCreate
 
         // set up the RecyclerView
@@ -297,15 +273,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
-
-//                    Log.d(TAG, "all places in bytes");
-//                    MainActivity.testPlacesList(places);
-//                    try {
-//                        Log.d(TAG, "added place in bytes: " + MainActivity.serialize(newPlace).length + " bytes");
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-
                 }
             }
 
@@ -505,15 +472,44 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(500)
-                .setMaxHeight(300)
+//                .setMaxWidth(500)
+//                .setMaxHeight(300)
+                .setMaxWidth(600)
+                .setMaxHeight(600)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
+            /* // uncomment to get size of bitmap in bytes
+            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() + " bytes");
+            Log.d(TAG, "which is: " + bitmap.getByteCount() / 1000 + " KB");
+            */
+//            Log.d(TAG, "using getAllocationByteCount, bitmap before encoding to Base64String has: " + BitmapCompat.getAllocationByteCount(bitmap) + " bytes");
+
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
+
+            Log.d(TAG, "using float method, bitmap after encoding has: " + calcBase64SizeInKBytes(base64Image) + " KB");
+            Log.d(TAG, "using int method, bitmap after encoding has about: " + getBase64StringSizeInBytes(base64Image) / 1000 + " KB");
+            try {
+                // a Base64 String encodes binary date to ASCII,
+                // and Android's default character set, UTF-8, is backwards compatible with ASCII
+                // since ASCII is a subset of UTF-8
+                int byteLength = base64Image.getBytes("UTF-8").length;
+                Log.d(TAG, "bitmap using getBytes() default UTF-8: " + byteLength + " bytes");
+                Log.d(TAG, "bitmap using getBytes() default UTF-8 in KB: " + byteLength / 1000 + " KB");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+
+//            try {
+//                int byteLength = base64Image.getBytes("US-ASCII").length;
+//                Log.d(TAG, "bitmap using getBytes() US-ASCII: " + byteLength + " bytes");
+//                Log.d(TAG, "bitmap using getBytes() US-ASCII in KB: " + byteLength / 1000 + " KB");
+//            } catch (UnsupportedEncodingException e) {
+//                e.printStackTrace();
+//            }
 
             // update the selected place with the Base64 String
             placeModel.setBase64String(base64Image);
@@ -560,10 +556,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             placeIds.add(place.getPlaceId());
         }
 
-        // check number of bytes in list
-//        Log.d(TAG, "refreshPlacesList place IDs in bytes");
-//        MainActivity.testObjects(placeIds);
-
         // put ArrayList of all the user's Place IDs in Intent
         serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
 
@@ -592,15 +584,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
     }
 
-    /*// check how many bytes a String list contains
-    public static void testObjects(List<String> list) {
-        Log.d(TAG, "Objects: " + list.getClass().getSimpleName());
-        long size = getBytesFromList(list);
-        printInUnits(size);
-    }
+    /*
+    // Uncomment this code to check about how many bytes a String List contains.
+    // You can use this to see whether the Place ID List sent to RefreshPlaceListService or
+    // the Place ID, name, and address Lists sent back from RefreshPlaceListService
+    // will cause a android.os.TransactionTooLargeException and crash the app.
 
-    // check how many bytes a PlaceModel list contains
-    public static void testPlacesList(List<PlaceModel> list) {
+    // check how many bytes a String List contains
+    public static void testObjects(List<String> list) {
         Log.d(TAG, "Objects: " + list.getClass().getSimpleName());
         long size = getBytesFromList(list);
         printInUnits(size);
@@ -625,12 +616,74 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         Log.d(TAG, "list size is: " + length / 1000 + " KB");
         Log.d(TAG, "list size is: " + length + " bytes");
     }
+    */
 
-    // convert object to byte stream to get size of object as byte stream
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(obj);
-        return baos.toByteArray();
-    }*/
+    // get Base64 String size in bytes
+    // Source: Pedro Silva
+    // https://stackoverflow.com/questions/13378815/base64-length-calculation
+//    private double calcBase64SizeInKBytes(String base64String) {
+//        double result = -1.0;
+//        if(!TextUtils.isEmpty(base64String)) {
+//            int padding = 0;
+//            if(base64String.endsWith("==")) {
+//                padding = 2;
+//            }
+//            else {
+//                if (base64String.endsWith("=")) padding = 1;
+//            }
+//            // Math.ceil() takes a double as its input and output,
+//            // but input will always be an int, so casting back to int should be ok
+//            result = ( Math.ceil(base64String.length() / 4) * 3 ) - padding;
+//        }
+//        return result / 1000;
+//    }
+
+    // get Base64 String size in bytes
+    // Source: Pedro Silva
+    // https://stackoverflow.com/questions/13378815/base64-length-calculation
+    private int calcBase64SizeInKBytes(String base64String) {
+        int result = -1;
+        if(!TextUtils.isEmpty(base64String)) {
+            int padding = 0;
+            if(base64String.endsWith("==")) {
+                padding = 2;
+            }
+            else {
+                if (base64String.endsWith("=")) padding = 1;
+            }
+            // Math.ceil() takes a double as its input and output,
+            // but input will always be an int, so casting back to int should be ok
+            result = ( (int) Math.ceil( (double) base64String.length() / 3) * 4 ) - padding;
+        }
+        return result / 1000;
+    }
+
+    // get size of Base64 String in bytes
+    // source: Maarten Bodewes
+    // https://stackoverflow.com/questions/13378815/base64-length-calculation
+    private static int getBase64StringSizeInBytes(String base64String) {
+        int result = -1;
+        if(!TextUtils.isEmpty(base64String)) {
+            result = paddedBase64(base64String.length());
+        }
+        return result;
+    }
+
+    private static int ceilDiv(int x, int y) {
+        return (x + y - 1) / y;
+    }
+
+    private static int paddedBase64(int stringLen) {
+        int blocks = ceilDiv(stringLen, 3);
+        return blocks * 4;
+    }
+
+    private int getBundleSizeInBytes(Bundle bundle) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeValue(bundle);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle();
+        return bytes.length;
+    }
+
 }

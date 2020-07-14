@@ -45,9 +45,4 @@ public class PlaceRepository {
         });
     }
 
-//    void updateNameAndAddress(String name, String address, String id) {
-//        PlaceRoomDatabase.databaseWriteExecutor.execute(() -> {
-//            placeDao.updateNameAndAddress(id, name, address);
-//        });
-//    }
 }

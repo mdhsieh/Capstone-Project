@@ -27,11 +27,4 @@ public interface PlaceDao {
 
     @Query("SELECT * from place_table")
     LiveData<List<PlaceModel>> getPlaces();
-
-    /**
-     * Updating only name and address
-     * By Place ID
-     */
-//    @Query("UPDATE place_table SET name = :newName, address = :newAddress WHERE place_id =:id")
-//    void updateNameAndAddress(String id, String newName, String newAddress);
 }

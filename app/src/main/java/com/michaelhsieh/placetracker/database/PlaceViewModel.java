@@ -39,7 +39,4 @@ public class PlaceViewModel extends AndroidViewModel {
         repository.update(place);
     }
 
-//    public void updateNameAndAddress(String id, String name, String address) {
-//        repository.updateNameAndAddress(id, name, address);
-//    }
 }
