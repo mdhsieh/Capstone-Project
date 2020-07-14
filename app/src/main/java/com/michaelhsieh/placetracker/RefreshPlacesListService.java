@@ -33,17 +33,23 @@ public class RefreshPlacesListService extends IntentService {
 
     private static final String TAG = RefreshPlacesListService.class.getSimpleName();
 
+    // key of all fetched place IDs to send to MainActivity
+    public static final String EXTRA_UPDATED_PLACE_IDS = "updated_place_ids";
     // key of all fetched place names to send to MainActivity
     public static final String EXTRA_UPDATED_PLACE_NAMES = "updated_place_names";
+    // key of all fetched place addresses to send to MainActivity
     public static final String EXTRA_UPDATED_PLACE_ADDRESSES = "updated_place_addresses";
 
     // notification ID must not be 0 or ANR will occur with log like
     // Reason: Context.startForegroundService() did not then call Service.startForeground()
     private static final int NOTIFICATION_ID = 2;
 
+    // ArrayLists that will contain updated place info to be sent to MainActivity through Intent Extras
+    private ArrayList<String> updatedPlaceIds;
     private ArrayList<String> updatedPlaceNames;
     private ArrayList<String> updatedPlaceAddresses;
 
+    // place counter to send updated place info to MainActivity once all places fetched
     private int placeCounter = 0;
 
     public RefreshPlacesListService() {
@@ -97,6 +103,8 @@ public class RefreshPlacesListService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "onHandleIntent");
 
+        // create new ArrayLists to hold updated place info
+        updatedPlaceIds = new ArrayList<>();
         updatedPlaceNames = new ArrayList<>();
         updatedPlaceAddresses = new ArrayList<>();
 
@@ -115,10 +123,10 @@ public class RefreshPlacesListService extends IntentService {
 
 
             // test, freeze thread to simulate work for 10 seconds
-            for (int i = 0; i < 10; i++) {
-                Log.d(TAG, " - " + i);
-                SystemClock.sleep(1000); // 1 second
-            }
+//            for (int i = 0; i < 10; i++) {
+//                Log.d(TAG, " - " + i);
+//                SystemClock.sleep(1000); // 1 second
+//            }
         }
 
     }
@@ -143,6 +151,7 @@ public class RefreshPlacesListService extends IntentService {
             Place place = response.getPlace();
             // Log.i(TAG, "Place found: " + place.getName());
             Log.i(TAG, "Place found: " + place.getName() + ", " + place.getId());
+            updatedPlaceIds.add(place.getId());
             updatedPlaceNames.add(place.getName());
             updatedPlaceAddresses.add(place.getAddress());
             if (placeCounter == listSize - 1) {
@@ -156,6 +165,9 @@ public class RefreshPlacesListService extends IntentService {
                 // Handle error with given status code.
                 Log.e(TAG, "Place not found: " + exception.getMessage());
                 Log.e(TAG, "status code: " +  statusCode);
+            }
+            if (placeCounter == listSize - 1) {
+                sendInfo();
             }
             incrementPlaceCounter();
         });
@@ -174,14 +186,14 @@ public class RefreshPlacesListService extends IntentService {
 
     private void sendInfo() {
         Log.d(TAG, "finished getting updated place info");
-//        for (int i = 0; i < updatedPlaceNames.size(); i++) {
-//            Log.d(TAG, i + ": " + updatedPlaceNames.get(i));
-//        }
-//        for (int i = 0; i < updatedPlaceAddresses.size(); i++) {
-//            Log.d(TAG, i + ": " + updatedPlaceAddresses.get(i));
-//        }
+
+//        Log.d(TAG, "service refreshed ids, names, and addresses in bytes");
+//        MainActivity.testObjects(updatedPlaceIds);
+//        MainActivity.testObjects(updatedPlaceNames);
+//        MainActivity.testObjects(updatedPlaceAddresses);
 
         Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
+        returnIntent.putExtra(EXTRA_UPDATED_PLACE_IDS, updatedPlaceIds);
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_NAMES, updatedPlaceNames);
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_ADDRESSES, updatedPlaceAddresses);
         LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);

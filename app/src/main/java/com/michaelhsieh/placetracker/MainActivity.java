@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -46,6 +47,8 @@ import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +59,7 @@ import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
 import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_ADDRESSES;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_IDS;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_NAMES;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
@@ -103,15 +107,74 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction() != null && intent.getAction().equals(RECEIVE_REFRESHED_PLACES_INFO)) {
+                // get refreshed place IDs, names, and addresses
+                ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_IDS);
                 ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_NAMES);
                 ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_ADDRESSES);
 
-                if (updatedPlaceNames != null && updatedPlaceAddresses != null) {
-                    for (int i = 0; i < updatedPlaceNames.size(); i++) {
-                        Log.d(TAG, "onReceive: " + updatedPlaceNames.get(i) + ", " + updatedPlaceAddresses.get(i));
+                if (updatedPlaceIds != null && updatedPlaceNames != null && updatedPlaceAddresses != null) {
+
+                    PlaceModel refreshedPlace;
+                    String id;
+                    String name;
+                    String address;
+//                    LiveData<PlaceModel> originalPlace;
+                    // update places list with refreshed info. new info should display in adapter
+                    for (int i = 0; i < updatedPlaceIds.size(); i++) {
+
+                        id = updatedPlaceIds.get(i);
+                        name = updatedPlaceNames.get(i);
+                        address = updatedPlaceAddresses.get(i);
+//                        Log.d(TAG, "onReceive: " + updatedPlaceIds.get(i) + ", " +
+//                                updatedPlaceNames.get(i) + ", " + updatedPlaceAddresses.get(i));
+                        Log.d(TAG, "onReceive: " + id + ", " + name + ", " + address);
+
+                        // get the place in database by ID and
+                        // update the place's name and address
+//                        if (placeViewModel != null) {
+//                            placeViewModel.updateNameAndAddress(id, name, address);
+//                            Log.d(TAG, "updated " + name);
+//                        }
+
+//                        originalPlace = placeViewModel.getPlaceById(id);
+//                        originalPlace.getValue().setName(name);
+//                        originalPlace.getValue().setAddress(address);
+
+                        // loop through all places in user's list and set place's
+                        // name and address to refreshed name and address
+//                        if (places != null) {
+//                            for (PlaceModel place : places) {
+//                                if (place.getPlaceId().equals(id)) {
+//                                    place.setName(name);
+//                                    place.setAddress(address);
+//                                }
+//                            }
+//                        }
+
+                        if (places != null) {
+                            for (PlaceModel originalPlace : places) {
+                                if (originalPlace.getPlaceId().equals(id)) {
+                                    // set new place to original place with updated name and address
+                                    refreshedPlace = new PlaceModel(id, name, address);
+                                    refreshedPlace.setNotes(originalPlace.getNotes());
+                                    refreshedPlace.setVisits(originalPlace.getVisits());
+                                    refreshedPlace.setBase64String(originalPlace.getBase64String());
+                                    refreshedPlace.setAttributions(originalPlace.getAttributions());
+
+                                    // update with refreshed place info
+                                    if (placeViewModel != null) {
+                                        placeViewModel.update(refreshedPlace);
+                                        Log.d(TAG, "refreshed " + refreshedPlace.getName());
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
             }
+
+            Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -171,6 +234,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // updatedPlaces should be an empty list in onCreate, ex. when app first
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
+                    Log.d(TAG, "onChanged list size: " + updatedPlaces.size());
+
                     // set places list to updated places list
                     places = updatedPlaces;
 
@@ -232,6 +297,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
+
+//                    Log.d(TAG, "all places in bytes");
+//                    MainActivity.testPlacesList(places);
+//                    try {
+//                        Log.d(TAG, "added place in bytes: " + MainActivity.serialize(newPlace).length + " bytes");
+//                    } catch (IOException e) {
+//                        e.printStackTrace();
+//                    }
+
                 }
             }
 
@@ -331,7 +405,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         } else if (requestCode == MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
                 PlaceModel manualPlace = data.getParcelableExtra(EXTRA_MANUAL_ADDED_PLACE);
-                // insert place into the database
+                // insert manually added place into the database
                 placeViewModel.insert(manualPlace);
                 // Observer's onChanged() method updates the adapter
             }
@@ -424,6 +498,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         placeModel.setAttributions(attributions);
+        Log.d(TAG, "attributions: " + attributions);
 
         // must set max width and height in pixels. The image's default width and height
         // causes a TransactionTooLargeException and the app crashes
@@ -485,6 +560,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             placeIds.add(place.getPlaceId());
         }
 
+        // check number of bytes in list
+//        Log.d(TAG, "refreshPlacesList place IDs in bytes");
+//        MainActivity.testObjects(placeIds);
+
         // put ArrayList of all the user's Place IDs in Intent
         serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
 
@@ -512,4 +591,46 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             }
         }
     }
+
+    /*// check how many bytes a String list contains
+    public static void testObjects(List<String> list) {
+        Log.d(TAG, "Objects: " + list.getClass().getSimpleName());
+        long size = getBytesFromList(list);
+        printInUnits(size);
+    }
+
+    // check how many bytes a PlaceModel list contains
+    public static void testPlacesList(List<PlaceModel> list) {
+        Log.d(TAG, "Objects: " + list.getClass().getSimpleName());
+        long size = getBytesFromList(list);
+        printInUnits(size);
+    }
+
+    public static long getBytesFromList(List list) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream out = new ObjectOutputStream(baos);
+            out.writeObject(list);
+            out.close();
+            return baos.toByteArray().length;
+        } catch (IOException exception) {
+            Log.e(TAG, "getBytesFromList: ", exception);
+            return 0;
+        }
+    }
+
+    public static void printInUnits(long length) {
+        Log.d(TAG, "list size is: " + length / 1000000000 + " GB");
+        Log.d(TAG, "list size is: " + length / 1000000 + " MB");
+        Log.d(TAG, "list size is: " + length / 1000 + " KB");
+        Log.d(TAG, "list size is: " + length + " bytes");
+    }
+
+    // convert object to byte stream to get size of object as byte stream
+    public static byte[] serialize(Object obj) throws IOException {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        return baos.toByteArray();
+    }*/
 }
