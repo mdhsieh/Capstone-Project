@@ -140,7 +140,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         id = updatedPlaceIds.get(i);
                         name = updatedPlaceNames.get(i);
                         address = updatedPlaceAddresses.get(i);
-                        Log.d(TAG, "onReceive: " + id + ", " + name + ", " + address);
 
                         if (places != null) {
                             for (PlaceModel originalPlace : places) {
@@ -156,13 +155,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                                     // update place in the database with refreshed place info
                                     if (placeViewModel != null) {
                                         placeViewModel.update(refreshedPlace);
-                                        Log.d(TAG, "refreshed " + refreshedPlace.getName());
                                         // if photo metadata not found, ex. place added manually,
                                         // photo metadata element will be null
                                         if (updatedPhotoMetadata.get(i) != null) {
                                             photoMetadata = updatedPhotoMetadata.get(i);
                                             fetchPhotoAndUpdatePlaceWhenFinished(placesClient, refreshedPlace, photoMetadata);
-                                            Log.d(TAG, "fetching refreshed photo of " + refreshedPlace.getName());
                                         }
                                     }
                                 }
@@ -173,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 }
             }
 
-            // Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -488,11 +485,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // Get the attribution text.
         final String attributions = photoMetadata.getAttributions();
         placeModel.setAttributions(attributions);
-        Log.d(TAG, "attributions: " + attributions);
 
-        Toast.makeText(this, "fetching photo of " + placeModel.getName(), Toast.LENGTH_SHORT).show();
-
-        // must set max width and height in pixels. The image's default width and height
+        // Must set max width and height in pixels. The image's default width and height
         // causes a TransactionTooLargeException and the app crashes
 
         // Create a FetchPhotoRequest.
