@@ -5,15 +5,29 @@
     android:padding="@dimen/widget_margin">
 
     <TextView
-        android:id="@+id/appwidget_text"
+        android:id="@+id/widget_place_name_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
         android:background="#09C"
-        android:contentDescription="@string/appwidget_text"
-        android:text="@string/appwidget_text"
+        android:contentDescription="@string/desc_widget_name"
+        android:text="@string/default_widget_name_text"
+        android:textColor="#ffffff"
+        android:textSize="24sp"
+        android:textStyle="bold|italic" />
+
+    <TextView
+        android:id="@+id/widget_place_address_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"
+        android:layout_below="@id/widget_place_name_text"
+        android:background="#09C"
+        android:contentDescription="@string/desc_widget_address"
+        android:text="@string/default_widget_address_text"
         android:textColor="#ffffff"
         android:textSize="24sp"
         android:textStyle="bold|italic" />

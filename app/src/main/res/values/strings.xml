@@ -43,6 +43,11 @@
     <string name="refresh_notification_title">Refreshing your places</string>
     <string name="refresh_notification_text">Refreshing…</string>
     <string name="refresh_finished">Finished refreshing your places</string>
-    <string name="appwidget_text">EXAMPLE</string>
+    <!--widget-->
+<!--    <string name="appwidget_text">EXAMPLE</string>-->
+    <string name="default_widget_name_text">Select a place!</string>
+    <string name="default_widget_address_text">Address will show here.</string>
+    <string name="desc_widget_name">Widget place name</string>
+    <string name="desc_widget_address">Widget place address</string>
     <string name="add_widget">Add widget</string>
 </resources>
