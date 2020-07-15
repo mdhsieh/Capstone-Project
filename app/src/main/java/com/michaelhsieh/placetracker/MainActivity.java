@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.core.graphics.BitmapCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -49,7 +48,6 @@ import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.io.ByteArrayOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -87,6 +85,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // MainActivity will respond to this action String
     public static final String RECEIVE_REFRESHED_PLACES_INFO = "receive_refreshed_places_info";
+
+    // maximum allowable size, in Kilobytes, of a place's Bitmap encoded as a Base64 String
+    private static final int MAX_BASE64_STRING_SIZE_IN_KB = 300;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -210,7 +211,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // updatedPlaces should be an empty list in onCreate, ex. when app first
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
-                    Log.d(TAG, "onChanged list size: " + updatedPlaces.size());
+//                    Log.d(TAG, "onChanged list size: " + updatedPlaces.size());
 
                     // set places list to updated places list
                     places = updatedPlaces;
@@ -332,6 +333,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // get the position that was clicked
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
+
+        /*Bundle extras = intent.getExtras();
+        int bundleSizeInBytes = getBundleSizeInBytes(extras);
+        Log.d(TAG, "onItemClick size of bundle: " + bundleSizeInBytes + " bytes");
+        Log.d(TAG, "in KB: " + bundleSizeInBytes /1000 + " KB");*/
+
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 
@@ -454,7 +461,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     /** Get the photo from place metadata as a Bitmap encoded as Base64 String and
      * set as place Base64 String. This uses an asynchronous method fetchPhoto(), so
      * by the time it finishes the place has already been inserted.
-     * When the Base64 String has been added the place should be updated.
+     * When the Base64 String has been added the place is updated.
      *
      * @param placesClient The places client required to initialize the Google Places SDK
      * @param placeModel The selected place
@@ -472,48 +479,50 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-//                .setMaxWidth(500)
-//                .setMaxHeight(300)
-                .setMaxWidth(600)
-                .setMaxHeight(600)
+                .setMaxWidth(500)
+                .setMaxHeight(300)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
-            /* // uncomment to get size of bitmap in bytes
-            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() + " bytes");
-            Log.d(TAG, "which is: " + bitmap.getByteCount() / 1000 + " KB");
-            */
-//            Log.d(TAG, "using getAllocationByteCount, bitmap before encoding to Base64String has: " + BitmapCompat.getAllocationByteCount(bitmap) + " bytes");
+            // get size of bitmap in bytes
+            int bitmapSizeInKB = bitmap.getByteCount() / 1000;
+//            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() + " bytes");
+//            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() / 1000 + " KB");
 
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
-            Log.d(TAG, "using float method, bitmap after encoding has: " + calcBase64SizeInKBytes(base64Image) + " KB");
-            Log.d(TAG, "using int method, bitmap after encoding has about: " + getBase64StringSizeInBytes(base64Image) / 1000 + " KB");
+            int base64StringSizeInKB = calculateBase64StringSizeInBytes(base64Image) / 1000;
+//            Log.d(TAG, "using int method, bitmap after encoding has about: " + base64StringSizeInKB + " KB");
+
+            // uncomment to check that approximate size of Bas64String in bytes is correct
+            /*
             try {
                 // a Base64 String encodes binary date to ASCII,
                 // and Android's default character set, UTF-8, is backwards compatible with ASCII
                 // since ASCII is a subset of UTF-8
                 int byteLength = base64Image.getBytes("UTF-8").length;
-                Log.d(TAG, "bitmap using getBytes() default UTF-8: " + byteLength + " bytes");
+                // Log.d(TAG, "bitmap using getBytes() default UTF-8: " + byteLength + " bytes");
                 Log.d(TAG, "bitmap using getBytes() default UTF-8 in KB: " + byteLength / 1000 + " KB");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
             }
+            */
 
-//            try {
-//                int byteLength = base64Image.getBytes("US-ASCII").length;
-//                Log.d(TAG, "bitmap using getBytes() US-ASCII: " + byteLength + " bytes");
-//                Log.d(TAG, "bitmap using getBytes() US-ASCII in KB: " + byteLength / 1000 + " KB");
-//            } catch (UnsupportedEncodingException e) {
-//                e.printStackTrace();
-//            }
-
-            // update the selected place with the Base64 String
-            placeModel.setBase64String(base64Image);
-            placeViewModel.update(placeModel);
+            /* if Bitmap is too large, the PlaceModel sent to DetailActivity through Intent's
+             putExtra() could cause a TransactionTooLargeException and crash the app.
+             The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
+             seems to be around 500 KB. */
+            if (base64StringSizeInKB >= MAX_BASE64_STRING_SIZE_IN_KB) {
+                Log.w(TAG, "Bitmap fetched is too large! Not adding to place. Bitmap size: "
+                    + bitmapSizeInKB + " KB, Base64 String size: " + base64StringSizeInKB + " KB");
+            } else {
+                // update the selected place with the Base64 String
+                placeModel.setBase64String(base64Image);
+                placeViewModel.update(placeModel);
+            }
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -584,12 +593,42 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
     }
 
-    /*
+    // get size of Bundle in bytes
+    // source: ChandraShekhar Kaushik
+    // https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
+    private static int getBundleSizeInBytes(Bundle bundle) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeValue(bundle);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle();
+        return bytes.length;
+    }
+
+    // get size of Base64 String in bytes
+    // source: Maarten Bodewes
+    // https://stackoverflow.com/questions/13378815/base64-length-calculation
+    private static int calculateBase64StringSizeInBytes(String base64String) {
+        int result = -1;
+        if(!TextUtils.isEmpty(base64String)) {
+            result = paddedBase64(base64String.length());
+        }
+        return result;
+    }
+
+    private static int ceilDiv(int x, int y) {
+        return (x + y - 1) / y;
+    }
+
+    private static int paddedBase64(int stringLen) {
+        int blocks = ceilDiv(stringLen, 3);
+        return blocks * 4;
+    }
+
     // Uncomment this code to check about how many bytes a String List contains.
     // You can use this to see whether the Place ID List sent to RefreshPlaceListService or
     // the Place ID, name, and address Lists sent back from RefreshPlaceListService
     // will cause a android.os.TransactionTooLargeException and crash the app.
-
+    /*
     // check how many bytes a String List contains
     public static void testObjects(List<String> list) {
         Log.d(TAG, "Objects: " + list.getClass().getSimpleName());
@@ -617,73 +656,5 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         Log.d(TAG, "list size is: " + length + " bytes");
     }
     */
-
-    // get Base64 String size in bytes
-    // Source: Pedro Silva
-    // https://stackoverflow.com/questions/13378815/base64-length-calculation
-//    private double calcBase64SizeInKBytes(String base64String) {
-//        double result = -1.0;
-//        if(!TextUtils.isEmpty(base64String)) {
-//            int padding = 0;
-//            if(base64String.endsWith("==")) {
-//                padding = 2;
-//            }
-//            else {
-//                if (base64String.endsWith("=")) padding = 1;
-//            }
-//            // Math.ceil() takes a double as its input and output,
-//            // but input will always be an int, so casting back to int should be ok
-//            result = ( Math.ceil(base64String.length() / 4) * 3 ) - padding;
-//        }
-//        return result / 1000;
-//    }
-
-    // get Base64 String size in bytes
-    // Source: Pedro Silva
-    // https://stackoverflow.com/questions/13378815/base64-length-calculation
-    private int calcBase64SizeInKBytes(String base64String) {
-        int result = -1;
-        if(!TextUtils.isEmpty(base64String)) {
-            int padding = 0;
-            if(base64String.endsWith("==")) {
-                padding = 2;
-            }
-            else {
-                if (base64String.endsWith("=")) padding = 1;
-            }
-            // Math.ceil() takes a double as its input and output,
-            // but input will always be an int, so casting back to int should be ok
-            result = ( (int) Math.ceil( (double) base64String.length() / 3) * 4 ) - padding;
-        }
-        return result / 1000;
-    }
-
-    // get size of Base64 String in bytes
-    // source: Maarten Bodewes
-    // https://stackoverflow.com/questions/13378815/base64-length-calculation
-    private static int getBase64StringSizeInBytes(String base64String) {
-        int result = -1;
-        if(!TextUtils.isEmpty(base64String)) {
-            result = paddedBase64(base64String.length());
-        }
-        return result;
-    }
-
-    private static int ceilDiv(int x, int y) {
-        return (x + y - 1) / y;
-    }
-
-    private static int paddedBase64(int stringLen) {
-        int blocks = ceilDiv(stringLen, 3);
-        return blocks * 4;
-    }
-
-    private int getBundleSizeInBytes(Bundle bundle) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeValue(bundle);
-        byte[] bytes = parcel.marshall();
-        parcel.recycle();
-        return bytes.length;
-    }
 
 }
