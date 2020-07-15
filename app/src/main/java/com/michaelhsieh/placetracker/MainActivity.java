@@ -24,7 +24,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -57,10 +56,10 @@ import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
 import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PHOTO_METADATA;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_ADDRESSES;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_IDS;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_NAMES;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PHOTO_METADATA;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_ADDRESSES;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_IDS;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_NAMES;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -106,17 +105,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private LocalBroadcastManager broadcastManager;
 
     /** BroadcastReceiver to get refreshed place info from RefreshPlacesListService.
-     * May contain null in photo metadata ArrayList
+     *
+     * A place in the Room Database is only updated with refreshed info if
+     * its Place ID can be found.
+     * If the place's photo metadata is available, the place is updated twice.
+     *
+     * Creates a new Places Client.
+     * May contain null elements in photo metadata ArrayList, ex. if places added manually.
      */
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction() != null && intent.getAction().equals(RECEIVE_REFRESHED_PLACES_INFO)) {
                 // get refreshed place IDs, names, addresses, and metadata
-                ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_IDS);
-                ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_NAMES);
-                ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_ADDRESSES);
-                ArrayList<PhotoMetadata> updatedPhotoMetadata = intent.getParcelableArrayListExtra(EXTRA_UPDATED_PHOTO_METADATA);
+                ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_IDS);
+                ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_NAMES);
+                ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_ADDRESSES);
+                ArrayList<PhotoMetadata> updatedPhotoMetadata = intent.getParcelableArrayListExtra(EXTRA_REFRESHED_PHOTO_METADATA);
 
                 // Create a new Places client instance
                 PlacesClient placesClient = Places.createClient(MainActivity.this);
@@ -128,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     String name;
                     String address;
                     PhotoMetadata photoMetadata;
-                    // update places list with refreshed info. new info should display in adapter
+                    // Loop through refreshed Place IDs and find the user's place that
+                    // matches this ID. Then update that place with refreshed info.
                     for (int i = 0; i < updatedPlaceIds.size(); i++) {
 
                         id = updatedPlaceIds.get(i);
@@ -139,19 +145,20 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         if (places != null) {
                             for (PlaceModel originalPlace : places) {
                                 if (originalPlace.getPlaceId().equals(id)) {
-                                    // set new place to original place with updated name and address
+                                    // set new place to original place with refreshed
+                                    // name and address
                                     refreshedPlace = new PlaceModel(id, name, address);
                                     refreshedPlace.setNotes(originalPlace.getNotes());
                                     refreshedPlace.setVisits(originalPlace.getVisits());
                                     refreshedPlace.setBase64String(originalPlace.getBase64String());
                                     refreshedPlace.setAttributions(originalPlace.getAttributions());
 
-                                    // update with refreshed place info
+                                    // update place in the database with refreshed place info
                                     if (placeViewModel != null) {
                                         placeViewModel.update(refreshedPlace);
                                         Log.d(TAG, "refreshed " + refreshedPlace.getName());
-                                        // if photo metadata not found, ex. place added manually
-                                        // photo metadata's value will be null
+                                        // if photo metadata not found, ex. place added manually,
+                                        // photo metadata element will be null
                                         if (updatedPhotoMetadata.get(i) != null) {
                                             photoMetadata = updatedPhotoMetadata.get(i);
                                             fetchPhotoAndUpdatePlaceWhenFinished(placesClient, refreshedPlace, photoMetadata);
@@ -166,7 +173,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 }
             }
 
-            Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
+            // Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -226,7 +233,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // updatedPlaces should be an empty list in onCreate, ex. when app first
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
-//                    Log.d(TAG, "onChanged list size: " + updatedPlaces.size());
 
                     // set places list to updated places list
                     places = updatedPlaces;
@@ -348,11 +354,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // get the position that was clicked
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
-
-        /*Bundle extras = intent.getExtras();
-        int bundleSizeInBytes = getBundleSizeInBytes(extras);
-        Log.d(TAG, "onItemClick size of bundle: " + bundleSizeInBytes + " bytes");
-        Log.d(TAG, "in KB: " + bundleSizeInBytes /1000 + " KB");*/
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
@@ -503,35 +504,27 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
-            // get size of bitmap in bytes
+            // get size of bitmap in kilobytes, which is bytes / 1000
             int bitmapSizeInKB = bitmap.getByteCount() / 1000;
-//            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() + " bytes");
-//            Log.d(TAG, "bitmap before encoding to Base64String has: " + bitmap.getByteCount() / 1000 + " KB");
 
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
             int base64StringSizeInKB = calculateBase64StringSizeInBytes(base64Image) / 1000;
-//            Log.d(TAG, "using int method, bitmap after encoding has about: " + base64StringSizeInKB + " KB");
 
-            // uncomment to check that approximate size of Bas64String in bytes is correct
-            /*
-            try {
+            // uncomment to check that approximate size of Base64String in bytes is correct
+            /* try {
                 // a Base64 String encodes binary date to ASCII,
                 // and Android's default character set, UTF-8, is backwards compatible with ASCII
                 // since ASCII is a subset of UTF-8
                 int byteLength = base64Image.getBytes("UTF-8").length;
-                // Log.d(TAG, "bitmap using getBytes() default UTF-8: " + byteLength + " bytes");
                 Log.d(TAG, "bitmap using getBytes() default UTF-8 in KB: " + byteLength / 1000 + " KB");
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();
-            }
-            */
+            } */
 
             /* if Bitmap is too large, the PlaceModel sent to DetailActivity through Intent's
-             putExtra() could cause a TransactionTooLargeException and crash the app.
-             The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
-             seems to be around 500 KB. */
+             putExtra() could cause a TransactionTooLargeException and crash the app. */
             if (base64StringSizeInKB >= MAX_BASE64_STRING_SIZE_IN_KB) {
                 Log.w(TAG, "Bitmap fetched is too large! Not adding to place. Bitmap size: "
                     + bitmapSizeInKB + " KB, Base64 String size: " + base64StringSizeInKB + " KB");
@@ -563,10 +556,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return Base64.encodeToString(byteArrayInput, Base64.DEFAULT);
     }
 
-    /** Starts an IntentService to get up-to-date info on user's places in the background.
+    /** Starts an IntentService to get refreshed info on user's places in the background.
      *
-     * The method gets new Place info from the Google Places SDK using the Place ID
-     * of each place in the places list. Then the Room Database is updated with the new info.
+     * The IntentService gets refreshed place info from the Google Places SDK using the Place ID
+     * of each place in the places list. The IntentService sends this info back to MainActivity.
+     * Then the Room Database is updated with the refreshed info.
      *
      */
     private void refreshPlacesList() {
@@ -610,20 +604,18 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }
     }
 
-    // get size of Bundle in bytes
-    // source: ChandraShekhar Kaushik
-    // https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
-    private static int getBundleSizeInBytes(Bundle bundle) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeValue(bundle);
-        byte[] bytes = parcel.marshall();
-        parcel.recycle();
-        return bytes.length;
-    }
+    // Methods to check size of objects in bytes. Too many bytes in Intent putExtras() will cause
+    // a TransactionTooLargeException and crash the app.
 
-    // get size of Base64 String in bytes
-    // source: Maarten Bodewes
-    // https://stackoverflow.com/questions/13378815/base64-length-calculation
+    /** Get approximate size of Base64 String in bytes.
+     *
+     * Source: Maarten Bodewes
+     * https://stackoverflow.com/questions/13378815/base64-length-calculation
+     *
+     * @param base64String The Base64String
+     * @return The size in bytes
+     *
+     */
     private static int calculateBase64StringSizeInBytes(String base64String) {
         int result = -1;
         if(!TextUtils.isEmpty(base64String)) {
@@ -641,8 +633,25 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return blocks * 4;
     }
 
+    /* Get size of Bundle in bytes.
+    Can be used with Intent's getExtras() to check if the PlaceModel sent to DetailActivity is
+    using too many bytes, causing a TransactionTooLargeException and crashing the app.
+    The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
+    seems to be around 500 KB. One PlaceModel Visit is 3 KB.
+
+    Source: ChandraShekhar Kaushik
+    https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
+     */
+    /*private static int getBundleSizeInBytes(Bundle bundle) {
+        Parcel parcel = Parcel.obtain();
+        parcel.writeValue(bundle);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle();
+        return bytes.length;
+    }*/
+
     // Uncomment to check about how many bytes a String List contains.
-    // You can use this to see whether the Place ID List sent to RefreshPlaceListService or
+    // Can be used to check whether the Place ID List sent to RefreshPlaceListService or
     // the Place ID, name, and address Lists sent back from RefreshPlaceListService
     // will cause a android.os.TransactionTooLargeException and crash the app.
     /*

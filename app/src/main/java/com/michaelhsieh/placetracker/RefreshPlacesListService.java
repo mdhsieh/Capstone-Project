@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
-//import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
@@ -25,8 +24,9 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import static com.michaelhsieh.placetracker.MainActivity.CHANNEL_ID;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_SERVICE_PLACE_IDS;
 
-/** An IntentService that refreshes the user's places list with new place info in the background.
- * A place is only refreshed if its Place ID can be found.
+/** Gets refreshed info on the user's places in the background.
+ *
+ * Creates a new Places Client.
  *
  */
 public class RefreshPlacesListService extends IntentService {
@@ -34,27 +34,28 @@ public class RefreshPlacesListService extends IntentService {
     private static final String TAG = RefreshPlacesListService.class.getSimpleName();
 
     // key of all fetched place IDs to send to MainActivity
-    public static final String EXTRA_UPDATED_PLACE_IDS = "updated_place_ids";
+    public static final String EXTRA_REFRESHED_PLACE_IDS = "refreshed_place_ids";
     // key of all fetched place names to send to MainActivity
-    public static final String EXTRA_UPDATED_PLACE_NAMES = "updated_place_names";
+    public static final String EXTRA_REFRESHED_PLACE_NAMES = "refreshed_place_names";
     // key of all fetched place addresses to send to MainActivity
-    public static final String EXTRA_UPDATED_PLACE_ADDRESSES = "updated_place_addresses";
+    public static final String EXTRA_REFRESHED_PLACE_ADDRESSES = "refreshed_place_addresses";
     // key of all fetched places' first photo metadata to send to MainActivity
-    public static final String EXTRA_UPDATED_PHOTO_METADATA = "updated_place_photometadata";
+    public static final String EXTRA_REFRESHED_PHOTO_METADATA = "refreshed_place_photometadata";
 
     // notification ID must not be 0 or ANR will occur with log like
     // Reason: Context.startForegroundService() did not then call Service.startForeground()
     private static final int NOTIFICATION_ID = 2;
 
-    // ArrayLists that will contain updated place info to be sent to MainActivity through Intent Extras
-    private ArrayList<String> updatedPlaceIds;
-    private ArrayList<String> updatedPlaceNames;
-    private ArrayList<String> updatedPlaceAddresses;
-    // this ArrayList will have a null value if a place's first photo metadata can't be found,
+    // ArrayLists that will contain refreshed place info to be
+    // sent to MainActivity through Intent Extras
+    private ArrayList<String> refreshedPlaceIds;
+    private ArrayList<String> refreshedPlaceNames;
+    private ArrayList<String> refreshedPlaceAddresses;
+    // This ArrayList will have a null element if a place's first photo metadata can't be found,
     // ex. place added manually
-    private ArrayList<PhotoMetadata> updatedPhotoMetadata;
+    private ArrayList<PhotoMetadata> refreshedPhotoMetadata;
 
-    // place counter to send updated place info to MainActivity once all places fetched
+    // place counter to send refreshed place info to MainActivity once all places fetched
     private int placeCounter = 0;
 
     public RefreshPlacesListService() {
@@ -91,11 +92,11 @@ public class RefreshPlacesListService extends IntentService {
     protected void onHandleIntent(@Nullable Intent intent) {
         Log.d(TAG, "onHandleIntent");
 
-        // create new ArrayLists to hold updated place info
-        updatedPlaceIds = new ArrayList<>();
-        updatedPlaceNames = new ArrayList<>();
-        updatedPlaceAddresses = new ArrayList<>();
-        updatedPhotoMetadata = new ArrayList<>();
+        // create new ArrayLists to hold refreshed place info
+        refreshedPlaceIds = new ArrayList<>();
+        refreshedPlaceNames = new ArrayList<>();
+        refreshedPlaceAddresses = new ArrayList<>();
+        refreshedPhotoMetadata = new ArrayList<>();
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -109,21 +110,16 @@ public class RefreshPlacesListService extends IntentService {
                     fetchAllPlacesById(placesClient, allPlaceIds.get(i), allPlaceIdsSize);
                 }
             }
-
-
-            // test, freeze thread to simulate work for 10 seconds
-//            for (int i = 0; i < 10; i++) {
-//                Log.d(TAG, " - " + i);
-//                SystemClock.sleep(1000); // 1 second
-//            }
         }
 
     }
 
-    /** Fetch up-to-date place info using the Place ID,
+    /** Fetch refreshed place info using the Place ID,
      * or just log message if the Place ID can't be found.
      *
-     * @param placesClient The places client, initialized by the Service
+     * The info consists of a place's ID, name, address, and first photo's metadata.
+     *
+     * @param placesClient The places client, initialized by the IntentService
      * @param placeId The Place ID of a place in user's places list
      * @param listSize The size of the List of Place IDs
      */
@@ -138,22 +134,23 @@ public class RefreshPlacesListService extends IntentService {
         // Add a listener to handle the response.
         placesClient.fetchPlace(request).addOnSuccessListener((response) -> {
             Place place = response.getPlace();
-            Log.i(TAG, "Place found: " + place.getName() + ", " + place.getId());
-            updatedPlaceIds.add(place.getId());
-            updatedPlaceNames.add(place.getName());
-            updatedPlaceAddresses.add(place.getAddress());
-            // add first photo metadata if available
+
+            refreshedPlaceIds.add(place.getId());
+            refreshedPlaceNames.add(place.getName());
+            refreshedPlaceAddresses.add(place.getAddress());
+            // add first photo's metadata if available
             if (place.getPhotoMetadatas() != null && !place.getPhotoMetadatas().isEmpty()) {
-                updatedPhotoMetadata.add(place.getPhotoMetadatas().get(0));
-                Log.d(TAG, "added metadata");
+                refreshedPhotoMetadata.add(place.getPhotoMetadatas().get(0));
             } else {
-                // add null data to keep index the same as other updated place ArrayList indexes
-                updatedPhotoMetadata.add(null);
-                Log.d(TAG, "added null");
+                // add null element to keep index the same as
+                // other refreshed info ArrayList indexes
+                refreshedPhotoMetadata.add(null);
             }
+            // when last place has been fetched, send the info to MainActivity
             if (placeCounter == listSize - 1) {
                 sendInfo();
             }
+            // increase place counter by 1
             incrementPlaceCounter();
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {
@@ -163,9 +160,12 @@ public class RefreshPlacesListService extends IntentService {
                 Log.e(TAG, "Place not found: " + exception.getMessage());
                 Log.e(TAG, "status code: " +  statusCode);
             }
+            // when last place has been fetched, send the info to MainActivity
             if (placeCounter == listSize - 1) {
                 sendInfo();
             }
+            // still increase place counter by 1 because
+            // a fetch may fail if ex. place added manually
             incrementPlaceCounter();
         });
     }
@@ -180,14 +180,17 @@ public class RefreshPlacesListService extends IntentService {
         placeCounter += 1;
     }
 
+    /** Send all places' refreshed info to MainActivity.
+     *
+     */
     private void sendInfo() {
-        Log.d(TAG, "finished getting updated place info");
+        Log.d(TAG, "finished getting refreshed place info");
 
         Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
-        returnIntent.putExtra(EXTRA_UPDATED_PLACE_IDS, updatedPlaceIds);
-        returnIntent.putExtra(EXTRA_UPDATED_PLACE_NAMES, updatedPlaceNames);
-        returnIntent.putExtra(EXTRA_UPDATED_PLACE_ADDRESSES, updatedPlaceAddresses);
-        returnIntent.putExtra(EXTRA_UPDATED_PHOTO_METADATA, updatedPhotoMetadata);
+        returnIntent.putExtra(EXTRA_REFRESHED_PLACE_IDS, refreshedPlaceIds);
+        returnIntent.putExtra(EXTRA_REFRESHED_PLACE_NAMES, refreshedPlaceNames);
+        returnIntent.putExtra(EXTRA_REFRESHED_PLACE_ADDRESSES, refreshedPlaceAddresses);
+        returnIntent.putExtra(EXTRA_REFRESHED_PHOTO_METADATA, refreshedPhotoMetadata);
         LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);
     }
 }
