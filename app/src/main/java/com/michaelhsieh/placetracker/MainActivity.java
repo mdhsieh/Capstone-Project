@@ -57,6 +57,7 @@ import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
 import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
+import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PHOTO_METADATA;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_ADDRESSES;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_IDS;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_UPDATED_PLACE_NAMES;
@@ -113,13 +114,18 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_IDS);
                 ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_NAMES);
                 ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_ADDRESSES);
+                ArrayList<PhotoMetadata> updatedPhotoMetadata = intent.getParcelableArrayListExtra(EXTRA_UPDATED_PHOTO_METADATA);
 
-                if (updatedPlaceIds != null && updatedPlaceNames != null && updatedPlaceAddresses != null) {
+                // Create a new Places client instance
+                PlacesClient placesClient = Places.createClient(MainActivity.this);
+
+                if (updatedPlaceIds != null && updatedPlaceNames != null && updatedPlaceAddresses != null && updatedPhotoMetadata != null) {
 
                     PlaceModel refreshedPlace;
                     String id;
                     String name;
                     String address;
+                    PhotoMetadata photoMetadata;
                     // update places list with refreshed info. new info should display in adapter
                     for (int i = 0; i < updatedPlaceIds.size(); i++) {
 
@@ -142,6 +148,11 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                                     if (placeViewModel != null) {
                                         placeViewModel.update(refreshedPlace);
                                         Log.d(TAG, "refreshed " + refreshedPlace.getName());
+                                        if (updatedPhotoMetadata.get(i) != null) {
+                                            photoMetadata = updatedPhotoMetadata.get(i);
+                                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, refreshedPlace, photoMetadata);
+                                            Log.d(TAG, "fetching refreshed photo of " + refreshedPlace.getName());
+                                        }
                                     }
                                 }
                             }
@@ -473,6 +484,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         final String attributions = photoMetadata.getAttributions();
         placeModel.setAttributions(attributions);
         Log.d(TAG, "attributions: " + attributions);
+
+        Toast.makeText(this, "fetching photo of " + placeModel.getName(), Toast.LENGTH_SHORT).show();
 
         // must set max width and height in pixels. The image's default width and height
         // causes a TransactionTooLargeException and the app crashes

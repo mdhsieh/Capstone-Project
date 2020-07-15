@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -38,6 +39,8 @@ public class RefreshPlacesListService extends IntentService {
     public static final String EXTRA_UPDATED_PLACE_NAMES = "updated_place_names";
     // key of all fetched place addresses to send to MainActivity
     public static final String EXTRA_UPDATED_PLACE_ADDRESSES = "updated_place_addresses";
+    // key of all fetched places' first photo metadata to send to MainActivity
+    public static final String EXTRA_UPDATED_PHOTO_METADATA = "updated_place_photometadata";
 
     // notification ID must not be 0 or ANR will occur with log like
     // Reason: Context.startForegroundService() did not then call Service.startForeground()
@@ -47,6 +50,7 @@ public class RefreshPlacesListService extends IntentService {
     private ArrayList<String> updatedPlaceIds;
     private ArrayList<String> updatedPlaceNames;
     private ArrayList<String> updatedPlaceAddresses;
+    private ArrayList<PhotoMetadata> updatedPhotoMetadata;
 
     // place counter to send updated place info to MainActivity once all places fetched
     private int placeCounter = 0;
@@ -89,6 +93,7 @@ public class RefreshPlacesListService extends IntentService {
         updatedPlaceIds = new ArrayList<>();
         updatedPlaceNames = new ArrayList<>();
         updatedPlaceAddresses = new ArrayList<>();
+        updatedPhotoMetadata = new ArrayList<>();
 
         // Create a new Places client instance.
         PlacesClient placesClient = Places.createClient(this);
@@ -122,7 +127,7 @@ public class RefreshPlacesListService extends IntentService {
      */
     private void fetchAllPlacesById( PlacesClient placesClient, String placeId, int listSize) {
         // Specify the fields to return.
-        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS);
+        List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
 
         // Construct a request object, passing the place ID and fields array.
         FetchPlaceRequest request = FetchPlaceRequest.builder(placeId, placeFields)
@@ -135,6 +140,15 @@ public class RefreshPlacesListService extends IntentService {
             updatedPlaceIds.add(place.getId());
             updatedPlaceNames.add(place.getName());
             updatedPlaceAddresses.add(place.getAddress());
+            // add first photo metadata if available
+            if (place.getPhotoMetadatas() != null && !place.getPhotoMetadatas().isEmpty()) {
+                updatedPhotoMetadata.add(place.getPhotoMetadatas().get(0));
+                Log.d(TAG, "added metadata");
+            } else {
+                // add null data to keep index the same as other updated place ArrayList indexes
+                updatedPhotoMetadata.add(null);
+                Log.d(TAG, "added null");
+            }
             if (placeCounter == listSize - 1) {
                 sendInfo();
             }
@@ -171,6 +185,7 @@ public class RefreshPlacesListService extends IntentService {
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_IDS, updatedPlaceIds);
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_NAMES, updatedPlaceNames);
         returnIntent.putExtra(EXTRA_UPDATED_PLACE_ADDRESSES, updatedPlaceAddresses);
+        returnIntent.putExtra(EXTRA_UPDATED_PHOTO_METADATA, updatedPhotoMetadata);
         LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);
     }
 }
