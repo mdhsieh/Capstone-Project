@@ -105,12 +105,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private LocalBroadcastManager broadcastManager;
 
-    // BroadcastReceiver to get refreshed place info from RefreshPlacesListService
+    /** BroadcastReceiver to get refreshed place info from RefreshPlacesListService.
+     * May contain null in photo metadata ArrayList
+     */
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if(intent.getAction() != null && intent.getAction().equals(RECEIVE_REFRESHED_PLACES_INFO)) {
-                // get refreshed place IDs, names, and addresses
+                // get refreshed place IDs, names, addresses, and metadata
                 ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_IDS);
                 ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_NAMES);
                 ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_UPDATED_PLACE_ADDRESSES);
@@ -148,6 +150,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                                     if (placeViewModel != null) {
                                         placeViewModel.update(refreshedPlace);
                                         Log.d(TAG, "refreshed " + refreshedPlace.getName());
+                                        // if photo metadata not found, ex. place added manually
+                                        // photo metadata's value will be null
                                         if (updatedPhotoMetadata.get(i) != null) {
                                             photoMetadata = updatedPhotoMetadata.get(i);
                                             fetchPhotoAndUpdatePlaceWhenFinished(placesClient, refreshedPlace, photoMetadata);
@@ -637,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return blocks * 4;
     }
 
-    // Uncomment this code to check about how many bytes a String List contains.
+    // Uncomment to check about how many bytes a String List contains.
     // You can use this to see whether the Place ID List sent to RefreshPlaceListService or
     // the Place ID, name, and address Lists sent back from RefreshPlaceListService
     // will cause a android.os.TransactionTooLargeException and crash the app.

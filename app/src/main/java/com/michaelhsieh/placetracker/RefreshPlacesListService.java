@@ -50,6 +50,8 @@ public class RefreshPlacesListService extends IntentService {
     private ArrayList<String> updatedPlaceIds;
     private ArrayList<String> updatedPlaceNames;
     private ArrayList<String> updatedPlaceAddresses;
+    // this ArrayList will have a null value if a place's first photo metadata can't be found,
+    // ex. place added manually
     private ArrayList<PhotoMetadata> updatedPhotoMetadata;
 
     // place counter to send updated place info to MainActivity once all places fetched
