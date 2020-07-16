@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.google.android.gms.common.api.ApiException;
@@ -80,7 +81,7 @@ public class RefreshPlacesListService extends IntentService {
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.refresh_notification_title))
                 .setContentText(getString(R.string.refresh_notification_text))
-                .setSmallIcon(R.drawable.ic_notification_list_orange_24dp)
+                .setSmallIcon(R.drawable.ic_notification_list_white_24dp)
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true)
                 .build();

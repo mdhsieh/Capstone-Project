@@ -1,7 +1,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#09C"
+    android:background="@color/colorPrimary"
     android:padding="@dimen/widget_margin">
 
     <TextView
@@ -11,7 +11,6 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_margin="8dp"
-        android:background="#09C"
         android:contentDescription="@string/desc_widget_name"
         android:text="@string/default_widget_name_text"
         android:textColor="#ffffff"
@@ -25,7 +24,6 @@
         android:layout_centerHorizontal="true"
         android:layout_margin="8dp"
         android:layout_below="@id/widget_place_name_text"
-        android:background="#09C"
         android:contentDescription="@string/desc_widget_address"
         android:text="@string/default_widget_address_text"
         android:textColor="#ffffff"
