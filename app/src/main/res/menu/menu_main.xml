@@ -8,4 +8,7 @@
     <item android:id="@+id/action_refresh"
         android:title="@string/refresh"
         app:showAsAction="never"/>
+    <item android:id="@+id/action_random_picker"
+        android:title="@string/random_picker"
+        app:showAsAction="never"/>
 </menu>

@@ -50,6 +50,7 @@ import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
 import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
@@ -333,6 +334,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // refresh places list with up-to-date place info
                 refreshPlacesList();
                 return true;
+            case R.id.action_random_picker:
+                // pick a random place and start its DetailActivity
+                pickRandomPlace();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -571,23 +576,61 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      *
      */
     private void refreshPlacesList() {
-        Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
+        // only refresh if Internet is connected
+        if (isNetworkConnected()) {
+            Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
 
-        Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
+            Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
 
-        ArrayList<String> placeIds = new ArrayList<>();
+            ArrayList<String> placeIds = new ArrayList<>();
 
-        PlaceModel place;
-        for (int i = 0; i < places.size(); i++) {
-            place = places.get(i);
-            placeIds.add(place.getPlaceId());
+            PlaceModel place;
+            for (int i = 0; i < places.size(); i++) {
+                place = places.get(i);
+                placeIds.add(place.getPlaceId());
+            }
+
+            // put ArrayList of all the user's Place IDs in Intent
+            serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
+
+            // use startForegroundService in API 26 and higher, otherwise startService on lower API
+            ContextCompat.startForegroundService(this, serviceIntent);
+        } else {
+            Toast.makeText(this, R.string.refresh_internet_connection_error, Toast.LENGTH_LONG).show();
+
         }
+    }
 
-        // put ArrayList of all the user's Place IDs in Intent
-        serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
+    /** Start a random place's DetailActivity. This may be useful if ex. the user
+     * wants to pick a random restaurant. Similar to onItemClick().
+     */
+    private void pickRandomPlace() {
+        // don't pick a random place if there are no places
+        if (adapter != null && places != null && !places.isEmpty()) {
+            // pick a random number between 0 and places.size() - 1
+            // this will be the position of the place in the user's list
+            int randPos = new Random().nextInt(places.size());
+            Log.d(TAG, "pickRandomPlace position: " + randPos);
+            PlaceModel randPlace = adapter.getItem(randPos);
+            // start DetailActivity
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(EXTRA_PLACE, randPlace);
+            // get the position that was clicked
+            // This will be used to save or delete the place from the DetailActivity buttons
+            clickedPlacePos = randPos;
 
-        // use startForegroundService in API 26 and higher, otherwise startService on lower API
-        ContextCompat.startForegroundService(this, serviceIntent);
+            Toast.makeText(this, randPlace.getName(), Toast.LENGTH_SHORT).show();
+
+            // get the random place's name, address, and number of visits and
+            // update the widget
+            PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
+                    randPlace.getName(), randPlace.getAddress(),
+                    randPlace.getNumVisits());
+
+            startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
+        } else if (places != null && places.isEmpty()) {
+            Toast.makeText(this, R.string.random_pick_empty_error, Toast.LENGTH_LONG).show();
+        }
     }
 
     /** Creates a notification channel.

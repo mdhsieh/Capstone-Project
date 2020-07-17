@@ -205,7 +205,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         // alert dialog to confirm user wants to delete this place
                         new AlertDialog.Builder(DetailActivity.this)
                                 .setTitle(R.string.delete_place_title)
-                                // .setMessage(R.string.delete_place_message)
                                 .setMessage(deleteMessage)
 
                                 // Specifying a listener allows you to take an action before dismissing the dialog.
@@ -441,7 +440,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 new AlertDialog.Builder(DetailActivity.this)
                         .setTitle(R.string.delete_visit_title)
-                        // .setMessage(R.string.delete_visit_message)
                         .setMessage(deleteVisitMessage)
 
                         // Specifying a listener allows you to take an action before dismissing the dialog.
