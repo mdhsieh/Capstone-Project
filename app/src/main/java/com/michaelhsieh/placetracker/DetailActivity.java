@@ -195,10 +195,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     @Override
                     public void onClick(View view) {
 
+                        // create delete place message
+                        // Are you sure you want to delete [place] at [address]?
+                        String deleteMessage = getResources().getString(R.string.delete_place_message)
+                                + place.getName() + getResources().getString(R.string.at) +
+                                place.getAddress() +
+                                getResources().getString(R.string.question_mark);
+
                         // alert dialog to confirm user wants to delete this place
                         new AlertDialog.Builder(DetailActivity.this)
                                 .setTitle(R.string.delete_place_title)
-                                .setMessage(R.string.delete_place_message)
+                                // .setMessage(R.string.delete_place_message)
+                                .setMessage(deleteMessage)
 
                                 // Specifying a listener allows you to take an action before dismissing the dialog.
                                 // The dialog is automatically dismissed when a dialog button is clicked.
@@ -423,9 +431,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         dialogView.findViewById(R.id.btn_delete_visit).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                // create delete visit message
+                // Are you sure you want to delete this visit on [date] at [time]?
+                String deleteVisitMessage = getResources().getString(R.string.delete_visit_message)
+                        + visit.getDate() + getResources().getString(R.string.at) +
+                        visit.getTime() +
+                        getResources().getString(R.string.question_mark);
+
                 new AlertDialog.Builder(DetailActivity.this)
                         .setTitle(R.string.delete_visit_title)
-                        .setMessage(R.string.delete_visit_message)
+                        // .setMessage(R.string.delete_visit_message)
+                        .setMessage(deleteVisitMessage)
 
                         // Specifying a listener allows you to take an action before dismissing the dialog.
                         // The dialog is automatically dismissed when a dialog button is clicked.

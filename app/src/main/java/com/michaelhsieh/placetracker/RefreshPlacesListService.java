@@ -78,6 +78,7 @@ public class RefreshPlacesListService extends IntentService {
                 0, notificationIntent, 0);
 
         // display notification
+        // currently the service finishes too quickly for the notification to be visible
         Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(getString(R.string.refresh_notification_title))
                 .setContentText(getString(R.string.refresh_notification_text))

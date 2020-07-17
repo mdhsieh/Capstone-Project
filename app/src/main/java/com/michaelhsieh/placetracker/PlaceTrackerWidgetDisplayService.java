@@ -9,7 +9,7 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 
 /** Updates the name, address, and number of visits of place tracker widgets
- * to the user's clicked place.
+ * to the user's selected place.
  *
  * An {@link IntentService} subclass so actions are done in the background on a separate thread.
  *

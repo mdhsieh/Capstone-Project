@@ -352,7 +352,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
 
-        // get the place name and address and update the widget using an IntentService
+        // get the place name, address, and number of visits and
+        // update the widget using an IntentService
         PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
                 adapter.getItem(position).getName(), adapter.getItem(position).getAddress(),
                 adapter.getItem(position).getNumVisits());
@@ -392,6 +393,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         // update place in the database
                         placeViewModel.update(updatedPlace);
                         // Observer's onChanged() method updates the adapter
+
+                        // get the saved place's name, address, and number of visits and
+                        // update the widget
+                        PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
+                                updatedPlace.getName(), updatedPlace.getAddress(),
+                                updatedPlace.getNumVisits());
                     }
                 }
             }
