@@ -16,20 +16,19 @@ public class PlaceTrackerAppWidget extends AppWidgetProvider {
     private static final String TAG = PlaceTrackerAppWidget.class.getSimpleName();
 
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                String name, String address, int appWidgetId) {
+                                String name, String address, int numVisits, int appWidgetId) {
 
-        Log.d(TAG, "updateAppWidget: " + name + ", " + address);
+        Log.d(TAG, "updateAppWidget: " + name + ", " + address + ", " + numVisits);
 
         // Create an Intent to launch MainActivity when the widget is clicked
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
 
-//        String widgetPlaceNameText = context.getString(R.string.default_widget_name_text);
-//        String widgetPlaceAddressText = context.getString(R.string.default_widget_address_text);
         // Construct the RemoteViews object
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.place_tracker_app_widget);
         views.setTextViewText(R.id.widget_place_name_text, name);
         views.setTextViewText(R.id.widget_place_address_text, address);
+        views.setTextViewText(R.id.widget_place_num_visits_text, String.valueOf(numVisits));
         views.setOnClickPendingIntent(R.id.widget_layout, pendingIntent);
 
         // Instruct the widget manager to update the widget
@@ -68,13 +67,14 @@ public class PlaceTrackerAppWidget extends AppWidgetProvider {
      * @param appWidgetManager The widget manager
      * @param name       The name of the selected place
      * @param address      The address of that place
+     * @param numVisits The number of visits to that place
      * @param appWidgetIds     Array of widget Ids to be updated
      */
     public static void updatePlaceTrackerWidgets(Context context, AppWidgetManager appWidgetManager,
-                                           String name, String address, int[] appWidgetIds)
+                                           String name, String address, int numVisits, int[] appWidgetIds)
     {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, name, address, appWidgetId);
+            updateAppWidget(context, appWidgetManager, name, address, numVisits, appWidgetId);
         }
     }
 

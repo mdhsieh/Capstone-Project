@@ -353,7 +353,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         clickedPlacePos = position;
 
         // get the place name and address and update the widget using an IntentService
-        PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this, adapter.getItem(position).getName(), adapter.getItem(position).getAddress());
+        PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
+                adapter.getItem(position).getName(), adapter.getItem(position).getAddress(),
+                adapter.getItem(position).getNumVisits());
 
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);

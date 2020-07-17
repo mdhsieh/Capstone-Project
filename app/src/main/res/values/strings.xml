@@ -46,7 +46,9 @@
     <!--widget-->
     <string name="default_widget_name_text">Select a place!</string>
     <string name="default_widget_address_text">Address will go here.</string>
+    <string name="default_widget_num_visits_text">0</string>
     <string name="desc_widget_name">Widget place name</string>
     <string name="desc_widget_address">Widget place address</string>
+    <string name="desc_widget_num_visits">Widget number of visits</string>
     <string name="add_widget">Add widget</string>
 </resources>
