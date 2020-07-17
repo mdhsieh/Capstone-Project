@@ -352,6 +352,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
 
+        // get the place name and address and update the widget using an IntentService
+        PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this, adapter.getItem(position).getName(), adapter.getItem(position).getAddress());
+
+
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 

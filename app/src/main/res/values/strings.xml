@@ -44,7 +44,6 @@
     <string name="refresh_notification_text">Refreshing…</string>
     <string name="refresh_finished">Finished refreshing your places</string>
     <!--widget-->
-<!--    <string name="appwidget_text">EXAMPLE</string>-->
     <string name="default_widget_name_text">Select a place!</string>
     <string name="default_widget_address_text">Address will go here.</string>
     <string name="desc_widget_name">Widget place name</string>

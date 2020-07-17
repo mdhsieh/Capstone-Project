@@ -24,21 +24,26 @@
                 android:resource="@xml/place_tracker_app_widget_info" />
         </receiver>
 
-        <activity
-            android:name=".ManualPlaceDetailActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity
-            android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity" />
-        <activity android:name=".MainActivity">
+        <!--launch mode singleTop to not have multiple screens when re-opening widget and app-->
+        <activity android:name=".MainActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".DetailActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".ManualPlaceDetailActivity"
+            android:parentActivityName=".MainActivity" />
 
+        <!--service to get refreshed place info-->
         <service android:name=".RefreshPlacesListService" />
+        <!--service to update widget-->
+        <service android:name=".PlaceTrackerWidgetDisplayService"/>
     </application>
 
 </manifest>
