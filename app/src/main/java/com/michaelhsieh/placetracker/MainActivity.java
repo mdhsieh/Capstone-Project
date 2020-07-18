@@ -610,7 +610,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // pick a random number between 0 and places.size() - 1
             // this will be the position of the place in the user's list
             int randPos = new Random().nextInt(places.size());
-            Log.d(TAG, "pickRandomPlace position: " + randPos);
             PlaceModel randPlace = adapter.getItem(randPos);
             // start DetailActivity
             Intent intent = new Intent(this, DetailActivity.class);

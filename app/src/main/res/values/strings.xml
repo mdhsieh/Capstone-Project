@@ -32,6 +32,7 @@
     <!--date time picker buttons-->
     <string name="set">Set</string>
     <string name="cancel">Cancel</string>
+    <string name="copy_visit">Copy Visit</string>
     <string name="delete_visit">Delete Visit</string>
     <!--visit delete alert dialog-->
     <string name="delete_visit_title">Delete visit</string>
@@ -56,4 +57,6 @@
     <string name="add_widget">Add widget</string>
     <!--random picker empty-->
     <string name="random_pick_empty_error">No places yet! Can\'t pick a place.</string>
+    <string name="visit_date_time_copy_label">visit date and time</string>
+    <string name="visit_date_time_copy_confirm_message">Copied date and time to clipboard</string>
 </resources>
