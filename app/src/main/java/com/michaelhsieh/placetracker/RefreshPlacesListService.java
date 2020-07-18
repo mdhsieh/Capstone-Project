@@ -186,8 +186,6 @@ public class RefreshPlacesListService extends IntentService {
      *
      */
     private void sendInfo() {
-        Log.d(TAG, "finished getting refreshed place info");
-
         Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_IDS, refreshedPlaceIds);
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_NAMES, refreshedPlaceNames);

@@ -15,3 +15,8 @@
 
 # resource file that holds API key
 app/src/main/res/values/secrets.xml
+
+# keystore file
+keystore.jks
+# properties file containing signing information
+keystore.properties
