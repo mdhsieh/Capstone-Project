@@ -41,6 +41,9 @@ dependencies {
     // use ExpandableRecyclerView to show expandable visit dates and times
     implementation 'com.thoughtbot:expandablerecyclerview:1.3'
 
+    // use Google AdMob to display a banner ad
+    implementation 'com.google.android.gms:play-services-ads:19.2.0'
+
     // Room components
     implementation "androidx.room:room-runtime:$rootProject.roomVersion"
     annotationProcessor "androidx.room:room-compiler:$rootProject.roomVersion"
