@@ -2,6 +2,7 @@ package com.michaelhsieh.placetracker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
@@ -15,6 +16,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
@@ -24,6 +26,7 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcel;
 import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -94,6 +97,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // maximum allowable size, in Kilobytes, of a place's Bitmap encoded as a Base64 String
     private static final int MAX_BASE64_STRING_SIZE_IN_KB = 300;
+
+    // maximum allowable size, in Kilobytes, of data sent to another Activity through Intent
+    public static final int MAX_BUNDLE_SIZE_IN_KB = 500;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -382,6 +388,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 adapter.getItem(position).getName(), adapter.getItem(position).getAddress(),
                 adapter.getItem(position).getNumVisits());
 
+        int intentSizeInKB = getBundleSizeInBytes(intent.getExtras()) / 1000;
+
+        if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
+            Log.w(TAG, "onItemClick: size in KB: " + intentSizeInKB);
+            Log.w(TAG, "onItemClick: PlaceModel put in Intent may contain too much data.");
+        }
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
@@ -597,7 +609,43 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private void refreshPlacesList() {
         // only refresh if Internet is connected
         if (isNetworkConnected()) {
-            Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
+
+            // show confirmation dialog and refresh if user confirms
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.refresh_places_title)
+                    .setMessage(R.string.refresh_places_message)
+
+                    // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            // Continue and start refresh service
+                            Toast.makeText(MainActivity.this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
+
+                            Intent serviceIntent = new Intent(MainActivity.this, RefreshPlacesListService.class);
+
+                            ArrayList<String> placeIds = new ArrayList<>();
+
+                            PlaceModel place;
+                            for (int i = 0; i < places.size(); i++) {
+                                place = places.get(i);
+                                placeIds.add(place.getPlaceId());
+                            }
+
+                            // put ArrayList of all the user's Place IDs in Intent
+                            serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
+
+                            // use startForegroundService in API 26 and higher, otherwise startService on lower API
+                            ContextCompat.startForegroundService(MainActivity.this, serviceIntent);
+                        }
+                    })
+
+                    // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(android.R.string.no, null)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .show();
+
+            /*Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
 
             Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
 
@@ -613,7 +661,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
 
             // use startForegroundService in API 26 and higher, otherwise startService on lower API
-            ContextCompat.startForegroundService(this, serviceIntent);
+            ContextCompat.startForegroundService(this, serviceIntent);*/
+
         } else {
             Toast.makeText(this, R.string.refresh_internet_connection_error, Toast.LENGTH_LONG).show();
 
@@ -644,6 +693,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
                     randPlace.getName(), randPlace.getAddress(),
                     randPlace.getNumVisits());
+
+            int intentSizeInKB = getBundleSizeInBytes(intent.getExtras()) / 1000;
+
+            if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
+                Log.w(TAG, "pickRandomPlace: size in KB: " + intentSizeInKB);
+                Log.w(TAG, "pickRandomPlace: PlaceModel put in Intent may contain too much data.");
+            }
 
             startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
         } else if (places != null && places.isEmpty()) {
@@ -701,22 +757,25 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return blocks * 4;
     }
 
-    /* Get size of Bundle in bytes.
-    Can be used with Intent's getExtras() to check if the PlaceModel sent to DetailActivity is
+    /* Get size of a Bundle in bytes.
+
+    Can be used with Intent's getExtras() to check if data sent to an Activity,
+    ex. the PlaceModel sent to DetailActivity, is
     using too many bytes, causing a TransactionTooLargeException and crashing the app.
+
     The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
     seems to be around 500 KB. One PlaceModel Visit is 3 KB.
 
     Source: ChandraShekhar Kaushik
     https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
      */
-    /*private static int getBundleSizeInBytes(Bundle bundle) {
+    public static int getBundleSizeInBytes(Bundle bundle) {
         Parcel parcel = Parcel.obtain();
         parcel.writeValue(bundle);
         byte[] bytes = parcel.marshall();
         parcel.recycle();
         return bytes.length;
-    }*/
+    }
 
     // Uncomment to check about how many bytes a String List contains.
     // Can be used to check whether the Place ID List sent to RefreshPlaceListService or

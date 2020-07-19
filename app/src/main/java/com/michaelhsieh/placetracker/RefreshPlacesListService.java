@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.SystemClock;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.libraries.places.api.Places;
@@ -24,6 +25,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import static com.michaelhsieh.placetracker.MainActivity.CHANNEL_ID;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_SERVICE_PLACE_IDS;
+import static com.michaelhsieh.placetracker.MainActivity.MAX_BUNDLE_SIZE_IN_KB;
+import static com.michaelhsieh.placetracker.MainActivity.getBundleSizeInBytes;
 
 /** Gets refreshed info on the user's places in the background.
  *
@@ -191,6 +194,15 @@ public class RefreshPlacesListService extends IntentService {
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_NAMES, refreshedPlaceNames);
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_ADDRESSES, refreshedPlaceAddresses);
         returnIntent.putExtra(EXTRA_REFRESHED_PHOTO_METADATA, refreshedPhotoMetadata);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);
+
+        int intentSizeInKB = getBundleSizeInBytes(returnIntent.getExtras()) / 1000;
+
+        if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
+            Log.w(TAG, "sendInfo: size in KB: " + intentSizeInKB);
+            Log.w(TAG, "sendInfo: Extras put in returnIntent may contain too much data. Canceling refresh.");
+            Toast.makeText(this, R.string.refresh_too_much_data_error, Toast.LENGTH_SHORT).show();
+        } else {
+            LocalBroadcastManager.getInstance(this).sendBroadcast(returnIntent);
+        }
     }
 }

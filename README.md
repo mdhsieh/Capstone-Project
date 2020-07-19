@@ -1,6 +1,6 @@
 # Capstone-Project
-A place tracker to record places you've visited. You can use it to remember what restaurants you've
-eaten at, save your latest doctor's appointment, or whatever you'd like.
+A simple way to record places you've visited. You can use Place Tracker to remember what restaurants you've
+eaten at, save your latest doctor's appointment, and more.
 
 ## Installation
 To run the app from this repository, you need to:

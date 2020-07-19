@@ -47,6 +47,7 @@
     <string name="refresh_notification_text">Refreshing…</string>
     <string name="refresh_finished">Finished refreshing your places</string>
     <string name="refresh_internet_connection_error">No Internet connection! Please connect to refresh.</string>
+    <string name="refresh_too_much_data_error">Too much data fetched. Canceling refresh.</string>
     <!--widget-->
     <string name="default_widget_name_text">Select a place!</string>
     <string name="default_widget_address_text">Address will go here.</string>
@@ -59,4 +60,7 @@
     <string name="random_pick_empty_error">No places yet! Can\'t pick a place.</string>
     <string name="visit_date_time_copy_label">visit date and time</string>
     <string name="visit_date_time_copy_confirm_message">Copied date and time to clipboard</string>
+    <!--refresh places alert dialog-->
+    <string name="refresh_places_message">Refreshing will replace all names and addresses with new info. Are you sure you want to continue?</string>
+    <string name="refresh_places_title">Refresh places</string>
 </resources>
