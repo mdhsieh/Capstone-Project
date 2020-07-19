@@ -73,7 +73,6 @@ public class RefreshPlacesListService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        Log.d(TAG, "onCreate");
 
         // open MainActivity when service notification clicked
         Intent notificationIntent = new Intent(this, MainActivity.class);
@@ -95,7 +94,6 @@ public class RefreshPlacesListService extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        Log.d(TAG, "onHandleIntent");
 
         // create new ArrayLists to hold refreshed place info
         refreshedPlaceIds = new ArrayList<>();
@@ -178,7 +176,6 @@ public class RefreshPlacesListService extends IntentService {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
     }
 
     private void incrementPlaceCounter() {
