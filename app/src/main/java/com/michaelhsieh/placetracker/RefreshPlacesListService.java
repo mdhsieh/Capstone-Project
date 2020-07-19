@@ -197,6 +197,8 @@ public class RefreshPlacesListService extends IntentService {
 
         int intentSizeInKB = getBundleSizeInBytes(returnIntent.getExtras()) / 1000;
 
+        // cancel refresh if too much data is fetched, since sending too much data will
+        // crash the app with a TransactionTooLargeException
         if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
             Log.w(TAG, "sendInfo: size in KB: " + intentSizeInKB);
             Log.w(TAG, "sendInfo: Extras put in returnIntent may contain too much data. Canceling refresh.");

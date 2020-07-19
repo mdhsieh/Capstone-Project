@@ -388,13 +388,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 adapter.getItem(position).getName(), adapter.getItem(position).getAddress(),
                 adapter.getItem(position).getNumVisits());
 
-        int intentSizeInKB = getBundleSizeInBytes(intent.getExtras()) / 1000;
-
-        if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
-            Log.w(TAG, "onItemClick: size in KB: " + intentSizeInKB);
-            Log.w(TAG, "onItemClick: PlaceModel put in Intent may contain too much data.");
-        }
-
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 
@@ -645,24 +638,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     .setIcon(android.R.drawable.ic_dialog_alert)
                     .show();
 
-            /*Toast.makeText(this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
-
-            Intent serviceIntent = new Intent(this, RefreshPlacesListService.class);
-
-            ArrayList<String> placeIds = new ArrayList<>();
-
-            PlaceModel place;
-            for (int i = 0; i < places.size(); i++) {
-                place = places.get(i);
-                placeIds.add(place.getPlaceId());
-            }
-
-            // put ArrayList of all the user's Place IDs in Intent
-            serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
-
-            // use startForegroundService in API 26 and higher, otherwise startService on lower API
-            ContextCompat.startForegroundService(this, serviceIntent);*/
-
         } else {
             Toast.makeText(this, R.string.refresh_internet_connection_error, Toast.LENGTH_LONG).show();
 
@@ -693,13 +668,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
                     randPlace.getName(), randPlace.getAddress(),
                     randPlace.getNumVisits());
-
-            int intentSizeInKB = getBundleSizeInBytes(intent.getExtras()) / 1000;
-
-            if (intentSizeInKB >= MAX_BUNDLE_SIZE_IN_KB) {
-                Log.w(TAG, "pickRandomPlace: size in KB: " + intentSizeInKB);
-                Log.w(TAG, "pickRandomPlace: PlaceModel put in Intent may contain too much data.");
-            }
 
             startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
         } else if (places != null && places.isEmpty()) {
@@ -757,10 +725,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         return blocks * 4;
     }
 
-    /* Get size of a Bundle in bytes.
+    /** Get size of a Bundle in bytes.
 
-    Can be used with Intent's getExtras() to check if data sent to an Activity,
-    ex. the PlaceModel sent to DetailActivity, is
+    Can be used on Intent's getExtras() to check if data sent to an Activity,
+    ex. the Lists sent to MainActivity or PlaceModel sent to DetailActivity, is
     using too many bytes, causing a TransactionTooLargeException and crashing the app.
 
     The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
@@ -768,6 +736,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     Source: ChandraShekhar Kaushik
     https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
+
+     @param bundle The bundle
+     @return The size of the bundle in bytes
      */
     public static int getBundleSizeInBytes(Bundle bundle) {
         Parcel parcel = Parcel.obtain();
