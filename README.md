@@ -1,8 +1,9 @@
 # Capstone-Project
-A place tracker to record places you've visited.
+A place tracker to record places you've visited. You can use it to remember what restaurants you've
+eaten at, save your latest doctor's appointment, or whatever you'd like.
 
 ## Installation
-To run this app, you need to:
+To run the app from this repository, you need to:
 1. Create an account on the [Google Cloud Platform](https://accounts.google.com/signin/v2/identifier?service=cloudconsole&passive=1209600&osid=1&continue=https%3A%2F%2Fconsole.cloud.google.com%2F%3Fref%3Dhttps%3A%2F%2Fwww.google.com%2F&followup=https%3A%2F%2Fconsole.cloud.google.com%2F%3Fref%3Dhttps%3A%2F%2Fwww.google.com%2F&flowName=GlifWebSignIn&flowEntry=ServiceLogin).
 2. Add a billing account.
 3. Enable the Places API from your console.
@@ -21,3 +22,9 @@ For example, you can just copy-paste this file into the "values" folder, replaci
 6. Clone this repository, open the cloned folder in Android Studio, and run the app.
 
 ## Screenshots
+![main screen with places list](place_tracker_1.PNG)
+![main screen when searching](place_tracker_2.PNG)
+![place details screen top half with image](place_tracker_3.PNG)
+![place details screen bottom half with visits](place_tracker_4.PNG)
+![visit dialog date](place_tracker_5.PNG)
+![visit dialog time](place_tracker_6.PNG)
