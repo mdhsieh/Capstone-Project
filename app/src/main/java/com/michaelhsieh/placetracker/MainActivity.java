@@ -259,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // updatedPlaces should be an empty list in onCreate, ex. when app first
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
+                    Log.d(TAG, "onChanged: list size is " + updatedPlaces.size());
 
                     // set places list to updated places list
                     places = updatedPlaces;
@@ -417,7 +418,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                     placeViewModel.delete(placeToDelete);
                     // Observer's onChanged() method updates the adapter
                 }
-                else if (buttonType != null && buttonType.equals(SAVE)) {
+                /*else if (buttonType != null && buttonType.equals(SAVE)) {
                     PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
                     if (updatedPlace != null) {
                         // update() in dao uses the primary key of the original clicked place,
@@ -433,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                                 updatedPlace.getName(), updatedPlace.getAddress(),
                                 updatedPlace.getNumVisits());
                     }
-                }
+                }*/
             }
         } else if (requestCode == MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
