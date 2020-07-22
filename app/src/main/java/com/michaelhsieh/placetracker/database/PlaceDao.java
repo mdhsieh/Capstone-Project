@@ -27,4 +27,7 @@ public interface PlaceDao {
 
     @Query("SELECT * from place_table")
     LiveData<List<PlaceModel>> getPlaces();
+
+    @Query("SELECT * FROM place_table WHERE place_id =:id")
+    LiveData<PlaceModel> getPlaceById(String id);
 }

@@ -25,6 +25,10 @@ public class PlaceRepository {
         return allPlaces;
     }
 
+    LiveData<PlaceModel> getPlaceById(String id) {
+        return placeDao.getPlaceById(id);
+    }
+
     // You must call this on a non-UI thread or your app will throw an exception. Room ensures
     // that you're not doing any long running operations on the main thread, blocking the UI.
     void insert(PlaceModel place) {

@@ -84,7 +84,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public static final String EXTRA_SERVICE_PLACE_IDS = "service_place_ids";
 
     // PlaceModel key when using Intent
-    public static final String EXTRA_PLACE = "PlaceModel";
+    // public static final String EXTRA_PLACE = "PlaceModel";
+
+    // PlaceModel ID key when using Intent
+    public static final String EXTRA_PLACE_ID = "PlaceModel_ID";
 
     // request code when opening DetailActivity
     public static final int DETAIL_ACTIVITY_REQUEST_CODE = 0;
@@ -377,7 +380,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public void onItemClick(View view, int position) {
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
+        // intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
+        intent.putExtra(EXTRA_PLACE_ID, adapter.getItem(position).getPlaceId());
         // get the position that was clicked
         // This will be used to save or delete the place from the DetailActivity buttons
         clickedPlacePos = position;
@@ -656,7 +660,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             PlaceModel randPlace = adapter.getItem(randPos);
             // start DetailActivity
             Intent intent = new Intent(this, DetailActivity.class);
-            intent.putExtra(EXTRA_PLACE, randPlace);
+            // intent.putExtra(EXTRA_PLACE, randPlace);
+            intent.putExtra(EXTRA_PLACE_ID, randPlace.getPlaceId());
             // get the position that was clicked
             // This will be used to save or delete the place from the DetailActivity buttons
             clickedPlacePos = randPos;

@@ -27,6 +27,10 @@ public class PlaceViewModel extends AndroidViewModel {
         return allPlaces;
     }
 
+    public LiveData<PlaceModel> getPlaceById(String id) {
+        return repository.getPlaceById(id);
+    }
+
     public void insert(PlaceModel place) {
         repository.insert(place);
     }

@@ -3,6 +3,8 @@ package com.michaelhsieh.placetracker;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,13 +30,15 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
+// import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
+import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE_ID;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
@@ -82,6 +86,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // TextView to display photo's attributions text
     TextView attributionsText;
 
+    // PlaceViewModel to get clicked place by Place ID
+    PlaceViewModel viewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,9 +111,195 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // fine TextView that displays attribution text
         attributionsText = findViewById(R.id.tv_attributions);
 
-        // get the PlaceModel from the Intent that started this Activity
+        viewModel = new ViewModelProvider(this).get(PlaceViewModel.class);
+
         Intent intent = getIntent();
+        if (intent.hasExtra(EXTRA_PLACE_ID)) {
+            String id = intent.getStringExtra(EXTRA_PLACE_ID);
+
+            Context context = this;
+
+            viewModel.getPlaceById(id).observe(this, new Observer<PlaceModel>() {
+                @Override
+                public void onChanged(PlaceModel placeModel) {
+                    // placeModel will be null if place is deleted
+                    if (placeModel != null) {
+                        Log.d(TAG, "onChanged name: " + placeModel.getName());
+                        Log.d(TAG, "address: " + placeModel.getAddress());
+                        Log.d(TAG, "visits: " + placeModel.getVisits());
+                        Log.d(TAG, "num visits: " + placeModel.getNumVisits());
+                        Log.d(TAG, "notes: " + placeModel.getNotes());
+                        place = placeModel;
+
+                        // rest of code using place is put here
+                        String name = place.getName();
+                        String address = place.getAddress();
+                        int numVisits = place.getNumVisits();
+                        String notes = place.getNotes();
+
+                        nameDisplay.setText(name);
+                        addressDisplay.setText(address);
+                        notesDisplay.setText(notes);
+
+                        // initialize the visit group and visits
+                        visits = place.getVisits();
+
+                        // list of visit groups which will only contain one group at position 0
+                        List<VisitGroup> visitGroupList =
+                                Arrays.asList
+                                        (new VisitGroup(getResources().getString(R.string.dates_visited),
+                                                visits)
+                                        );
+
+                        numVisitsDisplay.setText(String.valueOf(numVisits));
+
+                        // show last visit if PlaceModel already has visits,
+                        // otherwise hide last visit text and label
+                        showOrHideLastVisit();
+
+                        // initialize expanding RecyclerView
+                        RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
+                        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+                        recyclerView.setLayoutManager(layoutManager);
+                        // add a divider
+                        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                                layoutManager.getOrientation());
+                        // use custom white divider
+                        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
+                        recyclerView.addItemDecoration(dividerItemDecoration);
+
+                        // instantiate the adapter with the list of visit groups.
+                        // there's only one visit group
+                        adapter = new VisitGroupAdapter(visitGroupList);
+                        // set the click listener for clicks on individual visits
+                        adapter.setClickListener((VisitGroupAdapter.VisitItemClickListener) context);
+                        recyclerView.setAdapter(adapter);
+
+                        // display bitmap photo if available
+                        String base64String = place.getBase64String();
+                        // display photo's attribution text if available
+                        String attributions = place.getAttributions();
+                        if (base64String != null && !base64String.isEmpty()) {
+                            // decode Base64 String to bitmap
+                            Bitmap bitmap = decodeBase64StringToBitmap(base64String);
+
+                            photo.setVisibility(View.VISIBLE);
+                            photo.setImageBitmap(bitmap);
+
+                            // make attributions text visible and display
+                            if (attributions != null && !attributions.isEmpty()) {
+                                attributionsText.setVisibility(View.VISIBLE);
+                                // setText(Html.fromHtml(bodyData)) is deprecated after api 24
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                                    attributionsText.setText(Html.fromHtml(attributions, Html.FROM_HTML_MODE_COMPACT));
+                                } else {
+                                    attributionsText.setText(Html.fromHtml(attributions));
+                                }
+                            } else {
+                                Log.v(TAG, "attributions is: " + attributions);
+                                attributionsText.setVisibility(View.GONE);
+                            }
+                        } else {
+                            Log.v(TAG, "base64String is: " + base64String);
+                            photo.setVisibility(View.GONE);
+                            attributionsText.setVisibility(View.GONE);
+                        }
+
+                        // add visit when the add visit button is clicked
+                        Button addVisitButton = findViewById(R.id.btn_add_visit);
+                        addVisitButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // object whose calendar fields have been initialized with the current date and time
+                                Calendar rightNow = Calendar.getInstance();
+                                insertSingleItem(new Visit(rightNow));
+                            }
+                        });
+
+                        Button deleteButton = findViewById(R.id.btn_delete);
+                        deleteButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                                // create delete place message
+                                // Are you sure you want to delete [place] at [address]?
+                                String deleteMessage = getResources().getString(R.string.delete_place_message)
+                                        + place.getName() + getResources().getString(R.string.at) +
+                                        place.getAddress() +
+                                        getResources().getString(R.string.question_mark);
+
+                                // alert dialog to confirm user wants to delete this place
+                                new AlertDialog.Builder(DetailActivity.this)
+                                        .setTitle(R.string.delete_place_title)
+                                        .setMessage(deleteMessage)
+
+                                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                                        // The dialog is automatically dismissed when a dialog button is clicked.
+                                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Continue with delete operation
+                                                Intent deletePlaceIntent = new Intent();
+                                                // button is used to delete this place from place list
+                                                buttonType = DELETE;
+                                                deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
+                                                setResult(RESULT_OK, deletePlaceIntent);
+                                                finish();
+                                            }
+                                        })
+
+                                        // A null listener allows the button to dismiss the dialog and take no further action.
+                                        .setNegativeButton(android.R.string.no, null)
+                                        .setIcon(android.R.drawable.ic_dialog_alert)
+                                        .show();
+                            }
+                        });
+
+                        Button saveButton = findViewById(R.id.btn_save);
+                        saveButton.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent savePlaceIntent = new Intent();
+                                // button is used to save this place's info
+                                buttonType = SAVE;
+                                savePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
+                                // save the user's current EditText data for name, address, and notes
+                                // visits should already be added and Place ID should stay the same
+                                place.setName(nameDisplay.getText().toString());
+                                place.setAddress(addressDisplay.getText().toString());
+                                place.setNotes(notesDisplay.getText().toString());
+                                savePlaceIntent.putExtra(EXTRA_SAVED_PLACE, place);
+                                setResult(RESULT_OK, savePlaceIntent);
+                                finish();
+                            }
+                        });
+
+                        // if last visit TextView clicked, copy the date and time to clipboard
+                        lastVisitDisplay.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                if (lastVisitDisplay.getVisibility() == View.VISIBLE) {
+                                    // label is only used by developer, can retrieve by using clip.getDescription()
+                                    String label = getString(R.string.visit_date_time_copy_label);
+                                    String text = lastVisitDisplay.getText().toString();
+                                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                                    ClipData clip = ClipData.newPlainText(label, text);
+                                    if (clipboard != null) {
+                                        clipboard.setPrimaryClip(clip);
+                                        Toast.makeText(getApplicationContext(), R.string.visit_date_time_copy_confirm_message, Toast.LENGTH_LONG).show();
+                                    }
+                                }
+                            }
+                        });
+
+                    }
+                }
+            });
+        }
+
+        // get the PlaceModel from the Intent that started this Activity
+        /*Intent intent = getIntent();
         if (intent.hasExtra(EXTRA_PLACE)) {
+
             place = intent.getParcelableExtra(EXTRA_PLACE);
             if (place != null) {
 
@@ -272,7 +465,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             } else {
                 Log.e(TAG, "place is null");
             }
-        }
+        }*/
+
     }
 
     /* To save the expand and collapse state of the adapter,
