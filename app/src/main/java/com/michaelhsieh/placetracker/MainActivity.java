@@ -510,8 +510,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-                .setMaxWidth(500)
-                .setMaxHeight(300)
+//                .setMaxWidth(500)
+//                .setMaxHeight(300)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
@@ -538,14 +538,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
             /* if Bitmap is too large, the PlaceModel sent to DetailActivity through Intent's
              putExtra() could cause a TransactionTooLargeException and crash the app. */
-            if (base64StringSizeInKB >= MAX_BASE64_STRING_SIZE_IN_KB) {
+           /* if (base64StringSizeInKB >= MAX_BASE64_STRING_SIZE_IN_KB) {
                 Log.w(TAG, "Bitmap fetched is too large! Not adding to place. Bitmap size: "
                     + bitmapSizeInKB + " KB, Base64 String size: " + base64StringSizeInKB + " KB");
-            } else {
+            } else {*/
                 // update the selected place with the Base64 String
                 placeModel.setBase64String(base64Image);
                 placeViewModel.update(placeModel);
-            }
+            /*}*/
 
         }).addOnFailureListener((exception) -> {
             if (exception instanceof ApiException) {

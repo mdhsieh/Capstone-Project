@@ -148,7 +148,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             // if ex. device rotated, restore expand or collapse state of adapter
                             if (savedInstanceState != null && adapter != null) {
                                 adapter.onRestoreInstanceState(savedInstanceState);
-                                Log.d(TAG, "onChanged: restored adapter sate");
+                                Log.d(TAG, "onChanged: restored adapter state");
                             }
 
                             setUpPhoto();

@@ -181,6 +181,7 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         }
 
         // save the place that the user is manually adding
+        // This should not crash with TransactionTooLargeException unless user adds 150+ visits
         outState.putParcelable(STATE_MANUAL_PLACE, place);
     }
 
