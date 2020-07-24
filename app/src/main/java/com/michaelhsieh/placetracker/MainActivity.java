@@ -60,10 +60,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static com.michaelhsieh.placetracker.DetailActivity.DELETE;
-import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_BUTTON_TYPE;
-import static com.michaelhsieh.placetracker.DetailActivity.EXTRA_SAVED_PLACE;
-import static com.michaelhsieh.placetracker.DetailActivity.SAVE;
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PHOTO_METADATA;
 import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_ADDRESSES;
@@ -82,9 +78,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // key of all Place IDs in places list to use in RefreshPlaceListService
     public static final String EXTRA_SERVICE_PLACE_IDS = "service_place_ids";
-
-    // PlaceModel key when using Intent
-    // public static final String EXTRA_PLACE = "PlaceModel";
 
     // PlaceModel ID key when using Intent
     public static final String EXTRA_PLACE_ID = "PlaceModel_ID";
@@ -381,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public void onItemClick(View view, int position) {
         // start DetailActivity
         Intent intent = new Intent(this, DetailActivity.class);
-        // intent.putExtra(EXTRA_PLACE, adapter.getItem(position));
         intent.putExtra(EXTRA_PLACE_ID, adapter.getItem(position).getPlaceId());
         // get the position that was clicked
         // This will be used to save or delete the place from the DetailActivity buttons
@@ -411,30 +403,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         if (requestCode == DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
-                String buttonType = data.getStringExtra(EXTRA_BUTTON_TYPE);
-                if (buttonType != null && buttonType.equals(DELETE)) {
-                    // delete place from the database
-                    PlaceModel placeToDelete = places.get(clickedPlacePos);
-                    placeViewModel.delete(placeToDelete);
-                    // Observer's onChanged() method updates the adapter
-                }
-                /*else if (buttonType != null && buttonType.equals(SAVE)) {
-                    PlaceModel updatedPlace = data.getParcelableExtra(EXTRA_SAVED_PLACE);
-                    if (updatedPlace != null) {
-                        // update() in dao uses the primary key of the original clicked place,
-                        // which is the Place ID
-
-                        // update place in the database
-                        placeViewModel.update(updatedPlace);
-                        // Observer's onChanged() method updates the adapter
-
-                        // get the saved place's name, address, and number of visits and
-                        // update the widget
-                        PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(this,
-                                updatedPlace.getName(), updatedPlace.getAddress(),
-                                updatedPlace.getNumVisits());
-                    }
-                }*/
+                // delete place from the database
+                PlaceModel placeToDelete = places.get(clickedPlacePos);
+                placeViewModel.delete(placeToDelete);
+                // Observer's onChanged() method updates the adapter
             }
         } else if (requestCode == MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
@@ -661,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             PlaceModel randPlace = adapter.getItem(randPos);
             // start DetailActivity
             Intent intent = new Intent(this, DetailActivity.class);
-            // intent.putExtra(EXTRA_PLACE, randPlace);
             intent.putExtra(EXTRA_PLACE_ID, randPlace.getPlaceId());
             // get the position that was clicked
             // This will be used to save or delete the place from the DetailActivity buttons

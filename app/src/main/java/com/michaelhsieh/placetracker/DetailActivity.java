@@ -37,35 +37,22 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-// import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE_ID;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
-    // key of String used to determine which button was clicked
-    public static final String EXTRA_BUTTON_TYPE = "button_type";
-    // key of place with updated info when save button clicked
-    public static final String EXTRA_SAVED_PLACE = "place";
-
-    // Strings to either save or delete the place depending on what button is clicked
-    public static final String DELETE = "delete";
-    public static final String SAVE = "save";
-
     /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
     The visits list starts at position 1.
 
-    Need to get a clicked visit's adapter position - 1 to get the visit's list position.
+    Get a clicked visit's adapter position - 1 to get the visit's list position.
     For example first visit is at adapter position 1 but visit list position 0.
     The visit list position is used as a parameter to update, delete, and add visits.
 
-    Need to get visit's list position + 1 to get the visit's adapter position.
+    Get visit's list position + 1 to get the visit's adapter position.
     The adapter position is used to notify the adapter of changes to the visit list.*/
     private static final int NUM_VISIT_GROUPS = 1;
-
-    // type of button clicked, which is either the save or delete button
-    private String buttonType;
 
     private PlaceModel place;
 
@@ -105,8 +92,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
 
-        /*final EditText nameDisplay = findViewById(R.id.et_name);
-        final EditText addressDisplay = findViewById(R.id.et_address);*/
         nameDisplay = findViewById(R.id.et_name);
         addressDisplay = findViewById(R.id.et_address);
 
@@ -114,7 +99,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
 
-        /*final EditText notesDisplay = findViewById(R.id.et_notes);*/
         notesDisplay = findViewById(R.id.et_notes);
 
         // find ImageView that display photo
@@ -128,46 +112,57 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE_ID)) {
             String id = intent.getStringExtra(EXTRA_PLACE_ID);
 
-//            Context context = this;
+                viewModel.getPlaceById(id).observe(this, new Observer<PlaceModel>() {
+                    @Override
+                    public void onChanged(PlaceModel placeModel) {
+                        // placeModel will be null if place is deleted
+                        if (placeModel != null) {
+                            Log.d(TAG, "onChanged name: " + placeModel.getName());
+                            Log.d(TAG, "address: " + placeModel.getAddress());
+                            Log.d(TAG, "visits: " + placeModel.getVisits());
+                            Log.d(TAG, "num visits: " + placeModel.getNumVisits());
+                            Log.d(TAG, "notes: " + placeModel.getNotes());
+                            place = placeModel;
 
-            viewModel.getPlaceById(id).observe(this, new Observer<PlaceModel>() {
-                @Override
-                public void onChanged(PlaceModel placeModel) {
-                    // placeModel will be null if place is deleted
-                    if (placeModel != null) {
-                        Log.d(TAG, "onChanged name: " + placeModel.getName());
-                        Log.d(TAG, "address: " + placeModel.getAddress());
-                        Log.d(TAG, "visits: " + placeModel.getVisits());
-                        Log.d(TAG, "num visits: " + placeModel.getNumVisits());
-                        Log.d(TAG, "notes: " + placeModel.getNotes());
-                        place = placeModel;
+                            // rest of code using place is put here
+                            String name = place.getName();
+                            String address = place.getAddress();
+                            int numVisits = place.getNumVisits();
+                            String notes = place.getNotes();
 
-                        // rest of code using place is put here
-                        String name = place.getName();
-                        String address = place.getAddress();
-                        int numVisits = place.getNumVisits();
-                        String notes = place.getNotes();
+                            if (savedInstanceState == null) {
+                                nameDisplay.setText(name);
+                                addressDisplay.setText(address);
+                                notesDisplay.setText(notes);
+                            }
+                            // else, keep the EditText saved automatically by onSaveInstanceState,
+                            // ex. user types some text and rotates device
+                            else {
+                                Log.d(TAG, "onChanged: saved default EditText");
+                            }
 
-                        nameDisplay.setText(name);
-                        addressDisplay.setText(address);
-                        notesDisplay.setText(notes);
+                            setUpVisits(numVisits);
 
-                        setUpVisits(numVisits);
+                            setUpAdapter();
+                            
+                            // if ex. device rotated, restore expand or collapse state of adapter
+                            if (savedInstanceState != null && adapter != null) {
+                                adapter.onRestoreInstanceState(savedInstanceState);
+                                Log.d(TAG, "onChanged: restored adapter sate");
+                            }
 
-                        setUpAdapter();
+                            setUpPhoto();
 
-                        setUpPhoto();
+                            setUpAddVisitButton();
 
-                        setUpAddVisitButton();
+                            setUpDeleteButton();
 
-                        setUpDeleteButton();
+                            setUpSaveButton();
 
-                        setUpSaveButton();
-
-                        setUpLastVisitDisplay();
+                            setUpLastVisitDisplay();
+                        }
                     }
-                }
-            });
+                });
         }
 
         // get the PlaceModel from the Intent that started this Activity
@@ -450,9 +445,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             public void onClick(DialogInterface dialog, int which) {
                                 // Continue with delete operation
                                 Intent deletePlaceIntent = new Intent();
-                                // button is used to delete this place from place list
-                                buttonType = DELETE;
-                                deletePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);
                                 setResult(RESULT_OK, deletePlaceIntent);
                                 finish();
                             }
@@ -471,17 +463,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent savePlaceIntent = new Intent();*/
-                // button is used to save this place's info
-                /*buttonType = SAVE;
-                savePlaceIntent.putExtra(EXTRA_BUTTON_TYPE, buttonType);*/
                 // save the user's current EditText data for name, address, and notes
                 // visits should already be added and Place ID should stay the same
                 place.setName(nameDisplay.getText().toString());
                 place.setAddress(addressDisplay.getText().toString());
                 place.setNotes(notesDisplay.getText().toString());
-                /*savePlaceIntent.putExtra(EXTRA_SAVED_PLACE, place);
-                setResult(RESULT_OK, savePlaceIntent);*/
 
                 // update place in the database
                 viewModel.update(place);
@@ -529,7 +515,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
-    @Override
+    /*@Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         Log.d(TAG, "onRestoreInstanceState");
@@ -537,7 +523,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             adapter.onRestoreInstanceState(savedInstanceState);
             Log.d(TAG, "adapter onRestoreInstanceState");
         }
-    }
+    }*/
 
     /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
      *
