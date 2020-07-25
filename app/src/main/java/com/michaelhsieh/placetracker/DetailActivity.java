@@ -33,6 +33,7 @@ import android.widget.Toast;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -53,6 +54,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     Get visit's list position + 1 to get the visit's adapter position.
     The adapter position is used to notify the adapter of changes to the visit list.*/
     private static final int NUM_VISIT_GROUPS = 1;
+
+    // maximum number of visits in list to prevent TransactionTooLargeException when rotating device
+    public static final int MAX_NUM_VISITS = 150;
+
+    // key to get the visit list after ex. device rotated
+    private static final String STATE_VISIT_LIST = "visit_list";
 
     private PlaceModel place;
 
@@ -117,6 +124,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     public void onChanged(PlaceModel placeModel) {
                         // placeModel will be null if place is deleted
                         if (placeModel != null) {
+
+                            // save current DetailActivity list of visits to use after ex. screen rotated
+//                            List<Visit> currentVisits = new ArrayList<>();
+//                            if (visits != null) {
+//                                currentVisits = visits;
+//                                Log.d(TAG, "onChanged: current visits list " + currentVisits);
+//                                Log.d(TAG, "onChanged: current visits list size " + currentVisits.size());
+//                            }
+
+                            // change place to observed place from database
                             Log.d(TAG, "onChanged name: " + placeModel.getName());
                             Log.d(TAG, "address: " + placeModel.getAddress());
                             Log.d(TAG, "visits: " + placeModel.getVisits());
@@ -141,7 +158,38 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                                 Log.d(TAG, "onChanged: saved default EditText");
                             }
 
-                            setUpVisits(numVisits);
+
+                            /*setUpVisits(numVisits);*/
+                            // initialize the visit group and visits
+                            if (savedInstanceState == null) {
+                                visits = place.getVisits();
+                            }
+                            // else, use the visits list already in use. The user may have
+                            // edited this list before rotation, ex. added and deleted visits
+//                            else {
+//                                Log.d(TAG, "onChanged: used current visits list");
+//                                visits = currentVisits;
+//                            }
+                            else {
+                                Log.d(TAG, "onChanged: used current visits list");
+                                visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
+                                place.setVisits(visits);
+                                numVisits = place.getNumVisits();
+                            }
+
+                            // list of visit groups which will only contain one group at position 0
+                            visitGroupList =
+                                    Arrays.asList
+                                            (new VisitGroup(getResources().getString(R.string.dates_visited),
+                                                    visits)
+                                            );
+
+                            numVisitsDisplay.setText(String.valueOf(numVisits));
+
+                            // show last visit if PlaceModel already has visits,
+                            // otherwise hide last visit text and label
+                            showOrHideLastVisit();
+
 
                             setUpAdapter();
                             
@@ -338,7 +386,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     }
 
-    private void setUpVisits(int numVisits) {
+    /*private void setUpVisits(int numVisits) {
         // initialize the visit group and visits
         visits = place.getVisits();
 
@@ -354,7 +402,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // show last visit if PlaceModel already has visits,
         // otherwise hide last visit text and label
         showOrHideLastVisit();
-    }
+    }*/
 
     private void setUpAdapter() {
         // initialize expanding RecyclerView
@@ -512,6 +560,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (adapter != null) {
             adapter.onSaveInstanceState(outState);
             Log.d(TAG, "adapter onSaveInstanceState");
+        }
+        // save the visit list on configuration change, ex. device rotated
+        if (visits != null && visits.size() < MAX_NUM_VISITS) {
+            outState.putParcelableArrayList(STATE_VISIT_LIST, new ArrayList<>(visits));
+        } else if (visits != null) {
+            Log.d(TAG, "visit list is too large. Not placing in outState bundle.");
         }
     }
 
