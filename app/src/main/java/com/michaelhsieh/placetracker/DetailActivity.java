@@ -153,9 +153,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             // else, use the visits list already in use. The user may have
                             // edited this list before rotation, ex. added and deleted visits
                             else {
-                                visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
-                                place.setVisits(visits);
-                                numVisits = place.getNumVisits();
+                                if (savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST) != null) {
+                                    visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
+                                    place.setVisits(visits);
+                                    numVisits = place.getNumVisits();
+                                } else {
+                                    visits = place.getVisits();
+                                }
                             }
 
                             // list of visit groups which will only contain one group at position 0
@@ -226,6 +230,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
             photo.setVisibility(View.VISIBLE);
             photo.setImageBitmap(bitmap);
+
+            // recycle bitmap to free up memory and prevent OutOfMemory error after ex.
+            // adding 15+ visits, saving, opening the DetailActivity again, and rotating device multiple times
+            /*if(bitmap != null)
+            {
+                bitmap.recycle();
+                bitmap = null;
+            }*/
 
             // make attributions text visible and display
             if (attributions != null && !attributions.isEmpty()) {
