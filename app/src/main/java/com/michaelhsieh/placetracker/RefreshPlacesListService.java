@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+/*package com.michaelhsieh.placetracker;
 
 import android.app.IntentService;
 import android.app.Notification;
@@ -25,14 +25,15 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import static com.michaelhsieh.placetracker.MainActivity.CHANNEL_ID;
 import static com.michaelhsieh.placetracker.MainActivity.EXTRA_SERVICE_PLACE_IDS;
 import static com.michaelhsieh.placetracker.MainActivity.MAX_BUNDLE_SIZE_IN_KB;
-import static com.michaelhsieh.placetracker.MainActivity.getBundleSizeInBytes;
+import static com.michaelhsieh.placetracker.MainActivity.getBundleSizeInBytes;*/
 
 /** Gets refreshed info on the user's places in the background.
  *
  * Creates a new Places Client.
  *
  */
-public class RefreshPlacesListService extends IntentService {
+
+/*public class RefreshPlacesListService extends IntentService {
 
     private static final String TAG = RefreshPlacesListService.class.getSimpleName();
 
@@ -114,7 +115,7 @@ public class RefreshPlacesListService extends IntentService {
             }
         }
 
-    }
+    }*/
 
     /** Fetch refreshed place info using the Place ID,
      * or just log message if the Place ID can't be found.
@@ -125,7 +126,7 @@ public class RefreshPlacesListService extends IntentService {
      * @param placeId The Place ID of a place in user's places list
      * @param listSize The size of the List of Place IDs
      */
-    private void fetchAllPlacesById( PlacesClient placesClient, String placeId, int listSize) {
+    /*private void fetchAllPlacesById( PlacesClient placesClient, String placeId, int listSize) {
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
 
@@ -179,12 +180,12 @@ public class RefreshPlacesListService extends IntentService {
 
     private void incrementPlaceCounter() {
         placeCounter += 1;
-    }
+    }*/
 
     /** Send all places' refreshed info to MainActivity.
      *
      */
-    private void sendInfo() {
+    /*private void sendInfo() {
         Intent returnIntent = new Intent(MainActivity.RECEIVE_REFRESHED_PLACES_INFO);
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_IDS, refreshedPlaceIds);
         returnIntent.putExtra(EXTRA_REFRESHED_PLACE_NAMES, refreshedPlaceNames);
@@ -204,3 +205,4 @@ public class RefreshPlacesListService extends IntentService {
         }
     }
 }
+*/

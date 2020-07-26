@@ -129,11 +129,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         if (placeModel != null) {
 
                             // change place to observed place from database
-                            Log.d(TAG, "onChanged name: " + placeModel.getName());
-                            Log.d(TAG, "address: " + placeModel.getAddress());
-                            Log.d(TAG, "visits: " + placeModel.getVisits());
-                            Log.d(TAG, "num visits: " + placeModel.getNumVisits());
-                            Log.d(TAG, "notes: " + placeModel.getNotes());
                             place = placeModel;
 
                             // rest of code using place is put here
@@ -158,7 +153,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             // else, use the visits list already in use. The user may have
                             // edited this list before rotation, ex. added and deleted visits
                             else {
-                                Log.d(TAG, "onChanged: used current visits list");
                                 visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
                                 place.setVisits(visits);
                                 numVisits = place.getNumVisits();
@@ -183,7 +177,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             // if ex. device rotated, restore expand or collapse state of adapter
                             if (savedInstanceState != null && adapter != null) {
                                 adapter.onRestoreInstanceState(savedInstanceState);
-                                Log.d(TAG, "onChanged: restored adapter state");
                             }
 
                             setUpPhoto();
@@ -354,14 +347,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         super.onSaveInstanceState(outState);
         if (adapter != null) {
             adapter.onSaveInstanceState(outState);
-            Log.d(TAG, "adapter onSaveInstanceState");
         }
         // save the visit list on configuration change, ex. device rotated
         if (visits != null && visits.size() < MAX_NUM_VISITS) {
             outState.putParcelableArrayList(STATE_VISIT_LIST, new ArrayList<>(visits));
-            Log.d(TAG, "onSaveInstanceState: placed visits into outState bundle");
         } else if (visits != null) {
-            Log.d(TAG, "visit list is too large. Not placing in outState bundle.");
+            Log.e(TAG, "visit list is too large. Not placing in outState bundle.");
         }
     }
 
