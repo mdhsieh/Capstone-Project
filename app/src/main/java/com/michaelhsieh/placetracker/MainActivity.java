@@ -4,21 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-/*import androidx.core.content.ContextCompat;*/
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-/*import androidx.localbroadcastmanager.content.LocalBroadcastManager;*/
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-/*import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.content.BroadcastReceiver;*/
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-/*import android.content.IntentFilter;*/
 import android.graphics.Bitmap;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -26,7 +20,6 @@ import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcel;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
@@ -61,10 +54,6 @@ import java.util.List;
 import java.util.Random;
 
 import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
-/*import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PHOTO_METADATA;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_ADDRESSES;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_IDS;
-import static com.michaelhsieh.placetracker.RefreshPlacesListService.EXTRA_REFRESHED_PLACE_NAMES;*/
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 
@@ -72,12 +61,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // key to get the clicked place's position when Activity recreated, ex. when device rotated
     private static final String STATE_CLICKED_POSITION = "position";
-
-    // refresh places list notification channel ID
-    public static final String CHANNEL_ID = "refresh_places_list_channel";
-
-    // key of all Place IDs in places list to use in RefreshPlaceListService
-    public static final String EXTRA_SERVICE_PLACE_IDS = "service_place_ids";
 
     // PlaceModel ID key when using Intent
     public static final String EXTRA_PLACE_ID = "PlaceModel_ID";
@@ -87,12 +70,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     // request code when opening ManualPlaceDetailActivity
     public static final int MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE = 1;
-
-    // MainActivity will respond to this action String
-    /*public static final String RECEIVE_REFRESHED_PLACES_INFO = "receive_refreshed_places_info";*/
-
-    // maximum allowable size, in Kilobytes, of data sent to another Activity through Intent
-    public static final int MAX_BUNDLE_SIZE_IN_KB = 500;
 
     // list of places user selects from search results
     private List<PlaceModel> places;
@@ -107,8 +84,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private PlaceViewModel placeViewModel;
 
-    /*private LocalBroadcastManager broadcastManager;*/
-
 
     PlacesClient placesClient;
 
@@ -121,89 +96,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // banner ad
     private AdView adView;
 
-    /** BroadcastReceiver to get refreshed place info from RefreshPlacesListService.
-     *
-     * A place in the Room Database is only updated with refreshed info if
-     * its Place ID can be found.
-     * If the place's photo metadata is available, the place is updated twice.
-     *
-     * Creates a new Places Client.
-     * May contain null elements in photo metadata ArrayList, ex. if places added manually.
-     */
-    /*private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            if(intent.getAction() != null && intent.getAction().equals(RECEIVE_REFRESHED_PLACES_INFO)) {
-                // get refreshed place IDs, names, addresses, and metadata
-                ArrayList<String> updatedPlaceIds = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_IDS);
-                ArrayList<String> updatedPlaceNames = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_NAMES);
-                ArrayList<String> updatedPlaceAddresses = intent.getStringArrayListExtra(EXTRA_REFRESHED_PLACE_ADDRESSES);
-                ArrayList<PhotoMetadata> updatedPhotoMetadata = intent.getParcelableArrayListExtra(EXTRA_REFRESHED_PHOTO_METADATA);
-
-                // Create a new Places client instance
-                PlacesClient placesClient = Places.createClient(MainActivity.this);
-
-                if (updatedPlaceIds != null && updatedPlaceNames != null && updatedPlaceAddresses != null && updatedPhotoMetadata != null) {
-
-                    PlaceModel refreshedPlace;
-                    String id;
-                    String name;
-                    String address;
-                    PhotoMetadata photoMetadata;
-                    // Loop through refreshed Place IDs and find the user's place that
-                    // matches this ID. Then update that place with refreshed info.
-                    for (int i = 0; i < updatedPlaceIds.size(); i++) {
-
-                        id = updatedPlaceIds.get(i);
-                        name = updatedPlaceNames.get(i);
-                        address = updatedPlaceAddresses.get(i);
-
-                        if (places != null) {
-                            for (PlaceModel originalPlace : places) {
-                                if (originalPlace.getPlaceId().equals(id)) {
-                                    // set new place to original place with refreshed
-                                    // name and address
-                                    refreshedPlace = new PlaceModel(id, name, address);
-                                    refreshedPlace.setNotes(originalPlace.getNotes());
-                                    refreshedPlace.setVisits(originalPlace.getVisits());
-                                    refreshedPlace.setBase64String(originalPlace.getBase64String());
-                                    refreshedPlace.setAttributions(originalPlace.getAttributions());
-
-                                    // update place in the database with refreshed place info
-                                    if (placeViewModel != null) {
-                                        placeViewModel.update(refreshedPlace);
-                                        // if photo metadata not found, ex. place added manually,
-                                        // photo metadata element will be null
-                                        if (updatedPhotoMetadata.get(i) != null) {
-                                            photoMetadata = updatedPhotoMetadata.get(i);
-                                            fetchPhotoAndUpdatePlaceWhenFinished(placesClient, refreshedPlace, photoMetadata);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                    }
-                }
-            }
-
-            Toast.makeText(MainActivity.this, R.string.refresh_finished, Toast.LENGTH_SHORT).show();
-        }
-    };*/
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // create notification channel
-        /*createNotificationChannel();*/
-
-        // create broadcast manager and register receiver
-        /*broadcastManager = LocalBroadcastManager.getInstance(this);
-        IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(RECEIVE_REFRESHED_PLACES_INFO);
-        broadcastManager.registerReceiver(broadcastReceiver, intentFilter);*/
 
         // show a Toast if there's no Internet connection (Wi-Fi or cellular network)
         if (!isNetworkConnected()) {
@@ -393,15 +289,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
-
-    /** Unregister the BroadcastReceiver
-     *
-     */
-    /*@Override
-    protected void onDestroy() {
-        super.onDestroy();
-        broadcastManager.unregisterReceiver(broadcastReceiver);
-    }*/
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -597,24 +484,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                                 }
                             }
 
-                            /*// Continue and start refresh service
-                            Toast.makeText(MainActivity.this, R.string.refresh_notification_title, Toast.LENGTH_SHORT).show();
-
-                            Intent serviceIntent = new Intent(MainActivity.this, RefreshPlacesListService.class);
-
-                            ArrayList<String> placeIds = new ArrayList<>();
-
-                            PlaceModel place;
-                            for (int i = 0; i < places.size(); i++) {
-                                place = places.get(i);
-                                placeIds.add(place.getPlaceId());
-                            }
-
-                            // put ArrayList of all the user's Place IDs in Intent
-                            serviceIntent.putStringArrayListExtra(EXTRA_SERVICE_PLACE_IDS, placeIds);
-
-                            // use startForegroundService in API 26 and higher, otherwise startService on lower API
-                            ContextCompat.startForegroundService(MainActivity.this, serviceIntent);*/
                         }
                     })
 
@@ -640,8 +509,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      */
     private void fetchAllPlacesById(PlacesClient placesClient, String placeId, int listSize) {
 
-        Log.d(TAG, "fetchAllPlacesById");
-
         // Specify the fields to return.
         List<Place.Field> placeFields = Arrays.asList(Place.Field.ID, Place.Field.NAME, Place.Field.ADDRESS, Place.Field.PHOTO_METADATAS);
 
@@ -658,7 +525,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // when last place has been fetched, send the info to MainActivity
             if (placeCounter == listSize - 1) {
                 updatePlacesWithRefreshedInfo(refreshedPlaces);
-                Log.d(TAG, "fetchAllPlacesById: last place valid, updated places with refreshed info");
             }
             // increase place counter by 1
             incrementPlaceCounter();
@@ -673,7 +539,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // when last place has been fetched, send the info to MainActivity
             if (placeCounter == listSize - 1) {
                 updatePlacesWithRefreshedInfo(refreshedPlaces);
-                Log.d(TAG, "fetchAllPlacesById: last place invalid, updated places with refreshed info");
             }
             // still increase place counter by 1 because
             // a fetch may fail if ex. place added manually
@@ -762,53 +627,5 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             Toast.makeText(this, R.string.random_pick_empty_error, Toast.LENGTH_LONG).show();
         }
     }
-
-    /** Creates a notification channel.
-     *
-     */
-    /*private void createNotificationChannel() {
-        // API 26 and higher require notification channel
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel serviceChannel = new NotificationChannel(
-                    CHANNEL_ID,
-                    getString(R.string.refresh_notification_channel_name),
-                    NotificationManager.IMPORTANCE_DEFAULT
-            );
-
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            if (manager != null) {
-                manager.createNotificationChannel(serviceChannel);
-            } else {
-                Log.e(TAG, "notification manager is null");
-            }
-        }
-    }*/
-
-    // Methods to check size of objects in bytes. Too many bytes in Intent putExtras() will cause
-    // a TransactionTooLargeException and crash the app.
-
-
-    /** Get size of a Bundle in bytes.
-
-    Can be used on Intent's getExtras() to check if data sent to an Activity,
-    ex. the Lists sent to MainActivity or PlaceModel sent to DetailActivity, is
-    using too many bytes, causing a TransactionTooLargeException and crashing the app.
-
-    The maximum amount of bytes the entire Intent's getExtras() Bundle can hold
-    seems to be around 500 KB. One PlaceModel Visit is 3 KB.
-
-    Source: ChandraShekhar Kaushik
-    https://stackoverflow.com/questions/47633002/how-to-examine-the-size-of-the-bundle-object-in-onsaveinstancestate
-
-     @param bundle The bundle
-     @return The size of the bundle in bytes
-     */
-    /*public static int getBundleSizeInBytes(Bundle bundle) {
-        Parcel parcel = Parcel.obtain();
-        parcel.writeValue(bundle);
-        byte[] bytes = parcel.marshall();
-        parcel.recycle();
-        return bytes.length;
-    }*/
 
 }
