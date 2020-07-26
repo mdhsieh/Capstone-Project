@@ -92,7 +92,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public static final String RECEIVE_REFRESHED_PLACES_INFO = "receive_refreshed_places_info";
 
     // maximum allowable size, in Kilobytes, of a place's Bitmap encoded as a Base64 String
+/*
     private static final int MAX_BASE64_STRING_SIZE_IN_KB = 300;
+*/
 
     // maximum allowable size, in Kilobytes, of data sent to another Activity through Intent
     public static final int MAX_BUNDLE_SIZE_IN_KB = 500;
@@ -518,12 +520,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             Bitmap bitmap = fetchPhotoResponse.getBitmap();
 
             // get size of bitmap in kilobytes, which is bytes / 1000
-            int bitmapSizeInKB = bitmap.getByteCount() / 1000;
+            /*int bitmapSizeInKB = bitmap.getByteCount() / 1000;*/
 
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
-            int base64StringSizeInKB = calculateBase64StringSizeInBytes(base64Image) / 1000;
+            /*int base64StringSizeInKB = calculateBase64StringSizeInBytes(base64Image) / 1000;*/
 
             // uncomment to check that approximate size of Base64String in bytes is correct
             /* try {
@@ -685,7 +687,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      * @return The size in bytes
      *
      */
-    private static int calculateBase64StringSizeInBytes(String base64String) {
+    /*private static int calculateBase64StringSizeInBytes(String base64String) {
         int result = -1;
         if(!TextUtils.isEmpty(base64String)) {
             result = paddedBase64(base64String.length());
@@ -700,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     private static int paddedBase64(int stringLen) {
         int blocks = ceilDiv(stringLen, 3);
         return blocks * 4;
-    }
+    }*/
 
     /** Get size of a Bundle in bytes.
 
