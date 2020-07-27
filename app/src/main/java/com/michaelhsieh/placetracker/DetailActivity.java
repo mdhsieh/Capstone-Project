@@ -21,7 +21,9 @@ import android.os.Bundle;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -104,11 +106,35 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         nameDisplay = findViewById(R.id.et_name);
         addressDisplay = findViewById(R.id.et_address);
 
+
         // make name and address multi-line EditTexts with done button
         nameDisplay.setHorizontallyScrolling(false);
         nameDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
         addressDisplay.setHorizontallyScrolling(false);
         addressDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
+
+        // clear focus when done pressed on soft keyboard
+        nameDisplay.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    // Clear focus here from edittext
+                    nameDisplay.clearFocus();
+                }
+                return false;
+            }
+        });
+        addressDisplay.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    // Clear focus here from edittext
+                    addressDisplay.clearFocus();
+                }
+                return false;
+            }
+        });
+
 
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
