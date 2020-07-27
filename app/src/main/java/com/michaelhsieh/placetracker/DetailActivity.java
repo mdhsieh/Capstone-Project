@@ -122,79 +122,81 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (intent.hasExtra(EXTRA_PLACE_ID)) {
             String id = intent.getStringExtra(EXTRA_PLACE_ID);
 
-                viewModel.getPlaceById(id).observe(this, new Observer<PlaceModel>() {
-                    @Override
-                    public void onChanged(PlaceModel placeModel) {
-                        // placeModel will be null if place is deleted
-                        if (placeModel != null) {
+            viewModel.getPlaceById(id).observe(this, new Observer<PlaceModel>() {
+                @Override
+                public void onChanged(PlaceModel placeModel) {
+                    // placeModel will be null if place is deleted
+                    if (placeModel != null) {
 
-                            // change place to observed place from database
-                            place = placeModel;
+                        // change place to observed place from database
+                        place = placeModel;
 
-                            // rest of code using place is put here
-                            String name = place.getName();
-                            String address = place.getAddress();
-                            int numVisits = place.getNumVisits();
-                            String notes = place.getNotes();
+                        // rest of code using place is put here
+                        String name = place.getName();
+                        String address = place.getAddress();
+                        int numVisits = place.getNumVisits();
+                        String notes = place.getNotes();
 
-                            if (savedInstanceState == null) {
-                                nameDisplay.setText(name);
-                                addressDisplay.setText(address);
-                                notesDisplay.setText(notes);
-                            }
-                            // else, keep the EditText saved automatically by onSaveInstanceState,
-                            // ex. user types some text and rotates device
+                        if (savedInstanceState == null) {
+                            nameDisplay.setText(name);
+                            addressDisplay.setText(address);
+                            notesDisplay.setText(notes);
+                        }
+                        // else, keep the EditText saved automatically by onSaveInstanceState,
+                        // ex. user types some text and rotates device
 
 
-                            // initialize the visit group and visits
-                            if (savedInstanceState == null) {
+                        // initialize the visit group and visits
+                        if (savedInstanceState == null) {
+                            visits = place.getVisits();
+                        }
+                        // else, use the visits list already in use. The user may have
+                        // edited this list before rotation, ex. added and deleted visits
+                        else {
+                            if (savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST) != null) {
+                                visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
+                                place.setVisits(visits);
+                                numVisits = place.getNumVisits();
+                            } else {
                                 visits = place.getVisits();
                             }
-                            // else, use the visits list already in use. The user may have
-                            // edited this list before rotation, ex. added and deleted visits
-                            else {
-                                if (savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST) != null) {
-                                    visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
-                                    place.setVisits(visits);
-                                    numVisits = place.getNumVisits();
-                                } else {
-                                    visits = place.getVisits();
-                                }
-                            }
-
-                            // list of visit groups which will only contain one group at position 0
-                            visitGroupList =
-                                    Arrays.asList
-                                            (new VisitGroup(getResources().getString(R.string.dates_visited),
-                                                    visits)
-                                            );
-
-                            numVisitsDisplay.setText(String.valueOf(numVisits));
-
-                            // show last visit if PlaceModel already has visits,
-                            // otherwise hide last visit text and label
-                            showOrHideLastVisit();
-
-
-                            setUpAdapter();
-                            
-                            // if ex. device rotated, restore expand or collapse state of adapter
-                            if (savedInstanceState != null && adapter != null) {
-                                adapter.onRestoreInstanceState(savedInstanceState);
-                            }
-
-                            setUpPhoto();
-
-                            setUpAddVisitButton();
-
-                            setUpDeleteButton();
-
-                            setUpSaveButton();
-
-                            setUpLastVisitDisplay();
                         }
+
+                        // list of visit groups which will only contain one group at position 0
+                        visitGroupList =
+                                Arrays.asList
+                                        (new VisitGroup(getResources().getString(R.string.dates_visited),
+                                                visits)
+                                        );
+
+                        numVisitsDisplay.setText(String.valueOf(numVisits));
+
+                        // show last visit if PlaceModel already has visits,
+                        // otherwise hide last visit text and label
+                        showOrHideLastVisit();
+
+
+                        setUpAdapter();
+
+                        // if ex. device rotated, restore expand or collapse state of adapter
+                        if (savedInstanceState != null && adapter != null) {
+                            adapter.onRestoreInstanceState(savedInstanceState);
+                        }
+
+                        setUpPhoto();
+
+                        setUpAddVisitButton();
+
+                        setUpDeleteButton();
+
+                        setUpSaveButton();
+
+                        setUpLastVisitDisplay();
                     }
-                });
+                }
+            });
+
+
         }
 
     }
@@ -222,17 +224,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     private void setUpPhoto() {
         // display bitmap photo if available
         String base64String = place.getBase64String();
-//        List<Bitmap> bitmaps = place.getBitmaps();
         // display photo's attribution text if available
         String attributions = place.getAttributions();
         if (base64String != null && !base64String.isEmpty()) {
-//        if (bitmaps != null && !bitmaps.isEmpty()) {
             // decode Base64 String to bitmap
             Bitmap bitmap = decodeBase64StringToBitmap(base64String);
 
             photo.setVisibility(View.VISIBLE);
             photo.setImageBitmap(bitmap);
-//            photo.setImageBitmap(bitmaps.get(0));
 
             // make attributions text visible and display
             if (attributions != null && !attributions.isEmpty()) {
@@ -584,7 +583,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // The sample size is the number of pixels in either dimension that correspond to a
         // single pixel in the decoded bitmap. For example, inSampleSize == 4 returns an
         // image that is 1/4 the width/height of the original, and 1/16 the number of pixels.
-        opt.inSampleSize = 2;
+        // opt.inSampleSize = 2;
         bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
         return bitmap;
     }

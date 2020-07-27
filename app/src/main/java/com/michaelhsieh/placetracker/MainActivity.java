@@ -413,12 +413,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
-//            List<Bitmap> bitmaps = new ArrayList<>();
-//            bitmaps.add(bitmap);
-
             // update the selected place with the Base64 String
             placeModel.setBase64String(base64Image);
-//            placeModel.setBitmaps(bitmaps);
             placeViewModel.update(placeModel);
 
         }).addOnFailureListener((exception) -> {
