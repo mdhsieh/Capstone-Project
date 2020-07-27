@@ -403,8 +403,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Create a FetchPhotoRequest.
         final FetchPhotoRequest photoRequest = FetchPhotoRequest.builder(photoMetadata)
-//                .setMaxWidth(500)
-//                .setMaxHeight(300)
+                .setMaxWidth(500)
+                .setMaxHeight(300)
                 .build();
         placesClient.fetchPhoto(photoRequest).addOnSuccessListener((fetchPhotoResponse) -> {
 
@@ -413,8 +413,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // convert bitmap to Base64 String
             String base64Image = encodeBitmapToBase64String(bitmap);
 
+//            List<Bitmap> bitmaps = new ArrayList<>();
+//            bitmaps.add(bitmap);
+
             // update the selected place with the Base64 String
             placeModel.setBase64String(base64Image);
+//            placeModel.setBitmaps(bitmaps);
             placeViewModel.update(placeModel);
 
         }).addOnFailureListener((exception) -> {
@@ -574,6 +578,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         refreshedPlace.setNotes(originalPlace.getNotes());
                         refreshedPlace.setVisits(originalPlace.getVisits());
                         refreshedPlace.setBase64String(originalPlace.getBase64String());
+//                        refreshedPlace.setBitmaps(originalPlace.getBitmaps());
                         refreshedPlace.setAttributions(originalPlace.getAttributions());
 
                         // update place in the database with refreshed place info

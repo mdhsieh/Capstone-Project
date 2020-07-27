@@ -1,5 +1,6 @@
 package com.michaelhsieh.placetracker.model;
 
+//import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -47,6 +48,10 @@ public class PlaceModel implements Parcelable {
        which will crash the app. */
     private String base64String;
 
+    /* The first photo available from the place.
+           Photos of the place are Bitmaps. */
+//    private List<Bitmap> bitmaps = new ArrayList<>();
+
     // the attributions text of the photo
     private String attributions;
 
@@ -85,6 +90,10 @@ public class PlaceModel implements Parcelable {
         return base64String;
     }
 
+//    public List<Bitmap> getBitmaps() {
+//        return bitmaps;
+//    }
+
     public String getAttributions() {
         return attributions;
     }
@@ -113,6 +122,10 @@ public class PlaceModel implements Parcelable {
         this.base64String = base64String;
     }
 
+//    public void setBitmaps(List<Bitmap> bitmaps) {
+//        this.bitmaps = bitmaps;
+//    }
+
     public void setAttributions(String attributions) {
         this.attributions = attributions;
     }
@@ -131,6 +144,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(address);
         out.writeList(visits);
         out.writeString(notes);
+//        out.writeList(bitmaps);
         out.writeString(base64String);
         out.writeString(attributions);
     }
@@ -157,6 +171,7 @@ public class PlaceModel implements Parcelable {
         in.readList(visits, Visit.class.getClassLoader());
         notes = in.readString();
         base64String = in.readString();
+//        in.readList(bitmaps, Bitmap.class.getClassLoader());
         attributions = in.readString();
     }
 }

@@ -222,22 +222,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     private void setUpPhoto() {
         // display bitmap photo if available
         String base64String = place.getBase64String();
+//        List<Bitmap> bitmaps = place.getBitmaps();
         // display photo's attribution text if available
         String attributions = place.getAttributions();
         if (base64String != null && !base64String.isEmpty()) {
+//        if (bitmaps != null && !bitmaps.isEmpty()) {
             // decode Base64 String to bitmap
             Bitmap bitmap = decodeBase64StringToBitmap(base64String);
 
             photo.setVisibility(View.VISIBLE);
             photo.setImageBitmap(bitmap);
-
-            // recycle bitmap to free up memory and prevent OutOfMemory error after ex.
-            // adding 15+ visits, saving, opening the DetailActivity again, and rotating device multiple times
-            /*if(bitmap != null)
-            {
-                bitmap.recycle();
-                bitmap = null;
-            }*/
+//            photo.setImageBitmap(bitmaps.get(0));
 
             // make attributions text visible and display
             if (attributions != null && !attributions.isEmpty()) {
@@ -586,6 +581,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         Bitmap bitmap;
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inMutable = true;
+        // The sample size is the number of pixels in either dimension that correspond to a
+        // single pixel in the decoded bitmap. For example, inSampleSize == 4 returns an
+        // image that is 1/4 the width/height of the original, and 1/16 the number of pixels.
+        opt.inSampleSize = 2;
         bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
         return bitmap;
     }
