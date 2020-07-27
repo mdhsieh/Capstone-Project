@@ -62,10 +62,15 @@
             android:autofillHints="@string/name_hint"
             android:ems="10"
             android:hint="@string/name_hint"
-            android:inputType="textMultiLine"
+
+            android:inputType="text"
+            android:imeOptions="actionDone"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_name"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <!--android:inputType="textMultiLine"-->
 
         <EditText
             android:id="@+id/et_address"
@@ -79,10 +84,15 @@
             android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS"
             android:ems="10"
             android:hint="@string/address_hint"
-            android:inputType="textMultiLine"
+
+            android:inputType="text"
+            android:imeOptions="actionDone"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_address"
             app:layout_constraintTop_toBottomOf="@+id/et_name" />
+
+        <!--android:inputType="textMultiLine"-->
 
         <TextView
             android:id="@+id/tv_num_visits"

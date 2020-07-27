@@ -104,6 +104,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         nameDisplay = findViewById(R.id.et_name);
         addressDisplay = findViewById(R.id.et_address);
 
+        // make name and address multi-line EditTexts with done button
+        nameDisplay.setHorizontallyScrolling(false);
+        nameDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
+        addressDisplay.setHorizontallyScrolling(false);
+        addressDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
+
         numVisitsDisplay = findViewById(R.id.tv_num_visits);
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
