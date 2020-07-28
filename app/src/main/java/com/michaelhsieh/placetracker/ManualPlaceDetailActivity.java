@@ -17,6 +17,7 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.model.PlaceModel;
 
@@ -146,14 +147,20 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
                 public void onClick(View view) {
                     Intent addManualPlaceIntent = new Intent();
 
-                    // save the user's current EditText data for name, address, and notes
-                    // visits should already be added
-                    place.setName(nameDisplay.getText().toString());
-                    place.setAddress(addressDisplay.getText().toString());
-                    place.setNotes(notesDisplay.getText().toString());
-                    addManualPlaceIntent.putExtra(EXTRA_MANUAL_ADDED_PLACE, place);
-                    setResult(RESULT_OK, addManualPlaceIntent);
-                    finish();
+                    // show Toast and don't save place if user didn't enter a valid name
+                    if (nameDisplay.getText().toString().isEmpty()) {
+                        Toast.makeText(ManualPlaceDetailActivity.this, R.string.empty_place_name_error, Toast.LENGTH_LONG).show();
+                    } else {
+                        // save the user's current EditText data for name, address, and notes
+                        // visits should already be added
+                        // This should not crash with TransactionTooLargeException unless user adds 150+ visits
+                        place.setName(nameDisplay.getText().toString());
+                        place.setAddress(addressDisplay.getText().toString());
+                        place.setNotes(notesDisplay.getText().toString());
+                        addManualPlaceIntent.putExtra(EXTRA_MANUAL_ADDED_PLACE, place);
+                        setResult(RESULT_OK, addManualPlaceIntent);
+                        finish();
+                    }
                 }
             });
 

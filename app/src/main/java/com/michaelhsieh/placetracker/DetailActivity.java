@@ -395,21 +395,26 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // save the user's current EditText data for name, address, and notes
-                // visits should already be added and Place ID should stay the same
-                place.setName(nameDisplay.getText().toString());
-                place.setAddress(addressDisplay.getText().toString());
-                place.setNotes(notesDisplay.getText().toString());
+                // show Toast and don't save place if user didn't enter a valid name
+                if (nameDisplay.getText().toString().isEmpty()) {
+                    Toast.makeText(DetailActivity.this, R.string.empty_place_name_error, Toast.LENGTH_LONG).show();
+                } else {
+                    // save the user's current EditText data for name, address, and notes
+                    // visits should already be added and Place ID should stay the same
+                    place.setName(nameDisplay.getText().toString());
+                    place.setAddress(addressDisplay.getText().toString());
+                    place.setNotes(notesDisplay.getText().toString());
 
-                // update place in the database
-                viewModel.update(place);
-                // get the saved place's name, address, and number of visits and
-                // update the widget
-                PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(DetailActivity.this,
-                        place.getName(), place.getAddress(),
-                        place.getNumVisits());
+                    // update place in the database
+                    viewModel.update(place);
+                    // get the saved place's name, address, and number of visits and
+                    // update the widget
+                    PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(DetailActivity.this,
+                            place.getName(), place.getAddress(),
+                            place.getNumVisits());
 
-                finish();
+                    finish();
+                }
             }
         });
     }
