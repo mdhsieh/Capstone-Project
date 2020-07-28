@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -27,15 +27,27 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+/**
+ * This test demos a user searching a place and
+ * adding the first autocomplete entry to his or her list.
+ * <p></p>
+ * To pass this test, the test device must disable window animation scale,
+ * transition animation scale, and
+ * animator duration scale in developer options.
+ *
+ */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class MainActivitySearchPlaceTest {
+
+    // search the name of a place, ex. the restaurant Sweet Tomatoes
+    private static final String SEARCH_INPUT = "sweet tomatoes";
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void mainActivityTest() {
+    public void searchPlace() {
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.places_autocomplete_search_input),
                         childAtPosition(
@@ -56,7 +68,7 @@ public class MainActivitySearchPlaceTest {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText2.perform(replaceText("Sweet T"), closeSoftKeyboard());
+        appCompatEditText2.perform(replaceText(SEARCH_INPUT), closeSoftKeyboard());
 
         ViewInteraction linearLayout = onView(
                 allOf(childAtPosition(

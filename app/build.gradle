@@ -50,11 +50,14 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
+    // testing dependencies
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
+    // ActivityTestRule dependency
     androidTestImplementation 'androidx.test:rules:1.2.0'
+    // perform RecyclerView actions
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
 
 
     // use Google Places SDK to autocomplete searches and get restaurant information
