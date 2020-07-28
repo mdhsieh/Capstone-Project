@@ -16,14 +16,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -118,8 +121,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    // Clear focus here from edittext
+                    // Clear focus here from EditText
                     nameDisplay.clearFocus();
+                    // hide keyboard
+                    hideSoftKeyboard(nameDisplay);
                 }
                 return false;
             }
@@ -128,8 +133,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(actionId == EditorInfo.IME_ACTION_DONE){
-                    // Clear focus here from edittext
+                    // Clear focus here from EditText
                     addressDisplay.clearFocus();
+                    // hide keyboard
+                    hideSoftKeyboard(addressDisplay);
                 }
                 return false;
             }
@@ -231,6 +238,56 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         }
 
+    }
+
+    // EditText clear focus on touch outside
+    // used for name, address, and notes EditText
+    // to stop screen from jumping to focused EditText when ex. expanding visits or adding visits
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            int x = (int) event.getRawX();
+            int y = (int) event.getRawY();
+
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains(x, y)) {
+                    // clear focus
+                    v.clearFocus();
+
+                    // without this part of code, if the user clicks on another EditText then
+                    // the keyboard closes and reopens immediately
+                    boolean touchTargetIsEditText = false;
+                    // Check if another EditText has been touched
+                    for (View vi : v.getRootView().getTouchables()) {
+                        if (vi instanceof EditText) {
+                            Rect clickedViewRect = new Rect();
+                            vi.getGlobalVisibleRect(clickedViewRect);
+                            if (clickedViewRect.contains(x, y)) {
+                                touchTargetIsEditText = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!touchTargetIsEditText) {
+                        // hide keyboard
+                        hideSoftKeyboard(v);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    private void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void setUpAdapter() {
