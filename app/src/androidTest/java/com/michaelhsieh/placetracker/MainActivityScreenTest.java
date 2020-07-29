@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
+import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -46,19 +47,12 @@ public class MainActivityScreenTest {
     // position of VisitGroup in ExpandableRecyclerView
     private static final int POS_VISIT_GROUP = 0;
 
+    private static final String NOTES = "This is a buffet restaurant.\nThey have a salad bar" +
+            " and soups.";
+
     @Rule
     public ActivityTestRule activityTestRule = new ActivityTestRule<>(
             MainActivity.class);
-
-    // check the search bar, empty list message, and RecyclerView are visible on app startup
-    // if no places have been added yet
-    /* @Test
-    public void mainActivityStarted() {
-        onView(withId(R.id.cardView)).check(matches(isDisplayed()));
-        onView(withId(R.id.rv_places)).check(matches(isDisplayed()));
-        onView(withId(R.id.tv_empty_list)).check(matches(isDisplayed()));
-        onView(withId(R.id.tv_empty_list)).check(matches(withText(R.string.empty_list)));
-    }*/
 
     /** Checks a place at a given position has the correct name and address.
      * Clicks the place and opens the corresponding DetailActivity.
@@ -75,17 +69,17 @@ public class MainActivityScreenTest {
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
 
         checkInitialDetails();
+
+        addNotes();
     }
 
-    // when a new place's DetailActivity is started, check details are correct
+    /** When a new place's DetailActivity is started, check details are correct.
+     *
+     */
     private void checkInitialDetails() {
         // now in DetailActivity, check the name and address are correct
         onView(withId(R.id.et_name)).check(matches(withText(PLACE_NAME)));
         onView(withId(R.id.et_address)).check(matches(withText(PLACE_ADDRESS)));
-
-        // scroll to number of visits label to make sure views are displayed on screen to user
-//        onView(withId(R.id.tv_label_num_visits))
-//                .perform(scrollTo());
 
         // check that number of visits label and add visit button are visible to user
         onView(withId(R.id.tv_label_num_visits)).check(matches(isDisplayed()));
@@ -118,6 +112,21 @@ public class MainActivityScreenTest {
         // check save and delete button display correct text
         onView(withId(R.id.btn_delete)).check(matches(withText(R.string.delete)));
         onView(withId(R.id.btn_save)).check(matches(withText(R.string.save)));
+    }
+
+    /** Add notes in DetailActivity and save.
+     *
+     */
+    private void addNotes() {
+        // scroll to notes EditText to make sure Espresso can type text in it
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).perform(typeText(NOTES));
+
+        // scroll to save button to make sure Espresso can click it
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        onView(withId(R.id.btn_save)).perform(click());
     }
 
     /** Method to test item in RecyclerView at a given position.
