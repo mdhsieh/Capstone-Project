@@ -43,6 +43,8 @@ public class MainActivityScreenTest {
     private static final String PLACE_ADDRESS = "4501 Hopyard Rd, Pleasanton, CA 94588, USA";
     // position of the place in RecyclerView
     private static final int POS_PLACE = 0;
+    // position of VisitGroup in ExpandableRecyclerView
+    private static final int POS_VISIT_GROUP = 0;
 
     @Rule
     public ActivityTestRule activityTestRule = new ActivityTestRule<>(
@@ -72,32 +74,45 @@ public class MainActivityScreenTest {
         onView(withId(R.id.rv_places))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
 
+        checkInitialDetails();
+    }
+
+    // when a new place's DetailActivity is started, check details are correct
+    private void checkInitialDetails() {
         // now in DetailActivity, check the name and address are correct
         onView(withId(R.id.et_name)).check(matches(withText(PLACE_NAME)));
         onView(withId(R.id.et_address)).check(matches(withText(PLACE_ADDRESS)));
 
-        // scroll to number of visits label to make sure displayed on screen to user
-        onView(withId(R.id.tv_label_num_visits))
-                .perform(scrollTo());
+        // scroll to number of visits label to make sure views are displayed on screen to user
+//        onView(withId(R.id.tv_label_num_visits))
+//                .perform(scrollTo());
 
-        // check that number of visits label and add visit button are visible and
-        // display correct text
+        // check that number of visits label and add visit button are visible to user
         onView(withId(R.id.tv_label_num_visits)).check(matches(isDisplayed()));
-        onView(withId(R.id.tv_label_num_visits)).check(matches(withText(R.string.num_visits_label)));
         onView(withId(R.id.btn_add_visit)).check(matches(isDisplayed()));
+
+        // check that number of visits label and add visit button display correct text
+        onView(withId(R.id.tv_label_num_visits)).check(matches(withText(R.string.num_visits_label)));
         onView(withId(R.id.btn_add_visit)).check(matches(withText(R.string.add_visit)));
-        // if no visits added yet, check number of visits is 0
+        // assuming no visits added yet, check number of visits is 0
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(0))));
 
-        // scroll to notes label to make sure displayed on screen to user
-        onView(withId(R.id.tv_label_notes))
+        // scroll to save button to make sure Views are displayed on screen to user
+        onView(withId(R.id.btn_save))
                 .perform(scrollTo());
 
-        // check notes label is visible and displays correct text
+        // check expandable visit group displays correct label
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
+                .check(matches(atPosition(POS_VISIT_GROUP, hasDescendant(withText(R.string.dates_visited)))));
+
+        // check notes label is visible to user
         onView(withId(R.id.tv_label_notes)).check(matches(isDisplayed()));
+
+        // check notes label displays correct text
         onView(withId(R.id.tv_label_notes)).check(matches(withText(R.string.notes_label)));
 
-        // if notes empty, check notes EditText displays correct hint
+        // assuming notes empty, check notes EditText displays correct hint
         onView(withId(R.id.et_notes)).check(matches(withHint(R.string.notes_hint)));
 
         // check save and delete button display correct text
