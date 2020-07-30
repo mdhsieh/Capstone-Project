@@ -29,6 +29,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
+/** Searches a place and adds a visit to it.
+ *
+ */
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class AddVisitTest {

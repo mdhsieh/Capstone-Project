@@ -674,10 +674,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         Bitmap bitmap;
         BitmapFactory.Options opt = new BitmapFactory.Options();
         opt.inMutable = true;
-        // The sample size is the number of pixels in either dimension that correspond to a
-        // single pixel in the decoded bitmap. For example, inSampleSize == 4 returns an
-        // image that is 1/4 the width/height of the original, and 1/16 the number of pixels.
-        // opt.inSampleSize = 2;
         bitmap = BitmapFactory.decodeByteArray(data, 0, data.length, opt);
         return bitmap;
     }

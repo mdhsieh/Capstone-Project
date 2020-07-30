@@ -1,10 +1,12 @@
 package com.michaelhsieh.placetracker;
 
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.Espresso;
+import androidx.test.espresso.contrib.PickerActions;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.BoundedMatcher;
 import androidx.test.espresso.matcher.ViewMatchers;
@@ -46,6 +48,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityScreenTest {
 
+    private static final String TAG = MainActivityScreenTest.class.getSimpleName();
+
     // name and address of the place which will be clicked
     private static final String PLACE_NAME = "Sweet Tomatoes";
     private static final String PLACE_ADDRESS = "4501 Hopyard Rd, Pleasanton, CA 94588, USA";
@@ -61,6 +65,15 @@ public class MainActivityScreenTest {
     private String time;
     private String date;
     private static final int POS_NEW_VISIT = 1;
+
+    // updated date is
+    // Tuesday, February 14, 2017 at 3:25 pm
+    private static final int UPDATED_YEAR = 2017;
+    private static final int UPDATED_MONTH = 2;
+    private static final int UPDATED_DAY = 14;
+    // 24-hour format
+    private static final int UPDATED_HOUR = 15;
+    private static final int UPDATED_MINUTE = 25;
 
     @Rule
     public ActivityTestRule activityTestRule = new ActivityTestRule<>(
@@ -80,11 +93,18 @@ public class MainActivityScreenTest {
         onView(withId(R.id.rv_places))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
 
+        // check labels, buttons, and number of visits are displayed to user and have correct text
+        // and go back to MainActivity
         checkInitialDetails();
 
+        // add notes and save
         addNotes();
 
+        // add a visit and save
         addVisit();
+
+        // update the visit and save
+        updateVisit();
     }
 
     /** When a new place's DetailActivity is started, check details are correct.
@@ -141,8 +161,6 @@ public class MainActivityScreenTest {
      */
     private void addNotes() {
         // click a place to start DetailActivity
-//        onView(withId(R.id.rv_places))
-//                .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
         clickPlace();
 
         // scroll to notes EditText to make sure Espresso can type text in it
@@ -158,7 +176,7 @@ public class MainActivityScreenTest {
         // save notes
         onView(withId(R.id.btn_save)).perform(click());
 
-        // now start DetailActivity again and check notes was saved
+        /*// now start DetailActivity again and check notes was saved
         clickPlace();
         // scroll to notes EditText
         onView(withId(R.id.et_notes))
@@ -168,7 +186,7 @@ public class MainActivityScreenTest {
         onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
 
         // go back
-        Espresso.pressBack();
+        Espresso.pressBack();*/
     }
 
     private void addVisit() {
@@ -186,8 +204,8 @@ public class MainActivityScreenTest {
         onView(withId(R.id.tv_last_visit)).check(
                 matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
 
-        // get time and date to check if matches RecyclerView display and last visit date
-        getCurrentDateAndTime();
+        // set date and time to check if matches RecyclerView display and last visit date
+        setCurrentDateAndTime();
 
         // check last visit has current date and time
         onView(withId(R.id.tv_last_visit)).check(
@@ -217,12 +235,100 @@ public class MainActivityScreenTest {
         onView(withId(R.id.btn_save)).perform(click());
     }
 
-    // get the date and time that should match the default date and time when user adds visit
-    private void getCurrentDateAndTime() {
+    // set the date and time that should match the default date and time when user adds visit
+    private void setCurrentDateAndTime() {
         Date currentTime = Calendar.getInstance().getTime();
         time = DateFormat.getTimeInstance(DateFormat.SHORT).format(currentTime);
         // format date to show day of week, month, day, year
         date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
+    }
+
+    private void updateVisit() {
+        // click place to start DetailActivity
+        clickPlace();
+
+        // scroll to expandable RecyclerView
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(scrollTo());
+
+        // scroll to visit group and click to expand
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
+                .perform(click());
+
+        // scroll to bottom of screen to allow visit to be clicked
+        onView(withId(R.id.btn_save)).perform(scrollTo());
+
+        // click the visit that was added to update it
+        onView(withId(R.id.expanding_rv_visits))
+                // .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
+
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            Log.e(TAG, "updateVisit: ", e);
+//        }
+
+        // pick updated date
+        onView(withId(R.id.date_picker)).perform(PickerActions.setDate(
+                UPDATED_YEAR, UPDATED_MONTH, UPDATED_DAY));
+
+        // scroll to time picker
+        onView(withId(R.id.time_picker))
+                .perform(scrollTo());
+
+        // pick updated time
+        onView(withId(R.id.time_picker)).perform(PickerActions.setTime(UPDATED_HOUR, UPDATED_MINUTE));
+
+//        try {
+//            Thread.sleep(3000);
+//        } catch (InterruptedException e) {
+//            Log.e(TAG, "updateVisit: ", e);
+//        }
+
+        // scroll to set button
+        onView(withId(R.id.btn_date_time_set))
+                .perform(scrollTo());
+
+        // click to set updated date and time
+        onView(withId(R.id.btn_date_time_set)).perform(click());
+        Log.d(TAG, "updateVisit: clicked set button");
+
+        // set updated date and time to check if matches RecyclerView TextViews
+        setUpdatedDateAndTime();
+
+        // check that the visit has updated date and time
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(date)))));
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(time)))));
+
+        // scroll to save button and save the updated visit
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo(), click());
+    }
+
+    // set the date and time to updated values
+    // these should match the date and time set in dialog when Espresso updates visit
+    private void setUpdatedDateAndTime() {
+        // Calendar whose Date object will be converted to a readable date String and time String
+        // initially set to the current date and time
+        Calendar updatedCalendar = Calendar.getInstance();
+        updatedCalendar.clear();
+        // subtract 1 because Calendar month numbering is 0-based, ex. January is 0
+        updatedCalendar.set(UPDATED_YEAR, UPDATED_MONTH-1, UPDATED_DAY, UPDATED_HOUR, UPDATED_MINUTE);
+
+        Date updatedTime = updatedCalendar.getTime();
+        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(updatedTime);
+        // format date to show day of week, month, day, year
+        date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
+    }
+
+    private void deleteVisit() {
+
     }
 
     // click place at position in list
