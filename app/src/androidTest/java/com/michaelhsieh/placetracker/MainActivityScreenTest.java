@@ -4,8 +4,10 @@ import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.test.espresso.Espresso;
 import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.espresso.matcher.BoundedMatcher;
+import androidx.test.espresso.matcher.ViewMatchers;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.ActivityTestRule;
 
@@ -15,6 +17,10 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
@@ -22,6 +28,7 @@ import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility;
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
@@ -47,8 +54,13 @@ public class MainActivityScreenTest {
     // position of VisitGroup in ExpandableRecyclerView
     private static final int POS_VISIT_GROUP = 0;
 
-    private static final String NOTES = "This is a buffet restaurant.\nThey have a salad bar" +
+    private static final String NOTES = "This is a buffet restaurant.\nIt has a salad bar" +
             " and soups.";
+
+    private static final String AT = " at ";
+    private String time;
+    private String date;
+    private static final int POS_NEW_VISIT = 1;
 
     @Rule
     public ActivityTestRule activityTestRule = new ActivityTestRule<>(
@@ -71,6 +83,8 @@ public class MainActivityScreenTest {
         checkInitialDetails();
 
         addNotes();
+
+        addVisit();
     }
 
     /** When a new place's DetailActivity is started, check details are correct.
@@ -80,6 +94,11 @@ public class MainActivityScreenTest {
         // now in DetailActivity, check the name and address are correct
         onView(withId(R.id.et_name)).check(matches(withText(PLACE_NAME)));
         onView(withId(R.id.et_address)).check(matches(withText(PLACE_ADDRESS)));
+
+        // scroll to save button to make sure number of visits label is visible to user,
+        // is visible on phone but not tablet
+        onView(withId(R.id.tv_label_num_visits))
+                .perform(scrollTo());
 
         // check that number of visits label and add visit button are visible to user
         onView(withId(R.id.tv_label_num_visits)).check(matches(isDisplayed()));
@@ -112,21 +131,104 @@ public class MainActivityScreenTest {
         // check save and delete button display correct text
         onView(withId(R.id.btn_delete)).check(matches(withText(R.string.delete)));
         onView(withId(R.id.btn_save)).check(matches(withText(R.string.save)));
+
+        // go back
+        Espresso.pressBack();
     }
 
     /** Add notes in DetailActivity and save.
      *
      */
     private void addNotes() {
+        // click a place to start DetailActivity
+//        onView(withId(R.id.rv_places))
+//                .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
+        clickPlace();
+
         // scroll to notes EditText to make sure Espresso can type text in it
         onView(withId(R.id.et_notes))
                 .perform(scrollTo());
         onView(withId(R.id.et_notes)).perform(typeText(NOTES));
+        // close soft keyboard when done typing
+        Espresso.closeSoftKeyboard();
 
         // scroll to save button to make sure Espresso can click it
         onView(withId(R.id.btn_save))
                 .perform(scrollTo());
+        // save notes
         onView(withId(R.id.btn_save)).perform(click());
+
+        // now start DetailActivity again and check notes was saved
+        clickPlace();
+        // scroll to notes EditText
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).check(matches(isDisplayed()));
+        // check notes displays correct text
+        onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
+
+        // go back
+        Espresso.pressBack();
+    }
+
+    private void addVisit() {
+        // click place to start DetailActivity
+        clickPlace();
+
+        // scroll to add visit button
+        onView(withId(R.id.btn_add_visit))
+                .perform(scrollTo());
+        onView(withId(R.id.btn_add_visit)).perform(click());
+
+        // check that the last visit label and date are visible
+        onView(withId(R.id.tv_label_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // get time and date to check if matches RecyclerView display and last visit date
+        getCurrentDateAndTime();
+
+        // check last visit has current date and time
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withText(date + AT + time)));
+
+        // scroll to expandable RecyclerView
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(scrollTo());
+
+        // scroll to visit group and click to expand
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
+                .perform(click());
+
+        // check that the new visit has current date and time
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(date)))));
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(time)))));
+
+        // scroll to save button
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save the visit
+        onView(withId(R.id.btn_save)).perform(click());
+    }
+
+    // get the date and time that should match the default date and time when user adds visit
+    private void getCurrentDateAndTime() {
+        Date currentTime = Calendar.getInstance().getTime();
+        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(currentTime);
+        // format date to show day of week, month, day, year
+        date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
+    }
+
+    // click place at position in list
+    private void clickPlace() {
+        onView(withId(R.id.rv_places))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
     }
 
     /** Method to test item in RecyclerView at a given position.
