@@ -27,6 +27,7 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
+import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -105,6 +106,9 @@ public class MainActivityScreenTest {
 
         // update the visit and save
         updateVisit();
+
+        // delete the visit and save
+        deleteVisit();
     }
 
     /** When a new place's DetailActivity is started, check details are correct.
@@ -264,12 +268,6 @@ public class MainActivityScreenTest {
                 // .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
 
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException e) {
-//            Log.e(TAG, "updateVisit: ", e);
-//        }
-
         // pick updated date
         onView(withId(R.id.date_picker)).perform(PickerActions.setDate(
                 UPDATED_YEAR, UPDATED_MONTH, UPDATED_DAY));
@@ -281,19 +279,12 @@ public class MainActivityScreenTest {
         // pick updated time
         onView(withId(R.id.time_picker)).perform(PickerActions.setTime(UPDATED_HOUR, UPDATED_MINUTE));
 
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException e) {
-//            Log.e(TAG, "updateVisit: ", e);
-//        }
-
         // scroll to set button
         onView(withId(R.id.btn_date_time_set))
                 .perform(scrollTo());
 
         // click to set updated date and time
         onView(withId(R.id.btn_date_time_set)).perform(click());
-        Log.d(TAG, "updateVisit: clicked set button");
 
         // set updated date and time to check if matches RecyclerView TextViews
         setUpdatedDateAndTime();
@@ -328,7 +319,57 @@ public class MainActivityScreenTest {
     }
 
     private void deleteVisit() {
+        // click place to start DetailActivity
+        clickPlace();
 
+        // check that the last visit label and date are visible
+//        onView(withId(R.id.tv_label_last_visit)).check(
+//                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+//        onView(withId(R.id.tv_last_visit)).check(
+//                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // scroll to expandable RecyclerView
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(scrollTo());
+
+        // scroll to visit group and click to expand
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
+                .perform(click());
+
+        // scroll to bottom of screen to allow visit to be clicked
+        onView(withId(R.id.btn_save)).perform(scrollTo());
+
+        // click the visit to delete it
+        onView(withId(R.id.expanding_rv_visits))
+//                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
+                .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
+
+        // scroll to delete button and click
+        onView(withId(R.id.btn_delete_visit))
+                .perform(scrollTo(), click());
+
+        // click confirmation dialog to delete
+        onView(withText(android.R.string.yes)).check(matches(isDisplayed()));
+        onView(withText(android.R.string.yes)).perform(click());
+
+        // check visit has been deleted
+        // visit group label should remain
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
+                .check(matches(atPosition(POS_VISIT_GROUP, hasDescendant(withText(R.string.dates_visited)))));
+
+        // visit should not exist
+//        onView(withId(R.id.expanding_rv_visits))
+//                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(date)))));
+
+        // scroll to save button
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save
+        onView(withId(R.id.btn_save)).perform(click());
+
+        Log.d(TAG, "deleteVisit: finished test");
     }
 
     // click place at position in list
