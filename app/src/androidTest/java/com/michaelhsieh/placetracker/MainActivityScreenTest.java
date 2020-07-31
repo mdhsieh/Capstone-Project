@@ -1,6 +1,5 @@
 package com.michaelhsieh.placetracker;
 
-import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -49,8 +48,6 @@ import static org.hamcrest.core.IsNot.not;
  */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityScreenTest {
-
-    private static final String TAG = MainActivityScreenTest.class.getSimpleName();
 
     // name and address of the place which will be clicked
     private static final String PLACE_NAME = "Sweet Tomatoes";
@@ -176,8 +173,8 @@ public class MainActivityScreenTest {
         // save notes
         onView(withId(R.id.btn_save)).perform(click());
 
-        // uncomment to re-open details screen and check notes text is still there
-        // checkNotes();
+        // re-open details screen and check notes text is still there
+        checkNotes();
 
         // clears notes to make repeat testing easier
         clearNotes();
@@ -231,8 +228,6 @@ public class MainActivityScreenTest {
         increaseNumVisits();
         // set current date and time to check if matches RecyclerView TextViews and last visit date
         setCurrentDateAndTime();
-        Log.d(TAG, "editVisits: test date " + date);
-        Log.d(TAG, "editVisits: test date " + time);
 
         // add a visit and save
         addVisit();
