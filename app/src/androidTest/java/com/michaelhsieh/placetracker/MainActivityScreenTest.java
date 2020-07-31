@@ -180,7 +180,11 @@ public class MainActivityScreenTest {
         // save notes
         onView(withId(R.id.btn_save)).perform(click());
 
-        /*// now start DetailActivity again and check notes was saved
+        /*checkNotes()*/
+    }
+
+    private void checkNotes() {
+        // now start DetailActivity again and check notes was saved
         clickPlace();
         // scroll to notes EditText
         onView(withId(R.id.et_notes))
@@ -190,7 +194,7 @@ public class MainActivityScreenTest {
         onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
 
         // go back
-        Espresso.pressBack();*/
+        Espresso.pressBack();
     }
 
     private void addVisit() {
@@ -201,6 +205,9 @@ public class MainActivityScreenTest {
         onView(withId(R.id.btn_add_visit))
                 .perform(scrollTo());
         onView(withId(R.id.btn_add_visit)).perform(click());
+
+        // check number of visits is 1
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(1))));
 
         // check that the last visit label and date are visible
         onView(withId(R.id.tv_label_last_visit)).check(
@@ -347,6 +354,15 @@ public class MainActivityScreenTest {
         onView(withText(android.R.string.yes)).check(matches(isDisplayed()));
         onView(withText(android.R.string.yes)).perform(click());
 
+        // check number of visits is 0
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(0))));
+
+        // check that the last visit label and date are gone
+        onView(withId(R.id.tv_label_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+
         // check visit has been deleted
         // visit group label should remain
         onView(withId(R.id.expanding_rv_visits))
@@ -357,12 +373,6 @@ public class MainActivityScreenTest {
                 .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(date))))));
         onView(withId(R.id.expanding_rv_visits))
                 .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(time))))));
-
-        // check that the last visit label and date are gone
-        onView(withId(R.id.tv_label_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
-        onView(withId(R.id.tv_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
 
         // scroll to save button
         onView(withId(R.id.btn_save))
