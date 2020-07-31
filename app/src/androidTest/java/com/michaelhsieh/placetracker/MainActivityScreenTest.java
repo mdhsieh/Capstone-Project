@@ -72,7 +72,7 @@ public class MainActivityScreenTest {
     private int numVisits = 0;
     private static final int POS_NEW_VISIT = 1;
 
-    // updated date is
+    // updated date is:
     // Tuesday, February 14, 2017 at 3:25 pm
     private static final int UPDATED_YEAR = 2017;
     private static final int UPDATED_MONTH = 2;
@@ -183,7 +183,9 @@ public class MainActivityScreenTest {
         clearNotes();
     }
 
-    // check notes were saved
+    /** Check notes were saved.
+     *
+     */
     private void checkNotes() {
         // start DetailActivity again
         clickPlace();
@@ -198,8 +200,9 @@ public class MainActivityScreenTest {
         Espresso.pressBack();
     }
 
-    // Clear notes by replacing with empty text.
-    // Used to make testing easier.
+    /** Clear notes by replacing with empty text.
+     *  Used to make testing easier.
+     */
     private void clearNotes() {
         // click a place to start DetailActivity
         clickPlace();
@@ -255,6 +258,38 @@ public class MainActivityScreenTest {
         numVisits -= 1;
     }
 
+    /** Set the expected date and time to the current date and time.
+     * These should match the default date and time when user adds visit.
+     *
+     */
+    private void setCurrentDateAndTime() {
+        Date currentTime = Calendar.getInstance().getTime();
+        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(currentTime);
+        // format date to show day of week, month, day, year
+        date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
+    }
+
+    /** Set the expected date and time to updated values.
+     * These should match the date and time set in dialog when Espresso updates visit.
+     *
+     */
+    private void setUpdatedDateAndTime() {
+        // Calendar whose Date object will be converted to a readable date String and time String
+        // initially set to the current date and time
+        Calendar updatedCalendar = Calendar.getInstance();
+        updatedCalendar.clear();
+        // subtract 1 because Calendar month numbering is 0-based, ex. January is 0
+        updatedCalendar.set(UPDATED_YEAR, UPDATED_MONTH-1, UPDATED_DAY, UPDATED_HOUR, UPDATED_MINUTE);
+
+        Date updatedTime = updatedCalendar.getTime();
+        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(updatedTime);
+        // format date to show day of week, month, day, year
+        date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
+    }
+
+    /** Add a visit and check TextViews are correct.
+     *
+     */
     private void addVisit() {
         // click place to start DetailActivity
         clickPlace();
@@ -267,6 +302,7 @@ public class MainActivityScreenTest {
         // check number of visits increased by 1
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
+        // check last visit label and text are visible and match current date and time
         checkLastVisitLabelAndText(date, time);
 
         // scroll to expandable RecyclerView
@@ -293,14 +329,9 @@ public class MainActivityScreenTest {
         onView(withId(R.id.btn_save)).perform(click());
     }
 
-    // set the date and time that should match the default date and time when user adds visit
-    private void setCurrentDateAndTime() {
-        Date currentTime = Calendar.getInstance().getTime();
-        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(currentTime);
-        // format date to show day of week, month, day, year
-        date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
-    }
-
+    /** Update an existing visit and check TextViews are correct.
+     *
+     */
     private void updateVisit() {
         // click place to start DetailActivity
         clickPlace();
@@ -363,22 +394,11 @@ public class MainActivityScreenTest {
                 .perform(scrollTo(), click());
     }
 
-    // set the date and time to updated values
-    // these should match the date and time set in dialog when Espresso updates visit
-    private void setUpdatedDateAndTime() {
-        // Calendar whose Date object will be converted to a readable date String and time String
-        // initially set to the current date and time
-        Calendar updatedCalendar = Calendar.getInstance();
-        updatedCalendar.clear();
-        // subtract 1 because Calendar month numbering is 0-based, ex. January is 0
-        updatedCalendar.set(UPDATED_YEAR, UPDATED_MONTH-1, UPDATED_DAY, UPDATED_HOUR, UPDATED_MINUTE);
-
-        Date updatedTime = updatedCalendar.getTime();
-        time = DateFormat.getTimeInstance(DateFormat.SHORT).format(updatedTime);
-        // format date to show day of week, month, day, year
-        date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
-    }
-
+    /** Check last visit label and TextView are visible and TextView matches the
+     * expected date and time.
+     * @param date The expected date
+     * @param time The expected time
+     */
     private void checkLastVisitLabelAndText(String date, String time) {
         // scroll to last visit label
         onView(withId(R.id.tv_label_last_visit)).perform(scrollTo());
@@ -393,6 +413,9 @@ public class MainActivityScreenTest {
                 matches(withText(date + AT + time)));
     }
 
+    /** Delete an existing visit and check TextViews are correct.
+     *
+     */
     private void deleteVisit() {
         // click place to start DetailActivity
         clickPlace();
@@ -448,7 +471,9 @@ public class MainActivityScreenTest {
         onView(withId(R.id.btn_save)).perform(click());
     }
 
-    // click place at position in list
+    /** Click place at position in list.
+     *
+     */
     private void clickPlace() {
         onView(withId(R.id.rv_places))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
