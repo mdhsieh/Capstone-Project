@@ -64,8 +64,12 @@ public class MainActivityScreenTest {
             " and soups.";
 
     private static final String AT = " at ";
+    // store the expected date and time, which should match date and time of TextViews
+    // in visit ExpandableRecyclerView
     private String time;
     private String date;
+    // expected number of visits
+    private int numVisits = 0;
     private static final int POS_NEW_VISIT = 1;
 
     // updated date is
@@ -219,26 +223,39 @@ public class MainActivityScreenTest {
      */
     @Test
     public void editVisits() {
-        // expected number of visits
-        int numberOfVisits = 0;
 
         // add one because expecting number of visits to increase by 1 when adding visit
-        numberOfVisits += 1;
+        increaseNumVisits();
+        // set current date and time to check if matches RecyclerView TextViews and last visit date
+        setCurrentDateAndTime();
+        Log.d(TAG, "editVisits: test date " + date);
+        Log.d(TAG, "editVisits: test date " + time);
 
         // add a visit and save
-        addVisit(numberOfVisits);
+        addVisit();
+
+        // set updated date and time to check if matches RecyclerView TextViews
+        setUpdatedDateAndTime();
 
         // update the visit and save
-        updateVisit(numberOfVisits);
+        updateVisit();
 
         // subtract one because expecting number of visits to decrease by 1 when deleting visit
-        numberOfVisits -= 1;
+        decreaseNumVisits();
 
         // delete the visit and save
-        deleteVisit(numberOfVisits);
+        deleteVisit();
     }
 
-    private void addVisit(int numVisits) {
+    private void increaseNumVisits() {
+        numVisits += 1;
+    }
+
+    private void decreaseNumVisits() {
+        numVisits -= 1;
+    }
+
+    private void addVisit() {
         // click place to start DetailActivity
         clickPlace();
 
@@ -250,18 +267,7 @@ public class MainActivityScreenTest {
         // check number of visits increased by 1
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
-        // check that the last visit label and date are visible
-        onView(withId(R.id.tv_label_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-        onView(withId(R.id.tv_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-
-        // set date and time to check if matches RecyclerView display and last visit date
-        setCurrentDateAndTime();
-
-        // check last visit has current date and time
-        onView(withId(R.id.tv_last_visit)).check(
-                matches(withText(date + AT + time)));
+        checkLastVisitLabelAndText(date, time);
 
         // scroll to expandable RecyclerView
         onView(withId(R.id.expanding_rv_visits))
@@ -295,7 +301,7 @@ public class MainActivityScreenTest {
         date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
     }
 
-    private void updateVisit(int numVisits) {
+    private void updateVisit() {
         // click place to start DetailActivity
         clickPlace();
 
@@ -333,31 +339,16 @@ public class MainActivityScreenTest {
         // click to set updated date and time
         onView(withId(R.id.btn_date_time_set)).perform(click());
 
-        // set updated date and time to check if matches RecyclerView TextViews
-        setUpdatedDateAndTime();
-
-
         // scroll to number of visits
         onView(withId(R.id.tv_num_visits)).perform(scrollTo());
         // check number of visits is unchanged
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
-        // scroll to last visit label
-        onView(withId(R.id.tv_label_last_visit)).perform(scrollTo());
-        // check that the last visit label and date are still visible
-        onView(withId(R.id.tv_label_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-        onView(withId(R.id.tv_last_visit)).check(
-                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-
-        // check last visit has updated date and time
-        onView(withId(R.id.tv_last_visit)).check(
-                matches(withText(date + AT + time)));
+        checkLastVisitLabelAndText(date, time);
 
         // scroll to expandable RecyclerView
         onView(withId(R.id.expanding_rv_visits))
                 .perform(scrollTo());
-
 
         // check that the visit has updated date and time
         onView(withId(R.id.expanding_rv_visits))
@@ -388,7 +379,21 @@ public class MainActivityScreenTest {
         date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
     }
 
-    private void deleteVisit(int numVisits) {
+    private void checkLastVisitLabelAndText(String date, String time) {
+        // scroll to last visit label
+        onView(withId(R.id.tv_label_last_visit)).perform(scrollTo());
+        // check that the last visit label and date are still visible
+        onView(withId(R.id.tv_label_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // check last visit has updated date and time
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withText(date + AT + time)));
+    }
+
+    private void deleteVisit() {
         // click place to start DetailActivity
         clickPlace();
 
@@ -416,7 +421,7 @@ public class MainActivityScreenTest {
         onView(withText(android.R.string.yes)).check(matches(isDisplayed()));
         onView(withText(android.R.string.yes)).perform(click());
 
-        // check number of visits is 0
+        // check number of visits decreased by 1
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
         // check that the last visit label and date are gone
