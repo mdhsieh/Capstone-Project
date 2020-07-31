@@ -25,6 +25,7 @@ import java.util.Date;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
@@ -97,9 +98,84 @@ public class MainActivityScreenTest {
         // check details are correct and go back to MainActivity
         checkInitialDetails();
 
-        // add notes and save
-        addNotes();
+//        // add notes and save
+//        addNotes();
 
+//        // add a visit and save
+//        addVisit();
+//
+//        // update the visit and save
+//        updateVisit();
+//
+//        // delete the visit and save
+//        deleteVisit();
+    }
+
+    /** Start DetailActivity, add notes, and save.
+     *
+     */
+    @Test
+    public void addNotes() {
+        // click a place to start DetailActivity
+        clickPlace();
+
+        // scroll to notes EditText to make sure Espresso can type text in it
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).perform(typeText(NOTES));
+        // close soft keyboard when done typing
+        Espresso.closeSoftKeyboard();
+
+        // scroll to save button to make sure Espresso can click it
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save notes
+        onView(withId(R.id.btn_save)).perform(click());
+
+        checkNotes();
+        clearNotes();
+    }
+
+    // check notes were saved
+    private void checkNotes() {
+        // start DetailActivity again
+        clickPlace();
+        // scroll to notes EditText
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).check(matches(isDisplayed()));
+        // check notes displays correct text
+        onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
+
+        // go back
+        Espresso.pressBack();
+    }
+
+    // Clear notes by replacing with empty text.
+    // Used to make testing easier.
+    private void clearNotes() {
+        // click a place to start DetailActivity
+        clickPlace();
+
+        // scroll to notes EditText to make sure Espresso can type text in it
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).perform(replaceText(""));
+        // close soft keyboard when done typing
+        Espresso.closeSoftKeyboard();
+
+        // scroll to save button to make sure Espresso can click it
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save notes
+        onView(withId(R.id.btn_save)).perform(click());
+    }
+
+    /** Add, update, and delete one visit.
+     *
+     */
+    @Test
+    public void editVisits() {
         // add a visit and save
         addVisit();
 
@@ -157,43 +233,6 @@ public class MainActivityScreenTest {
         // check save and delete button display correct text
         onView(withId(R.id.btn_delete)).check(matches(withText(R.string.delete)));
         onView(withId(R.id.btn_save)).check(matches(withText(R.string.save)));
-
-        // go back
-        Espresso.pressBack();
-    }
-
-    /** Add notes in DetailActivity and save.
-     *
-     */
-    private void addNotes() {
-        // click a place to start DetailActivity
-        clickPlace();
-
-        // scroll to notes EditText to make sure Espresso can type text in it
-        onView(withId(R.id.et_notes))
-                .perform(scrollTo());
-        onView(withId(R.id.et_notes)).perform(typeText(NOTES));
-        // close soft keyboard when done typing
-        Espresso.closeSoftKeyboard();
-
-        // scroll to save button to make sure Espresso can click it
-        onView(withId(R.id.btn_save))
-                .perform(scrollTo());
-        // save notes
-        onView(withId(R.id.btn_save)).perform(click());
-
-        /*checkNotes()*/
-    }
-
-    private void checkNotes() {
-        // now start DetailActivity again and check notes was saved
-        clickPlace();
-        // scroll to notes EditText
-        onView(withId(R.id.et_notes))
-                .perform(scrollTo());
-        onView(withId(R.id.et_notes)).check(matches(isDisplayed()));
-        // check notes displays correct text
-        onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
 
         // go back
         Espresso.pressBack();
