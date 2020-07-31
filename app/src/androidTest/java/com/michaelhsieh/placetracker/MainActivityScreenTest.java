@@ -94,8 +94,7 @@ public class MainActivityScreenTest {
         onView(withId(R.id.rv_places))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
 
-        // check labels, buttons, and number of visits are displayed to user and have correct text
-        // and go back to MainActivity
+        // check details are correct and go back to MainActivity
         checkInitialDetails();
 
         // add notes and save
@@ -111,7 +110,10 @@ public class MainActivityScreenTest {
         deleteVisit();
     }
 
-    /** When a new place's DetailActivity is started, check details are correct.
+    /** When a place's DetailActivity is started, check details are correct. Then go back.
+     * <p></p>
+     * Checks name, address, and number of visits have correct text.
+     * Check labels and buttons are displayed on screen to user and have correct text.
      *
      */
     private void checkInitialDetails() {
@@ -131,7 +133,7 @@ public class MainActivityScreenTest {
         // check that number of visits label and add visit button display correct text
         onView(withId(R.id.tv_label_num_visits)).check(matches(withText(R.string.num_visits_label)));
         onView(withId(R.id.btn_add_visit)).check(matches(withText(R.string.add_visit)));
-        // assuming no visits added yet, check number of visits is 0
+        // assuming no visits, check number of visits is 0
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(0))));
 
         // scroll to save button to make sure Views are displayed on screen to user
@@ -149,7 +151,7 @@ public class MainActivityScreenTest {
         // check notes label displays correct text
         onView(withId(R.id.tv_label_notes)).check(matches(withText(R.string.notes_label)));
 
-        // assuming notes empty, check notes EditText displays correct hint
+        // check notes EditText has correct hint
         onView(withId(R.id.et_notes)).check(matches(withHint(R.string.notes_hint)));
 
         // check save and delete button display correct text
@@ -201,7 +203,7 @@ public class MainActivityScreenTest {
         // click place to start DetailActivity
         clickPlace();
 
-        // scroll to add visit button
+        // scroll to add visit button and add visit
         onView(withId(R.id.btn_add_visit))
                 .perform(scrollTo());
         onView(withId(R.id.btn_add_visit)).perform(click());
@@ -272,7 +274,6 @@ public class MainActivityScreenTest {
 
         // click the visit that was added to update it
         onView(withId(R.id.expanding_rv_visits))
-                // .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
 
         // pick updated date
@@ -295,6 +296,29 @@ public class MainActivityScreenTest {
 
         // set updated date and time to check if matches RecyclerView TextViews
         setUpdatedDateAndTime();
+
+
+        // scroll to number of visits
+        onView(withId(R.id.tv_num_visits)).perform(scrollTo());
+        // check number of visits is still 1
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(1))));
+
+        // scroll to last visit label
+        onView(withId(R.id.tv_label_last_visit)).perform(scrollTo());
+        // check that the last visit label and date are still visible
+        onView(withId(R.id.tv_label_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
+
+        // check last visit has updated date and time
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withText(date + AT + time)));
+
+        // scroll to expandable RecyclerView
+        onView(withId(R.id.expanding_rv_visits))
+                .perform(scrollTo());
+
 
         // check that the visit has updated date and time
         onView(withId(R.id.expanding_rv_visits))
@@ -343,7 +367,6 @@ public class MainActivityScreenTest {
 
         // click the visit to delete it
         onView(withId(R.id.expanding_rv_visits))
-//                .perform(RecyclerViewActions.scrollToPosition(POS_NEW_VISIT))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
 
         // scroll to delete button and click
