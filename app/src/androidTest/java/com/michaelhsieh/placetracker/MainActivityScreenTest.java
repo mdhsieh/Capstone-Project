@@ -27,7 +27,6 @@ import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.action.ViewActions.typeText;
-import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -35,6 +34,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibilit
 import static androidx.test.espresso.matcher.ViewMatchers.withHint;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static org.hamcrest.core.IsNot.not;
 
 /**
  * This test demos a user clicking on a place in MainActivity which
@@ -359,17 +359,17 @@ public class MainActivityScreenTest {
                 .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
                 .check(matches(atPosition(POS_VISIT_GROUP, hasDescendant(withText(R.string.dates_visited)))));
 
-        // visit should not exist
-//        onView(withId(R.id.expanding_rv_visits))
-//                .check(matches(atPosition(POS_NEW_VISIT, hasDescendant(withText(date)))));
+        // visit date and time TextViews should not exist
+        onView(withId(R.id.expanding_rv_visits))
+                .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(date))))));
+        onView(withId(R.id.expanding_rv_visits))
+                .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(time))))));
 
         // scroll to save button
         onView(withId(R.id.btn_save))
                 .perform(scrollTo());
         // save
         onView(withId(R.id.btn_save)).perform(click());
-
-        Log.d(TAG, "deleteVisit: finished test");
     }
 
     // click place at position in list
