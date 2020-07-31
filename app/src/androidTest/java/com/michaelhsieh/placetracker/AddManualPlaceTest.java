@@ -1,7 +1,5 @@
 package com.michaelhsieh.placetracker;
 
-import android.util.Log;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,12 +30,12 @@ import static com.michaelhsieh.placetracker.MainActivityScreenTest.atPosition;
 /**
  * This test demos a user adding a place manually using the menu item, then
  * opens up the corresponding DetailActivity to check those details are displayed correctly.
+ * <p></p>
+ * The place must be at position {@link #POS_PLACE} in the RecyclerView.
  *
  */
 @RunWith(AndroidJUnit4.class)
 public class AddManualPlaceTest {
-
-    private static final String TAG = AddManualPlaceTest.class.getSimpleName();
 
     // name and address of the place which will be added manually
     private static final String PLACE_NAME = "Martian Crater";
@@ -72,7 +70,8 @@ public class AddManualPlaceTest {
             MainActivity.class);
 
     /** Adds a place manually by clicking menu item.
-     * Clicks the place and opens the corresponding DetailActivity.
+     * Clicks the place and opens the corresponding DetailActivity
+     * to check that details are correct.
      */
     @Test
     public void addManualPlaceAndCheckDetails() {
@@ -86,15 +85,22 @@ public class AddManualPlaceTest {
         // close the keyboard so all Views are visible again
         Espresso.closeSoftKeyboard();
 
+        // add a visit and update the date and time
         addAndUpdateManualVisit();
 
+        // type some notes
         typeNotes();
 
+        // add the manual place
         clickAddManualPlaceButton();
 
+        // click manual place in list and check details are correct
         clickPlaceItem_OpensManualDetailActivity();
     }
 
+    /** Adds a visit and sets it to updated date and time.
+     *
+     */
     private void addAndUpdateManualVisit() {
         // set updated date and time to check if matches RecyclerView TextViews
         setUpdatedDateAndTime();
@@ -111,6 +117,9 @@ public class AddManualPlaceTest {
         checkManualVisitBeforeAddingPlace();
     }
 
+    /** Sets visit to updated date and time.
+     *
+     */
     private void updateManualVisit() {
         // scroll to expandable RecyclerView
         onView(withId(R.id.expanding_rv_manual_visits))
@@ -121,18 +130,9 @@ public class AddManualPlaceTest {
                 .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
                 .perform(click());
 
-        // scroll to bottom of screen to allow visit to be clicked
-//        onView(withId(R.id.btn_manual_add_place)).perform(scrollTo());
-
         // click the visit that was added to update it
         onView(withId(R.id.expanding_rv_manual_visits))
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_NEW_VISIT, click()));
-
-//        try {
-//            Thread.sleep(3000);
-//        } catch (InterruptedException e) {
-//            Log.e(TAG, "updateManualVisit: ", e);
-//        }
 
         // pick updated date
         onView(withId(R.id.date_picker)).perform(PickerActions.setDate(
@@ -153,9 +153,14 @@ public class AddManualPlaceTest {
         onView(withId(R.id.btn_date_time_set)).perform(click());
     }
 
-    // check the visit added in ManualPlaceDetailActivity displays correct text
-    // This is different from checkManualPlaceUpdatedVisit because that method uses
-    // the IDs in DetailActivity, but this uses the IDs in ManualPlaceDetailActivity
+    /**
+     * Check the visit added in ManualPlaceDetailActivity displays correct text.
+     *
+     * This is similar to {@link #checkManualVisit}.
+     * The difference is this method uses the IDs in layout/activity_manual_place_detail.xml, and
+     * is called before the manual place is added, while
+     * that method uses the IDs in layout/activity_detail.xml.
+     */
     private void checkManualVisitBeforeAddingPlace() {
         // check the newly added visit
         // scroll to number of visits
@@ -206,6 +211,9 @@ public class AddManualPlaceTest {
         date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
     }
 
+    /** Type notes.
+     *
+     */
     private void typeNotes() {
         // scroll to notes EditText to make sure Espresso can type text in it
         onView(withId(R.id.et_manual_notes))
@@ -215,6 +223,9 @@ public class AddManualPlaceTest {
         Espresso.closeSoftKeyboard();
     }
 
+    /** Scroll to the button that adds manual place and click it.
+     *
+     */
     private void clickAddManualPlaceButton() {
         // scroll to save button to make sure Espresso can click it
         onView(withId(R.id.btn_manual_add_place))
@@ -223,6 +234,9 @@ public class AddManualPlaceTest {
         onView(withId(R.id.btn_manual_add_place)).perform(click());
     }
 
+    /** Check the name and address of manual place in list are correct, then
+     * open that place and check details are correct.
+     */
     private void clickPlaceItem_OpensManualDetailActivity() {
         // check the name and address of the manual place
         onView(withId(R.id.rv_places))
@@ -237,12 +251,14 @@ public class AddManualPlaceTest {
         checkManualPlaceDetails();
     }
 
+    /** Check manual place details are correct.
+     */
     private void checkManualPlaceDetails() {
         // now in DetailActivity, check the name and address are correct
         onView(withId(R.id.et_name)).check(matches(withText(PLACE_NAME)));
         onView(withId(R.id.et_address)).check(matches(withText(PLACE_ADDRESS)));
 
-        checkManualPlaceUpdatedVisit();
+        checkManualVisit();
 
         // scroll to notes EditText
         onView(withId(R.id.et_notes))
@@ -255,8 +271,10 @@ public class AddManualPlaceTest {
         Espresso.pressBack();
     }
 
-    // check manual place's DetailActivity has correct visit
-    private void checkManualPlaceUpdatedVisit() {
+    /** Check manual place's DetailActivity has correct visit.
+     *
+     */
+    private void checkManualVisit() {
         // scroll to number of visits
         onView(withId(R.id.tv_num_visits)).perform(scrollTo());
         // check number of visits is 1
