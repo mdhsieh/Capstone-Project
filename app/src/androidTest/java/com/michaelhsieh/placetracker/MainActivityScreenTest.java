@@ -96,94 +96,7 @@ public class MainActivityScreenTest {
                 .perform(RecyclerViewActions.actionOnItemAtPosition(POS_PLACE, click()));
 
         // check details are correct and go back to MainActivity
-        checkInitialDetails();
-
-//        // add notes and save
-//        addNotes();
-
-//        // add a visit and save
-//        addVisit();
-//
-//        // update the visit and save
-//        updateVisit();
-//
-//        // delete the visit and save
-//        deleteVisit();
-    }
-
-    /** Start DetailActivity, add notes, and save.
-     *
-     */
-    @Test
-    public void addNotes() {
-        // click a place to start DetailActivity
-        clickPlace();
-
-        // scroll to notes EditText to make sure Espresso can type text in it
-        onView(withId(R.id.et_notes))
-                .perform(scrollTo());
-        onView(withId(R.id.et_notes)).perform(typeText(NOTES));
-        // close soft keyboard when done typing
-        Espresso.closeSoftKeyboard();
-
-        // scroll to save button to make sure Espresso can click it
-        onView(withId(R.id.btn_save))
-                .perform(scrollTo());
-        // save notes
-        onView(withId(R.id.btn_save)).perform(click());
-
-        checkNotes();
-        clearNotes();
-    }
-
-    // check notes were saved
-    private void checkNotes() {
-        // start DetailActivity again
-        clickPlace();
-        // scroll to notes EditText
-        onView(withId(R.id.et_notes))
-                .perform(scrollTo());
-        onView(withId(R.id.et_notes)).check(matches(isDisplayed()));
-        // check notes displays correct text
-        onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
-
-        // go back
-        Espresso.pressBack();
-    }
-
-    // Clear notes by replacing with empty text.
-    // Used to make testing easier.
-    private void clearNotes() {
-        // click a place to start DetailActivity
-        clickPlace();
-
-        // scroll to notes EditText to make sure Espresso can type text in it
-        onView(withId(R.id.et_notes))
-                .perform(scrollTo());
-        onView(withId(R.id.et_notes)).perform(replaceText(""));
-        // close soft keyboard when done typing
-        Espresso.closeSoftKeyboard();
-
-        // scroll to save button to make sure Espresso can click it
-        onView(withId(R.id.btn_save))
-                .perform(scrollTo());
-        // save notes
-        onView(withId(R.id.btn_save)).perform(click());
-    }
-
-    /** Add, update, and delete one visit.
-     *
-     */
-    @Test
-    public void editVisits() {
-        // add a visit and save
-        addVisit();
-
-        // update the visit and save
-        updateVisit();
-
-        // delete the visit and save
-        deleteVisit();
+        checkDetails();
     }
 
     /** When a place's DetailActivity is started, check details are correct. Then go back.
@@ -192,7 +105,7 @@ public class MainActivityScreenTest {
      * Check labels and buttons are displayed on screen to user and have correct text.
      *
      */
-    private void checkInitialDetails() {
+    private void checkDetails() {
         // now in DetailActivity, check the name and address are correct
         onView(withId(R.id.et_name)).check(matches(withText(PLACE_NAME)));
         onView(withId(R.id.et_address)).check(matches(withText(PLACE_ADDRESS)));
@@ -238,7 +151,94 @@ public class MainActivityScreenTest {
         Espresso.pressBack();
     }
 
-    private void addVisit() {
+    /** Start DetailActivity, add notes, and save.
+     *
+     */
+    @Test
+    public void addNotes() {
+        // click a place to start DetailActivity
+        clickPlace();
+
+        // scroll to notes EditText to make sure Espresso can type text in it
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).perform(typeText(NOTES));
+        // close soft keyboard when done typing
+        Espresso.closeSoftKeyboard();
+
+        // scroll to save button to make sure Espresso can click it
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save notes
+        onView(withId(R.id.btn_save)).perform(click());
+
+        // uncomment to re-open details screen and check notes text is still there
+        // checkNotes();
+
+        // clears notes to make repeat testing easier
+        clearNotes();
+    }
+
+    // check notes were saved
+    private void checkNotes() {
+        // start DetailActivity again
+        clickPlace();
+        // scroll to notes EditText
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).check(matches(isDisplayed()));
+        // check notes displays correct text
+        onView(withId(R.id.et_notes)).check(matches(withText(NOTES)));
+
+        // go back
+        Espresso.pressBack();
+    }
+
+    // Clear notes by replacing with empty text.
+    // Used to make testing easier.
+    private void clearNotes() {
+        // click a place to start DetailActivity
+        clickPlace();
+
+        // scroll to notes EditText to make sure Espresso can type text in it
+        onView(withId(R.id.et_notes))
+                .perform(scrollTo());
+        onView(withId(R.id.et_notes)).perform(replaceText(""));
+        // close soft keyboard when done typing
+        Espresso.closeSoftKeyboard();
+
+        // scroll to save button to make sure Espresso can click it
+        onView(withId(R.id.btn_save))
+                .perform(scrollTo());
+        // save notes
+        onView(withId(R.id.btn_save)).perform(click());
+    }
+
+    /** Add, update, and delete one visit.
+     *
+     */
+    @Test
+    public void editVisits() {
+        // expected number of visits
+        int numberOfVisits = 0;
+
+        // add one because expecting number of visits to increase by 1 when adding visit
+        numberOfVisits += 1;
+
+        // add a visit and save
+        addVisit(numberOfVisits);
+
+        // update the visit and save
+        updateVisit(numberOfVisits);
+
+        // subtract one because expecting number of visits to decrease by 1 when deleting visit
+        numberOfVisits -= 1;
+
+        // delete the visit and save
+        deleteVisit(numberOfVisits);
+    }
+
+    private void addVisit(int numVisits) {
         // click place to start DetailActivity
         clickPlace();
 
@@ -247,8 +247,8 @@ public class MainActivityScreenTest {
                 .perform(scrollTo());
         onView(withId(R.id.btn_add_visit)).perform(click());
 
-        // check number of visits is 1
-        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(1))));
+        // check number of visits increased by 1
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
         // check that the last visit label and date are visible
         onView(withId(R.id.tv_label_last_visit)).check(
@@ -295,7 +295,7 @@ public class MainActivityScreenTest {
         date = DateFormat.getDateInstance(DateFormat.FULL).format(currentTime);
     }
 
-    private void updateVisit() {
+    private void updateVisit(int numVisits) {
         // click place to start DetailActivity
         clickPlace();
 
@@ -339,8 +339,8 @@ public class MainActivityScreenTest {
 
         // scroll to number of visits
         onView(withId(R.id.tv_num_visits)).perform(scrollTo());
-        // check number of visits is still 1
-        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(1))));
+        // check number of visits is unchanged
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
         // scroll to last visit label
         onView(withId(R.id.tv_label_last_visit)).perform(scrollTo());
@@ -388,7 +388,7 @@ public class MainActivityScreenTest {
         date = DateFormat.getDateInstance(DateFormat.FULL).format(updatedTime);
     }
 
-    private void deleteVisit() {
+    private void deleteVisit(int numVisits) {
         // click place to start DetailActivity
         clickPlace();
 
@@ -417,7 +417,7 @@ public class MainActivityScreenTest {
         onView(withText(android.R.string.yes)).perform(click());
 
         // check number of visits is 0
-        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(0))));
+        onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
         // check that the last visit label and date are gone
         onView(withId(R.id.tv_label_last_visit)).check(
