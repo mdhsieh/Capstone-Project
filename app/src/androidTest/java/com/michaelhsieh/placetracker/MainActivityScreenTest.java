@@ -322,12 +322,6 @@ public class MainActivityScreenTest {
         // click place to start DetailActivity
         clickPlace();
 
-        // check that the last visit label and date are visible
-//        onView(withId(R.id.tv_label_last_visit)).check(
-//                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-//        onView(withId(R.id.tv_last_visit)).check(
-//                matches(withEffectiveVisibility(ViewMatchers.Visibility.VISIBLE)));
-
         // scroll to expandable RecyclerView
         onView(withId(R.id.expanding_rv_visits))
                 .perform(scrollTo());
@@ -358,12 +352,17 @@ public class MainActivityScreenTest {
         onView(withId(R.id.expanding_rv_visits))
                 .perform(RecyclerViewActions.scrollToPosition(POS_VISIT_GROUP))
                 .check(matches(atPosition(POS_VISIT_GROUP, hasDescendant(withText(R.string.dates_visited)))));
-
         // visit date and time TextViews should not exist
         onView(withId(R.id.expanding_rv_visits))
                 .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(date))))));
         onView(withId(R.id.expanding_rv_visits))
                 .check(matches(not(atPosition(POS_NEW_VISIT, hasDescendant(withText(time))))));
+
+        // check that the last visit label and date are gone
+        onView(withId(R.id.tv_label_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
+        onView(withId(R.id.tv_last_visit)).check(
+                matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)));
 
         // scroll to save button
         onView(withId(R.id.btn_save))
