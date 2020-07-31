@@ -370,6 +370,7 @@ public class MainActivityScreenTest {
         // check number of visits is unchanged
         onView(withId(R.id.tv_num_visits)).check(matches(withText(String.valueOf(numVisits))));
 
+        // check last visit label visible and text has latest date and time TextViews
         checkLastVisitLabelAndText(date, time);
 
         // scroll to expandable RecyclerView

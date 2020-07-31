@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -349,6 +352,23 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         dialogView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                alertDialog.dismiss();
+            }
+        });
+
+        // copy visit date and time if copy button clicked
+        dialogView.findViewById(R.id.btn_copy_visit).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // label is only used by developer, can retrieve by using clip.getDescription()
+                String label = getString(R.string.visit_date_time_copy_label);
+                String text = visit.getDate() + getApplicationContext().getResources().getString(R.string.at) + visit.getTime();
+                ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData clip = ClipData.newPlainText(label, text);
+                if (clipboard != null) {
+                    clipboard.setPrimaryClip(clip);
+                    Toast.makeText(getApplicationContext(), R.string.visit_date_time_copy_confirm_message, Toast.LENGTH_LONG).show();
+                }
                 alertDialog.dismiss();
             }
         });
