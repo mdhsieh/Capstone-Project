@@ -174,7 +174,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         Places.initialize(getApplicationContext(), getString(R.string.google_places_api_key));
 
         // Create a new Places client instance
-        /*PlacesClient placesClient = Places.createClient(this);*/
         placesClient = Places.createClient(this);
 
         // Initialize the AutocompleteSupportFragment.
