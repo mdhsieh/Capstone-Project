@@ -7,8 +7,9 @@ import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-// each Visit contains a Calendar, date, and time
-// ExpandableRecyclerView library requires implementing Parcelable or error occurs
+/** Each Visit contains a Calendar, date, and time.
+ * ExpandableRecyclerView library requires implementing Parcelable or error occurs.
+ */
 public class Visit implements Parcelable {
 
     // used to get date and time Strings which are displayed to user,
@@ -40,7 +41,7 @@ public class Visit implements Parcelable {
 
 
     /** Get the date from Calendar's Date object, ex. Saturday. July 4, 2020.
-     *
+     * <p></p>
      * Source:
      *
      * Dany Pop

@@ -31,7 +31,7 @@ import static com.michaelhsieh.placetracker.MainActivityScreenTest.atPosition;
  * This test demos a user adding a place manually using the menu item, then
  * opens up the corresponding DetailActivity to check those details are displayed correctly.
  * <p></p>
- * The place must be at position {@link #POS_PLACE} in the RecyclerView.
+ * This test assumes the place is at the second position of the RecyclerView.
  *
  */
 @RunWith(AndroidJUnit4.class)

@@ -324,7 +324,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     }
 
     /** Check if connected to Wi-Fi or cellular network.
-
+        <p></p>
         Source:
         pavelnazimok
         https://stackoverflow.com/questions/32547006/connectivitymanager-getnetworkinfoint-deprecated

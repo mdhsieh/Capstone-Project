@@ -14,7 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 /** Adapter to populate Views in each row of RecyclerView with data.
- *
+ * <p></p>
  * Source:
  * Suragch
  * https://stackoverflow.com/questions/40584424/simple-android-recyclerview-example

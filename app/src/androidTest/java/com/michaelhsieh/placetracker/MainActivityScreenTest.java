@@ -45,6 +45,11 @@ import static org.hamcrest.core.IsNot.not;
  * The place must already be added to the RecyclerView,
  * ex. from first running {@link MainActivitySearchPlaceTest}.
  *
+ * <p></p>
+ *
+ * This test assumes the place is at the first position of the RecyclerView and
+ * has no visits or notes.
+ *
  */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityScreenTest {
