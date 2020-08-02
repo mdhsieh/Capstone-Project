@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -235,7 +236,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 }
             });
 
-
         }
 
     }
@@ -290,6 +290,73 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
+    private void setUpItemTouchHelper(RecyclerView recyclerView) {
+        // swipe left to delete a visit
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+                ItemTouchHelper.LEFT) {
+
+            // disable swipe for VisitGroup at position 0
+
+
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                if (viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) {
+                    Log.d(TAG, "getSwipeDirs: disable swipe on VisitGroup");
+                    return 0;
+                }
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                /* get adapter position that was swiped and
+                subtract 1 because VisitGroup is at position 0, and
+                the first visit is at position 1 */
+                int posToDelete = viewHolder.getAdapterPosition() - 1;
+                Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
+                // delete place at that position from the database
+                Visit visitToDelete = visits.get(posToDelete);
+
+                // create delete visit message
+                // Are you sure you want to delete this visit on [date] at [time]?
+                String deleteVisitMessage = getResources().getString(R.string.delete_visit_message)
+                        + visitToDelete.getDate() + getResources().getString(R.string.at) +
+                        visitToDelete.getTime() +
+                        getResources().getString(R.string.question_mark);
+
+                new AlertDialog.Builder(DetailActivity.this)
+                        .setTitle(R.string.delete_visit_title)
+                        .setMessage(deleteVisitMessage)
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                removeSingleItem(posToDelete);
+                            }
+                        })
+
+                        // if user cancels delete, then refresh the visit that was supposed to be swiped so
+                        // it doesn't get swiped off screen
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // make the visit visible again
+                                adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+
     private void setUpAdapter() {
         // initialize expanding RecyclerView
         RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
@@ -308,6 +375,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // set the click listener for clicks on individual visits
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+
+        // set up ItemTouchHelper to swipe left to delete visit
+        setUpItemTouchHelper(recyclerView);
     }
 
     private void setUpPhoto() {

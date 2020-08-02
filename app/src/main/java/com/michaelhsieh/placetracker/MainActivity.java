@@ -203,7 +203,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                             public void onClick(DialogInterface dialog, int which) {
                                 // Continue with delete operation
                                 placeViewModel.delete(placeToDelete);
-                                Toast.makeText(MainActivity.this, "Place deleted.", Toast.LENGTH_LONG).show();
+                                // Toast.makeText(MainActivity.this, "Place deleted.", Toast.LENGTH_LONG).show();
                             }
                         })
 
