@@ -23,8 +23,8 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.ui.expandablegroup.VisitGroup;
+import com.michaelhsieh.placetracker.ui.expandablegroup.VisitGroupAdapter;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 import com.michaelhsieh.placetracker.models.Visit;
 
