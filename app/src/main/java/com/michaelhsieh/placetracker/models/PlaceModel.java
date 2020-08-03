@@ -48,6 +48,9 @@ public class PlaceModel implements Parcelable {
     // the attributions text of the photo
     private String attributions;
 
+    // the sorting position of the place when drag and drop is enabled for place list
+    private int position;
+
     public PlaceModel(String placeId, String name, String address) {
         this.placeId = placeId;
         this.name = name;
@@ -87,6 +90,10 @@ public class PlaceModel implements Parcelable {
         return attributions;
     }
 
+    public int getPosition() {
+        return position;
+    }
+
     public void setPlaceId(String placeId) {
         this.placeId = placeId;
     }
@@ -115,6 +122,10 @@ public class PlaceModel implements Parcelable {
         this.attributions = attributions;
     }
 
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
     /* everything below here is for implementing Parcelable */
     @Override
     public int describeContents() {
@@ -131,6 +142,7 @@ public class PlaceModel implements Parcelable {
         out.writeString(notes);
         out.writeString(base64String);
         out.writeString(attributions);
+        out.writeInt(position);
     }
 
     // This is used to regenerate the object. All Parcelables must have a CREATOR that implements these two methods
@@ -156,5 +168,6 @@ public class PlaceModel implements Parcelable {
         notes = in.readString();
         base64String = in.readString();
         attributions = in.readString();
+        position = in.readInt();
     }
 }

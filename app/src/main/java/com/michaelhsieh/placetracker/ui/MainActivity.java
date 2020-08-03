@@ -220,6 +220,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         fetchPhotoAndUpdatePlaceWhenFinished(placesClient, newPlace, photoMetadata);
                     }
 
+                    // set sorted position of the place in Room Database
+                    int sortPosition = 0;
+                    if (places != null && !places.isEmpty()) {
+                        // place will be at last position in list,
+                        // which is size of list before adding this place
+                        sortPosition = places.size();
+                    }
+                    Log.d(TAG, "onPlaceSelected: sort position " + sortPosition);
+                    newPlace.setPosition(sortPosition);
+
                     // insert place into the database
                     placeViewModel.insert(newPlace);
                     // Observer's onChanged() method updates the adapter
@@ -312,6 +322,16 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 return true;
             }
 
+            // called when user interaction is over
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+
+                Log.d(TAG, "clearView");
+                // update all sorted place positions
+                setSortPositionsInDatabase();
+            }
+
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 // get adapter position that was swiped
@@ -355,6 +375,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }).attachToRecyclerView(recyclerView);
     }
 
+    // update sort positions in Room Database
+    private void setSortPositionsInDatabase() {
+        for (PlaceModel place : places) {
+            place.setPosition(places.indexOf(place));
+            placeViewModel.update(place);
+        }
+    }
+
     /** Move an item from one position to another in the RecyclerView.
      * @param fromPosition The starting position of the place
      * @param toPosition The ending position of the place
@@ -384,6 +412,19 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         } else if (requestCode == MANUAL_PLACE_DETAIL_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
             if (data != null) {
                 PlaceModel manualPlace = data.getParcelableExtra(EXTRA_MANUAL_ADDED_PLACE);
+
+                // set sorted position of the manual place in Room Database
+                if (manualPlace != null) {
+                    int sortPosition = 0;
+                    if (places != null && !places.isEmpty()) {
+                        // place will be at last position in list,
+                        // which is size of list before adding this place
+                        sortPosition = places.size();
+                    }
+                    Log.d(TAG, "onActivityResult: sort position " + sortPosition);
+                    manualPlace.setPosition(sortPosition);
+                }
+
                 // insert manually added place into the database
                 placeViewModel.insert(manualPlace);
                 // Observer's onChanged() method updates the adapter
@@ -637,6 +678,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         String name;
         String address;
         PhotoMetadata photoMetadata;
+
+        int sortPosition;
+
         // Loop through refreshed Place IDs and find the user's place that
         // matches this ID. Then update that place with refreshed info.
         for (int i = 0; i < refreshedPlaces.size(); i++) {
@@ -651,10 +695,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         // set new place to original place with refreshed
                         // name and address
                         refreshedPlace = new PlaceModel(id, name, address);
+
+                        // set sort position of refreshed place
+                        sortPosition = originalPlace.getPosition();
+                        Log.d(TAG, "updatePlacesWithRefreshedInfo: sort position " + sortPosition);
+                        refreshedPlace.setPosition(sortPosition);
+
                         refreshedPlace.setNotes(originalPlace.getNotes());
                         refreshedPlace.setVisits(originalPlace.getVisits());
                         refreshedPlace.setBase64String(originalPlace.getBase64String());
-//                        refreshedPlace.setBitmaps(originalPlace.getBitmaps());
                         refreshedPlace.setAttributions(originalPlace.getAttributions());
 
                         // update place in the database with refreshed place info
