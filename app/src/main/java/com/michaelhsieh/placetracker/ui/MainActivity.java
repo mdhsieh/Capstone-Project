@@ -174,54 +174,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         });
 
         // swipe left to delete a place
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
-                ItemTouchHelper.LEFT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
-
-            @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                // get adapter position that was swiped
-                // delete place at that position from the database
-                PlaceModel placeToDelete = places.get(viewHolder.getAdapterPosition());
-
-                // create delete place message
-                // Are you sure you want to delete [place] at [address]?
-                String deleteMessage = getResources().getString(R.string.delete_place_message)
-                        + placeToDelete.getName() + getResources().getString(R.string.at) +
-                        placeToDelete.getAddress() +
-                        getResources().getString(R.string.question_mark);
-
-                // alert dialog to confirm user wants to delete this place
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(R.string.delete_place_title)
-                        .setMessage(deleteMessage)
-
-                        // Specifying a listener allows you to take an action before dismissing the dialog.
-                        // The dialog is automatically dismissed when a dialog button is clicked.
-                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Continue with delete operation
-                                placeViewModel.delete(placeToDelete);
-                                // Toast.makeText(MainActivity.this, "Place deleted.", Toast.LENGTH_LONG).show();
-                            }
-                        })
-
-                        // If user cancels delete, then refresh the place that was supposed to be swiped so
-                        // it doesn't get swiped off screen
-                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // make the place visible again
-                                adapter.notifyItemChanged(viewHolder.getAdapterPosition());
-                            }
-                        })
-                        .setIcon(android.R.drawable.ic_dialog_alert)
-                        .show();
-            }
-        }).attachToRecyclerView(recyclerView);
+        // drag and drop to rearrange place
+        setUpItemTouchHelper(recyclerView);
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), getString(R.string.google_places_api_key));
@@ -341,6 +295,80 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
+
+    // swipe left to delete a place
+    // drag and drop to rearrange place
+    private void setUpItemTouchHelper(RecyclerView recyclerView) {
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                ItemTouchHelper.LEFT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                final int fromPos = viewHolder.getAdapterPosition();
+                final int toPos = target.getAdapterPosition();
+                // move item in fromPos to toPos in adapter.
+                PlaceModel placeToMove = places.get(viewHolder.getAdapterPosition());
+                moveSingleItem(fromPos, toPos, placeToMove);
+                // true if moved, false otherwise
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                // get adapter position that was swiped
+                // delete place at that position from the database
+                PlaceModel placeToDelete = places.get(viewHolder.getAdapterPosition());
+
+                // create delete place message
+                // Are you sure you want to delete [place] at [address]?
+                String deleteMessage = getResources().getString(R.string.delete_place_message)
+                        + placeToDelete.getName() + getResources().getString(R.string.at) +
+                        placeToDelete.getAddress() +
+                        getResources().getString(R.string.question_mark);
+
+                // alert dialog to confirm user wants to delete this place
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(R.string.delete_place_title)
+                        .setMessage(deleteMessage)
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                placeViewModel.delete(placeToDelete);
+                                // Toast.makeText(MainActivity.this, "Place deleted.", Toast.LENGTH_LONG).show();
+                            }
+                        })
+
+                        // If user cancels delete, then refresh the place that was supposed to be swiped so
+                        // it doesn't get swiped off screen
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // make the place visible again
+                                adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        }).attachToRecyclerView(recyclerView);
+    }
+
+    /** Move an item from one position to another in the RecyclerView.
+     * @param fromPosition The starting position of the place
+     * @param toPosition The ending position of the place
+     * @param place The place being moved
+     */
+    private void moveSingleItem(int fromPosition, int toPosition, PlaceModel place) {
+        // update places list
+        places.remove(fromPosition);
+        places.add(toPosition, place);
+
+        // notify adapter
+        adapter.notifyItemMoved(fromPosition, toPosition);
+    }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

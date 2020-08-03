@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker.ui.expandablegroup;
+package com.michaelhsieh.placetracker.expandablegroup;
 
 import com.michaelhsieh.placetracker.models.Visit;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;

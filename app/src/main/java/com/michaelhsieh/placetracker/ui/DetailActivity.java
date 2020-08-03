@@ -38,8 +38,8 @@ import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
-import com.michaelhsieh.placetracker.ui.expandablegroup.VisitGroup;
-import com.michaelhsieh.placetracker.ui.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 import com.michaelhsieh.placetracker.models.Visit;
 import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;
@@ -295,14 +295,35 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
+    private void setUpAdapter() {
+        // initialize expanding RecyclerView
+        RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        recyclerView.setLayoutManager(layoutManager);
+        // add a divider
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                layoutManager.getOrientation());
+        // use custom white divider
+        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
+        recyclerView.addItemDecoration(dividerItemDecoration);
+
+        // instantiate the adapter with the list of visit groups.
+        // there's only one visit group
+        adapter = new VisitGroupAdapter(visitGroupList);
+        // set the click listener for clicks on individual visits
+        adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);
+
+        // set up ItemTouchHelper to swipe left to delete visit
+        setUpItemTouchHelper(recyclerView);
+    }
+
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
         // swipe left to delete a visit
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
                 ItemTouchHelper.LEFT) {
 
             // disable swipe for VisitGroup at position 0
-
-
             @Override
             public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 if (viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) {
@@ -360,29 +381,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         .show();
             }
         }).attachToRecyclerView(recyclerView);
-    }
-
-    private void setUpAdapter() {
-        // initialize expanding RecyclerView
-        RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        // add a divider
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
-                layoutManager.getOrientation());
-        // use custom white divider
-        dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
-        recyclerView.addItemDecoration(dividerItemDecoration);
-
-        // instantiate the adapter with the list of visit groups.
-        // there's only one visit group
-        adapter = new VisitGroupAdapter(visitGroupList);
-        // set the click listener for clicks on individual visits
-        adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
-
-        // set up ItemTouchHelper to swipe left to delete visit
-        setUpItemTouchHelper(recyclerView);
     }
 
     private void setUpPhoto() {

@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker.ui.expandablegroup;
+package com.michaelhsieh.placetracker.expandablegroup;
 
 import android.view.LayoutInflater;
 import android.view.View;
