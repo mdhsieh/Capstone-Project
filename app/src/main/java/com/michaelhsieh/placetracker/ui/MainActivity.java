@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.ui;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,8 +45,10 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
+import com.michaelhsieh.placetracker.R;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.models.PlaceModel;
+import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;
 
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
@@ -54,7 +56,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
-import static com.michaelhsieh.placetracker.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
+import static com.michaelhsieh.placetracker.ui.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
 
 public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
 

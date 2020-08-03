@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -6,7 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.models.PlaceModel;
 
 import java.util.List;
 

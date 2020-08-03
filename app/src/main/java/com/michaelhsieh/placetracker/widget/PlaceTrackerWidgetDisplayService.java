@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.widget;
 
 import android.app.IntentService;
 import android.appwidget.AppWidgetManager;

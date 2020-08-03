@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;

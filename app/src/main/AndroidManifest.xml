@@ -20,7 +20,7 @@
             android:name="com.google.android.gms.ads.APPLICATION_ID"
             android:value="ca-app-pub-8705794059560973~9730782762"/>
 
-        <receiver android:name=".PlaceTrackerAppWidget">
+        <receiver android:name=".widget.PlaceTrackerAppWidget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -31,7 +31,7 @@
         </receiver>
 
         <!--launch mode singleTop to not have multiple screens when re-opening widget and app-->
-        <activity android:name=".MainActivity"
+        <activity android:name=".ui.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -40,16 +40,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".ui.DetailActivity"
+            android:parentActivityName=".ui.MainActivity" />
         <activity
-            android:name=".ManualPlaceDetailActivity"
-            android:parentActivityName=".MainActivity" />
+            android:name=".ui.ManualPlaceDetailActivity"
+            android:parentActivityName=".ui.MainActivity" />
 
         <!--service to get refreshed place info-->
         <service android:name=".RefreshPlacesListService" />
         <!--service to update widget-->
-        <service android:name=".PlaceTrackerWidgetDisplayService"/>
+        <service android:name=".widget.PlaceTrackerWidgetDisplayService"/>
     </application>
 
 </manifest>

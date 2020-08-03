@@ -2,7 +2,7 @@ package com.michaelhsieh.placetracker.database;
 
 import android.app.Application;
 
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.models.PlaceModel;
 
 import java.util.List;
 

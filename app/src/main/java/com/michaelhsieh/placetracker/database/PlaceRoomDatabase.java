@@ -2,8 +2,7 @@ package com.michaelhsieh.placetracker.database;
 
 import android.content.Context;
 
-import com.michaelhsieh.placetracker.VisitTypeConverter;
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.models.PlaceModel;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;

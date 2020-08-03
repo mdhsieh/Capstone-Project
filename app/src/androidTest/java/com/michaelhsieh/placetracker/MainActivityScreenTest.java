@@ -2,6 +2,8 @@ package com.michaelhsieh.placetracker;
 
 import android.view.View;
 
+import com.michaelhsieh.placetracker.ui.MainActivity;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.test.espresso.Espresso;

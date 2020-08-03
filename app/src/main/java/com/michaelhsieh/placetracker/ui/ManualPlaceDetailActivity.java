@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -22,7 +22,11 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.models.PlaceModel;
+import com.michaelhsieh.placetracker.models.Visit;
 
 import java.util.Arrays;
 import java.util.Calendar;

@@ -1,5 +1,6 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.expandablegroup;
 
+import com.michaelhsieh.placetracker.models.Visit;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.ui;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -36,15 +36,20 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.michaelhsieh.placetracker.R;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
-import com.michaelhsieh.placetracker.model.PlaceModel;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
+import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.models.PlaceModel;
+import com.michaelhsieh.placetracker.models.Visit;
+import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-import static com.michaelhsieh.placetracker.MainActivity.EXTRA_PLACE_ID;
+import static com.michaelhsieh.placetracker.ui.MainActivity.EXTRA_PLACE_ID;
 
 public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
 

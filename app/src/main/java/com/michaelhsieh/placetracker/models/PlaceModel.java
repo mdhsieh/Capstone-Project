@@ -1,9 +1,7 @@
-package com.michaelhsieh.placetracker.model;
+package com.michaelhsieh.placetracker.models;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
-import com.michaelhsieh.placetracker.Visit;
 
 import java.util.ArrayList;
 import java.util.List;

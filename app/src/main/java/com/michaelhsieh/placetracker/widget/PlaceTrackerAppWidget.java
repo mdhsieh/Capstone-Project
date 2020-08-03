@@ -1,12 +1,14 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.widget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.widget.RemoteViews;
+
+import com.michaelhsieh.placetracker.ui.MainActivity;
+import com.michaelhsieh.placetracker.R;
 
 /**
  * Implementation of App Widget functionality.
