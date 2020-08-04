@@ -65,4 +65,7 @@
     <string name="refresh_places_title">Refresh places</string>
     <!--place name empty-->
     <string name="empty_place_name_error">Please enter a valid name</string>
+    <string name="desc_drag_handle">drag handle</string>
+    <string name="edit">Edit</string>
+    <string name="done">Done</string>
 </resources>

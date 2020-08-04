@@ -10,21 +10,33 @@
 
     <TextView
         android:id="@+id/tv_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         style="@style/BigWhiteTextStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toStartOf="@+id/iv_drag_handle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="name" />
 
     <TextView
         android:id="@+id/tv_address"
-        android:layout_width="wrap_content"
+        style="@style/MediumWhiteTextStyle"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        style="@style/MediumWhiteTextStyle"
+        app:layout_constraintEnd_toStartOf="@+id/iv_drag_handle"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_name"
         tools:text="address" />
+
+    <ImageView
+        android:id="@+id/iv_drag_handle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/desc_drag_handle"
+        android:src="@drawable/ic_reorder_white_64dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

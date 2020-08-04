@@ -95,6 +95,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private ArrayList<Place> refreshedPlaces;
 
+    // can the user edit places with drag and drop
+    private boolean isEditable = false;
+
 
     // banner ad
     private AdView adView;
@@ -306,6 +309,23 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 adapter.getItem(position).getNumVisits());
 
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
+    }
+
+    /** Allow the user to drag and drop places or save changes when edit TextView is clicked.
+     *
+     * @param view The view clicked
+     */
+    public void editClicked(View view) {
+        TextView editDisplay = findViewById(R.id.tv_edit);
+        if (!isEditable) {
+            editDisplay.setText(getResources().getText(R.string.done));
+            // allow drag and drop
+            isEditable = true;
+        } else {
+            // since user clicked done, disable drag and drop and save changes
+            editDisplay.setText(getResources().getText(R.string.edit));
+            isEditable = false;
+        }
     }
 
     /** Swipe left to delete a place.
