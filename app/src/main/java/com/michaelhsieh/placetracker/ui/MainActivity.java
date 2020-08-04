@@ -324,10 +324,19 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
             isEditable = true;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
         } else {
             // since user clicked done, disable drag and drop and save changes
             editDisplay.setText(getResources().getText(R.string.edit));
             isEditable = false;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
+            Log.d(TAG, "editClicked: done rearranging places");
+            // update all sorted place positions in Room Database
+            setSortPositionsInDatabase();
         }
     }
 
@@ -358,14 +367,14 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             }
 
             // called when user interaction is over
-            @Override
-            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-                super.clearView(recyclerView, viewHolder);
-
-                Log.d(TAG, "clearView");
-                // update all sorted place positions
-                setSortPositionsInDatabase();
-            }
+//            @Override
+//            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+//                super.clearView(recyclerView, viewHolder);
+//
+//                Log.d(TAG, "clearView");
+//                // update all sorted place positions
+//                setSortPositionsInDatabase();
+//            }
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {

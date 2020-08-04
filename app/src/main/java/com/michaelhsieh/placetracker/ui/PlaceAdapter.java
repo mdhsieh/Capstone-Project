@@ -30,8 +30,11 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     private List<PlaceModel> places;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
+
     // listener used when user touches drag handle
     private StartDragListener startDragListener;
+    // track whether drag handles should be visible or not
+    private boolean isHandleVisible = false;
 
     // data is passed into the constructor
     public PlaceAdapter(Context context, List<PlaceModel> places, StartDragListener startDragListener) {
@@ -54,6 +57,12 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         PlaceModel place = places.get(position);
         holder.nameDisplay.setText(place.getName());
         holder.addressDisplay.setText(place.getAddress());
+
+        if (isHandleVisible) {
+            holder.dragHandle.setVisibility(View.VISIBLE);
+        } else {
+            holder.dragHandle.setVisibility(View.GONE);
+        }
 
         // drag and drop when handle clicked
         holder.dragHandle.setOnTouchListener(new View.OnTouchListener() {
@@ -126,5 +135,9 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     // parent activity will implement this method to respond to click events
     public interface ItemClickListener {
         void onItemClick(View view, int position);
+    }
+
+    void setHandleVisible(boolean isHandleVisible) {
+        this.isHandleVisible = isHandleVisible;
     }
 }
