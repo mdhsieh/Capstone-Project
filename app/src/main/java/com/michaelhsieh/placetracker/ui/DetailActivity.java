@@ -245,9 +245,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     }
 
-    // EditText clear focus on touch outside
-    // used for name, address, and notes EditText
-    // to stop screen from jumping to focused EditText when ex. expanding visits or adding visits
+    /** When user touches outside an EditText, clear that EditText's focus and close keyboard.
+     * <p></p>
+     * Used for name, address, and notes EditText
+     * to stop screen from jumping to focused EditText when ex. expanding visits or adding visits.
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -288,6 +290,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         return super.dispatchTouchEvent(event);
     }
 
+    /** Hide soft keyboard.
+     * @param view Used to retrieve the token identifying the window this view is attached to.
+     */
     private void hideSoftKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
@@ -295,6 +300,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
+    /** Set up the adapter, RecyclerView, and ItemTouchHelper.
+     *
+     */
     private void setUpAdapter() {
         // initialize expanding RecyclerView
         RecyclerView recyclerView = findViewById(R.id.expanding_rv_visits);
@@ -318,6 +326,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         setUpItemTouchHelper(recyclerView);
     }
 
+    /** Swipe to delete a visit.
+     *
+     * @param recyclerView The RecyclerView displaying the list of visits
+     */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
         // swipe left to delete a visit
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
@@ -383,6 +395,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }).attachToRecyclerView(recyclerView);
     }
 
+    /** Display place photo and attribution text, if available.
+     *
+     */
     private void setUpPhoto() {
         // display bitmap photo if available
         String base64String = place.getBase64String();
@@ -413,6 +428,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
     }
 
+    /** Set click listener for add visit button.
+     *
+     */
     private void setUpAddVisitButton() {
         // add visit when the add visit button is clicked
         Button addVisitButton = findViewById(R.id.btn_add_visit);
@@ -426,6 +444,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
     }
 
+    /** Set click listener for delete place button.
+     *
+     */
     private void setUpDeleteButton() {
         Button deleteButton = findViewById(R.id.btn_delete);
         deleteButton.setOnClickListener(new View.OnClickListener() {
@@ -463,6 +484,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
     }
 
+    /** Set click listener for save button.
+     *
+     */
     private void setUpSaveButton() {
         Button saveButton = findViewById(R.id.btn_save);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -492,6 +516,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
     }
 
+    /** Set up click listener for last visit text.
+     *
+     */
     private void setUpLastVisitDisplay() {
         // if last visit TextView clicked, copy the date and time to clipboard
         lastVisitDisplay.setOnClickListener(new View.OnClickListener() {
@@ -512,9 +539,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
     }
 
-    /* To save the expand and collapse state of the adapter,
+    /** To save the expand and collapse state of the adapter,
     you have to explicitly call through to the adapter's
-    onSaveInstanceState() and onRestoreInstanceState() in the calling Activity */
+    onSaveInstanceState() and onRestoreInstanceState() in the calling Activity. */
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -605,7 +632,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         showOrHideLastVisit();
     }
 
-    // show or hide the most recent date visited label and text
+    /** Show or hide the most recent date visited label and text.
+     *
+     */
     private void showOrHideLastVisit() {
         if (place.getNumVisits() == 0) {
             lastVisitLabel.setVisibility(View.GONE);

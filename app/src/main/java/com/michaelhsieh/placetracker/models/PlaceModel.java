@@ -48,7 +48,9 @@ public class PlaceModel implements Parcelable {
     // the attributions text of the photo
     private String attributions;
 
-    // the sorting position of the place when drag and drop is enabled for place list
+    /* The sorting position of the place when drag and drop is enabled for place list.
+    The position is used to get all places from the Room Database in the
+    order the user drags and drops them. */
     private int position;
 
     public PlaceModel(String placeId, String name, String address) {

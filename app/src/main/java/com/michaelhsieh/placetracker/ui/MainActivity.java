@@ -158,6 +158,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
 
+                    Log.d(TAG, "onChanged");
+
                     // set places list to updated places list
                     places = updatedPlaces;
 
@@ -306,8 +308,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 
-    // swipe left to delete a place
-    // drag and drop to rearrange place
+    /** Swipe left to delete a place.
+     * Drag and drop to rearrange place.
+     */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
@@ -315,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 final int fromPos = viewHolder.getAdapterPosition();
                 final int toPos = target.getAdapterPosition();
-                // move item in fromPos to toPos in adapter.
+                // move item at fromPos to toPos in adapter.
                 PlaceModel placeToMove = places.get(viewHolder.getAdapterPosition());
                 moveSingleItem(fromPos, toPos, placeToMove);
                 // true if moved, false otherwise
@@ -375,7 +378,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         }).attachToRecyclerView(recyclerView);
     }
 
-    // update sort positions in Room Database
+    /** Update sort positions in Room Database.
+     * Used to get all places in the order the user rearranged them.
+     * <p></p>
+     * Source: Diana Szczepankowska
+     * https://stackoverflow.com/questions/55949538/update-onmove-changes-in-recycler-view-data-to-room-database
+     *
+     */
     private void setSortPositionsInDatabase() {
         for (PlaceModel place : places) {
             place.setPosition(places.indexOf(place));
