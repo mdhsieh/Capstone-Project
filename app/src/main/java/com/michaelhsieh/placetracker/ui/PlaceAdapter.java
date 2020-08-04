@@ -2,11 +2,14 @@ package com.michaelhsieh.placetracker.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 
 import java.util.List;
@@ -27,11 +30,14 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
     private List<PlaceModel> places;
     private LayoutInflater inflater;
     private ItemClickListener clickListener;
+    // listener used when user touches drag handle
+    private StartDragListener startDragListener;
 
     // data is passed into the constructor
-    public PlaceAdapter(Context context, List<PlaceModel> places) {
+    public PlaceAdapter(Context context, List<PlaceModel> places, StartDragListener startDragListener) {
         this.inflater = LayoutInflater.from(context);
         this.places = places;
+        this.startDragListener = startDragListener;
     }
 
     // inflates the row layout from XML when needed
@@ -48,6 +54,17 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         PlaceModel place = places.get(position);
         holder.nameDisplay.setText(place.getName());
         holder.addressDisplay.setText(place.getAddress());
+
+        // drag and drop when handle clicked
+        holder.dragHandle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    startDragListener.requestDrag(holder);
+                }
+                return false;
+            }
+        });
     }
 
     // total number of rows
@@ -78,11 +95,13 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
 
         TextView nameDisplay;
         TextView addressDisplay;
+        ImageView dragHandle;
 
         public ViewHolder(View itemView) {
             super(itemView);
             nameDisplay = itemView.findViewById(R.id.tv_name);
             addressDisplay = itemView.findViewById(R.id.tv_address);
+            dragHandle = itemView.findViewById(R.id.iv_drag_handle);
             itemView.setOnClickListener(this);
         }
 

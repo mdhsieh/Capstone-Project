@@ -46,6 +46,7 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;
@@ -58,7 +59,7 @@ import java.util.Random;
 
 import static com.michaelhsieh.placetracker.ui.ManualPlaceDetailActivity.EXTRA_MANUAL_ADDED_PLACE;
 
-public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener {
+public class MainActivity extends AppCompatActivity implements PlaceAdapter.ItemClickListener, StartDragListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -98,6 +99,8 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // can the user edit places with drag and drop
     private boolean isEditable = false;
 
+    // ItemTouchHelper to drag and drop places
+    private ItemTouchHelper itemTouchHelper;
 
     // banner ad
     private AdView adView;
@@ -145,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // use a custom white divider
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
-        adapter = new PlaceAdapter(this, places);
+        adapter = new PlaceAdapter(this, places, this);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
@@ -332,8 +335,17 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      * Drag and drop to rearrange place.
      */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
+
+            // disable long press drag since
+            // user can drag by clicking edit and dragging handles instead
+            @Override
+            public boolean isLongPressDragEnabled() {
+                // return super.isLongPressDragEnabled();
+                return false;
+            }
+
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 final int fromPos = viewHolder.getAdapterPosition();
@@ -395,7 +407,18 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
             }
-        }).attachToRecyclerView(recyclerView);
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    /** Implement start dragging on a given ViewHolder.
+     *
+     * @param viewHolder The ViewHolder of the drag handle
+     */
+    @Override
+    public void requestDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
     }
 
     /** Update sort positions in Room Database.
@@ -786,5 +809,4 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             Toast.makeText(this, R.string.random_pick_empty_error, Toast.LENGTH_LONG).show();
         }
     }
-
 }
