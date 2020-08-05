@@ -433,6 +433,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     /** Update sort positions in Room Database.
      * Used to get all places in the order the user rearranged them.
      * <p></p>
+     * The positions will not match the places' list indexes if
+     * a place is deleted.
+     * <p></p>
      * Source: Diana Szczepankowska
      * https://stackoverflow.com/questions/55949538/update-onmove-changes-in-recycler-view-data-to-room-database
      *

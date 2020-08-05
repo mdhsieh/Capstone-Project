@@ -332,7 +332,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
         // swipe left to delete a visit
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0,
+        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
 
             // disable swipe for VisitGroup at position 0
@@ -347,7 +347,27 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
+                // return false;
+
+                if (!(viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) && !(target instanceof VisitGroupAdapter.VisitGroupViewHolder)) {
+                /* Subtract by 1 to get the correct visit list position of the Visits being moved.
+                 Since position 0 is already occupied by the VisitGroup parent, the first Visit
+                 is at adapter position 1.
+                 Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
+//                int positionInVisitList = position - NUM_VISIT_GROUPS;
+
+                    // final int fromPos = viewHolder.getAdapterPosition();
+                    // final int toPos = target.getAdapterPosition();
+                    final int fromPos = viewHolder.getAdapterPosition() - NUM_VISIT_GROUPS;
+                    final int toPos = target.getAdapterPosition() - NUM_VISIT_GROUPS;
+                    // move item at fromPos to toPos in adapter.
+                    Visit visitToMove = visits.get(fromPos);
+                    moveSingleItem(fromPos, toPos, visitToMove);
+                    // true if moved, false otherwise
+                    return true;
+                } else {
+                    return false;
+                }
             }
 
             @Override
@@ -630,6 +650,22 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         // update last visit
         showOrHideLastVisit();
+    }
+
+    /** Move an item from one position to another in the RecyclerView.
+     * @param fromPosition The starting position of the visit
+     * @param toPosition The ending position of the visit
+     * @param visit The visit being moved
+     */
+    private void moveSingleItem(int fromPosition, int toPosition, Visit visit) {
+        // update places list
+        visits.remove(fromPosition);
+        visits.add(toPosition, visit);
+
+        // notify adapter
+        // add 1 to get the correct adapter position of the visit,
+        // since the visit list starts at position 1 of the adapter
+        adapter.notifyItemMoved(fromPosition + NUM_VISIT_GROUPS, toPosition + NUM_VISIT_GROUPS);
     }
 
     /** Show or hide the most recent date visited label and text.
