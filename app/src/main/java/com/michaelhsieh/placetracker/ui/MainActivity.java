@@ -366,16 +366,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 return true;
             }
 
-            // called when user interaction is over
-//            @Override
-//            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
-//                super.clearView(recyclerView, viewHolder);
-//
-//                Log.d(TAG, "clearView");
-//                // update all sorted place positions
-//                setSortPositionsInDatabase();
-//            }
-
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
                 // get adapter position that was swiped
@@ -461,7 +451,12 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         adapter.notifyItemMoved(fromPosition, toPosition);
     }
 
-
+    /** Delete a place or add a manual place when returning to MainActivity.
+     *
+     * @param requestCode The request code of the Activity that called startActivityForResult
+     * @param resultCode Whether the result was okay or not
+     * @param data The data sent to MainActivity
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

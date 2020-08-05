@@ -1,6 +1,7 @@
 package com.michaelhsieh.placetracker.expandablegroup;
 
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.RotateAnimation;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.models.Visit;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
@@ -22,8 +24,14 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
 
     private VisitItemClickListener clickListener;
 
-    public VisitGroupAdapter(List<? extends ExpandableGroup> groups) {
+    // listener used when user touches drag handle
+    private StartDragListener startDragListener;
+    // track whether drag handles should be visible or not
+    private boolean isHandleVisible = false;
+
+    public VisitGroupAdapter(List<? extends ExpandableGroup> groups, StartDragListener startDragListener) {
         super(groups);
+        this.startDragListener = startDragListener;
     }
 
     @Override
@@ -45,6 +53,24 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
         final Visit visit = ((VisitGroup) group).getItems().get(childIndex);
         holder.setVisitDate(visit.getDate());
         holder.setVisitTime(visit.getTime());
+
+        // set drag handle visibility
+        if (isHandleVisible) {
+            holder.dragHandle.setVisibility(View.VISIBLE);
+        } else {
+            holder.dragHandle.setVisibility(View.GONE);
+        }
+
+        // start drag when handle clicked
+        holder.dragHandle.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                    startDragListener.requestDrag(holder);
+                }
+                return false;
+            }
+        });
     }
 
     @Override
@@ -68,11 +94,13 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
     public class VisitViewHolder extends ChildViewHolder implements View.OnClickListener {
         private TextView visitDate;
         private TextView visitTime;
+        ImageView dragHandle;
 
         public VisitViewHolder(View itemView) {
             super(itemView);
             visitDate = itemView.findViewById(R.id.list_item_visit_date);
             visitTime = itemView.findViewById(R.id.list_item_visit_time);
+            dragHandle = itemView.findViewById(R.id.iv_drag_handle);
             itemView.setOnClickListener(this);
         }
 
@@ -90,6 +118,10 @@ public class VisitGroupAdapter extends ExpandableRecyclerViewAdapter<VisitGroupA
                 clickListener.onItemClick(view, getAdapterPosition());
             }
         }
+    }
+
+    public void setHandleVisible(boolean isHandleVisible) {
+        this.isHandleVisible = isHandleVisible;
     }
 
 

@@ -58,13 +58,14 @@ public class PlaceAdapter extends RecyclerView.Adapter<PlaceAdapter.ViewHolder> 
         holder.nameDisplay.setText(place.getName());
         holder.addressDisplay.setText(place.getAddress());
 
+        // set drag handle visibility
         if (isHandleVisible) {
             holder.dragHandle.setVisibility(View.VISIBLE);
         } else {
             holder.dragHandle.setVisibility(View.GONE);
         }
 
-        // drag and drop when handle clicked
+        // start drag when handle clicked
         holder.dragHandle.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {

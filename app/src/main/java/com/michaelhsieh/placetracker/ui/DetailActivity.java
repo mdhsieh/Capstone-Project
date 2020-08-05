@@ -37,6 +37,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
@@ -51,7 +52,7 @@ import java.util.List;
 
 import static com.michaelhsieh.placetracker.ui.MainActivity.EXTRA_PLACE_ID;
 
-public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener {
+public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener, StartDragListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -104,6 +105,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     // track whether user can edit visits with drag and drop
     private boolean isEditable = false;
+
+    // ItemTouchHelper to drag and drop visits
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -318,9 +322,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
         recyclerView.addItemDecoration(dividerItemDecoration);
 
-        // instantiate the adapter with the list of visit groups.
+        // instantiate the adapter with the list of visit groups and
+        // DetailActivity as drag listener.
         // there's only one visit group
-        adapter = new VisitGroupAdapter(visitGroupList);
+        adapter = new VisitGroupAdapter(visitGroupList, this);
         // set the click listener for clicks on individual visits
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
@@ -335,10 +340,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      * @param recyclerView The RecyclerView displaying the list of visits
      */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
-        // swipe left to delete a visit
-        // drag and drop to rearrange visit
-        new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
+
+            // disable long press drag since
+            // user can drag by clicking edit and dragging handles instead
+            @Override
+            public boolean isLongPressDragEnabled() {
+                // return super.isLongPressDragEnabled();
+                return false;
+            }
 
             // disable swipe for VisitGroup at position 0
             @Override
@@ -414,7 +426,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         .setIcon(android.R.drawable.ic_dialog_alert)
                         .show();
             }
-        }).attachToRecyclerView(recyclerView);
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    /** Implement start dragging on a given ViewHolder.
+     *
+     * @param viewHolder The ViewHolder of the drag handle
+     */
+    @Override
+    public void requestDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
     }
 
     /** Display place photo and attribution text, if available.
@@ -608,16 +631,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
             isEditable = true;
-//            adapter.setHandleVisible(isEditable);
-//            // force onBindViewHolder again to update holder visibility
-//            adapter.notifyDataSetChanged();
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
         } else {
             // since user clicked done, disable drag and drop and save changes
             editDisplay.setText(getResources().getText(R.string.edit));
             isEditable = false;
-//            adapter.setHandleVisible(isEditable);
-//            // force onBindViewHolder again to update holder visibility
-//            adapter.notifyDataSetChanged();
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
+            // update last visit
+            showOrHideLastVisit();
             Log.d(TAG, "editClicked: done rearranging visits");
         }
     }

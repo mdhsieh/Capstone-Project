@@ -23,6 +23,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
+import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
 import com.michaelhsieh.placetracker.models.PlaceModel;
@@ -36,7 +37,7 @@ import java.util.UUID;
 /** Activity where user can enter info to add a place manually. Very similar to DetailActivity.
  *
  */
-public class ManualPlaceDetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener{
+public class ManualPlaceDetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener, StartDragListener {
 
     private static final String TAG = ManualPlaceDetailActivity.class.getSimpleName();
 
@@ -130,9 +131,10 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
             dividerItemDecoration.setDrawable(getResources().getDrawable(R.drawable.place_divider));
             recyclerView.addItemDecoration(dividerItemDecoration);
 
-            // instantiate the adapter with the list of visit groups.
+            // instantiate the adapter with the list of visit groups and
+            // ManualPlaceDetailActivity as drag listener.
             // there's only one visit group
-            adapter = new VisitGroupAdapter(visitGroupList);
+            adapter = new VisitGroupAdapter(visitGroupList, this);
             // set the click listener for clicks on individual visits
             adapter.setClickListener(this);
             recyclerView.setAdapter(adapter);
@@ -205,6 +207,11 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         if (adapter != null) {
             adapter.onRestoreInstanceState(savedInstanceState);
         }
+    }
+
+    @Override
+    public void requestDrag(RecyclerView.ViewHolder viewHolder) {
+        // manual place has no edit button so don't do anything with ViewHolder
     }
 
     /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
@@ -415,5 +422,4 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         alertDialog.setView(dialogView);
         alertDialog.show();
     }
-
 }
