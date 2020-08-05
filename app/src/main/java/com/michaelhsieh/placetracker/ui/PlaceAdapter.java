@@ -9,7 +9,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 
 import java.util.List;

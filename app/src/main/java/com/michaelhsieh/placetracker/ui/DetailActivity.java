@@ -37,7 +37,6 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
 import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;

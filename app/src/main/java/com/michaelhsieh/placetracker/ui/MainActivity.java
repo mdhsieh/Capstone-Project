@@ -46,7 +46,6 @@ import com.google.android.libraries.places.api.net.PlacesClient;
 import com.google.android.libraries.places.widget.AutocompleteSupportFragment;
 import com.google.android.libraries.places.widget.listener.PlaceSelectionListener;
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.StartDragListener;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
 import com.michaelhsieh.placetracker.models.PlaceModel;
 import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;

@@ -29,8 +29,6 @@
         app:layout_constraintEnd_toStartOf="@+id/iv_drag_handle"
         tools:text="10:42 AM" />
 
-<!--app:layout_constraintEnd_toEndOf="parent"-->
-
     <ImageView
         android:id="@+id/iv_drag_handle"
         android:layout_width="0dp"

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.StartDragListener;
+import com.michaelhsieh.placetracker.ui.StartDragListener;
 import com.michaelhsieh.placetracker.models.Visit;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;

@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker;
+package com.michaelhsieh.placetracker.ui;
 
 import androidx.recyclerview.widget.RecyclerView;
 
