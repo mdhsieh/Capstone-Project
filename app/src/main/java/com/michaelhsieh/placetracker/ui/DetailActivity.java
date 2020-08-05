@@ -102,6 +102,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     EditText addressDisplay;
     EditText notesDisplay;
 
+    // track whether user can edit visits with drag and drop
+    private boolean isEditable = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -326,12 +329,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         setUpItemTouchHelper(recyclerView);
     }
 
-    /** Swipe to delete a visit.
+    /** Swipe left to delete a visit.
+     * Drag and drop to rearrange visit.
      *
      * @param recyclerView The RecyclerView displaying the list of visits
      */
     private void setUpItemTouchHelper(RecyclerView recyclerView) {
         // swipe left to delete a visit
+        // drag and drop to rearrange visit
         new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
 
@@ -347,17 +352,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                // return false;
 
+                // don't allow VisitGroup to be moved
                 if (!(viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) && !(target instanceof VisitGroupAdapter.VisitGroupViewHolder)) {
-                /* Subtract by 1 to get the correct visit list position of the Visits being moved.
-                 Since position 0 is already occupied by the VisitGroup parent, the first Visit
-                 is at adapter position 1.
-                 Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
-//                int positionInVisitList = position - NUM_VISIT_GROUPS;
 
-                    // final int fromPos = viewHolder.getAdapterPosition();
-                    // final int toPos = target.getAdapterPosition();
+                    /* Subtract by 1 to get the correct visit list position of the Visits being moved.
+                     Since position 0 is already occupied by the VisitGroup parent, the first Visit
+                     is at adapter position 1.
+                     Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
                     final int fromPos = viewHolder.getAdapterPosition() - NUM_VISIT_GROUPS;
                     final int toPos = target.getAdapterPosition() - NUM_VISIT_GROUPS;
                     // move item at fromPos to toPos in adapter.
@@ -372,9 +374,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                /* get adapter position that was swiped and
+                /* Get adapter position that was swiped and
                 subtract 1 because VisitGroup is at position 0, and
-                the first visit is at position 1 */
+                the first visit is at position 1. */
                 int posToDelete = viewHolder.getAdapterPosition() - 1;
                 Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
                 // delete place at that position from the database
@@ -596,6 +598,30 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         showDateTimePicker(positionInVisitList, visit);
     }
 
+    /** Allow the user to drag and drop visits or save changes when edit TextView is clicked.
+     *
+     * @param view The view clicked
+     */
+    public void editClicked(View view) {
+        TextView editDisplay = findViewById(R.id.tv_edit_visits);
+        if (!isEditable) {
+            editDisplay.setText(getResources().getText(R.string.done));
+            // allow drag and drop
+            isEditable = true;
+//            adapter.setHandleVisible(isEditable);
+//            // force onBindViewHolder again to update holder visibility
+//            adapter.notifyDataSetChanged();
+        } else {
+            // since user clicked done, disable drag and drop and save changes
+            editDisplay.setText(getResources().getText(R.string.edit));
+            isEditable = false;
+//            adapter.setHandleVisible(isEditable);
+//            // force onBindViewHolder again to update holder visibility
+//            adapter.notifyDataSetChanged();
+            Log.d(TAG, "editClicked: done rearranging visits");
+        }
+    }
+
     /** Insert an item into the RecyclerView
      * @param visit The visit being inserted
      */
@@ -653,12 +679,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     }
 
     /** Move an item from one position to another in the RecyclerView.
-     * @param fromPosition The starting position of the visit
-     * @param toPosition The ending position of the visit
+     * @param fromPosition The starting visit list position of the visit
+     * @param toPosition The ending visit list position of the visit
      * @param visit The visit being moved
      */
     private void moveSingleItem(int fromPosition, int toPosition, Visit visit) {
-        // update places list
+        // update visits list
         visits.remove(fromPosition);
         visits.add(toPosition, visit);
 

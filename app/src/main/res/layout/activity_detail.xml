@@ -121,12 +121,13 @@
 
         <TextView
             android:id="@+id/tv_last_visit"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="24dp"
             android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_last_visit"
             app:layout_constraintTop_toBottomOf="@+id/btn_add_visit"
             tools:text="Tuesday, June 30, 2020 at 11:00 am" />
@@ -135,8 +136,8 @@
             android:id="@+id/expanding_rv_visits"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginTop="24dp"
-            app:layout_constraintTop_toBottomOf="@+id/tv_last_visit"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@+id/tv_edit_visits"
             tools:layout_editor_absoluteX="0dp" />
 
         <TextView
@@ -200,7 +201,7 @@
             android:contentDescription="@string/desc_place_photo"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/et_address"
-            tools:srcCompat="@android:drawable/picture_frame" />
+            tools:background="@android:color/darker_gray"/>
 
         <TextView
             android:id="@+id/tv_attributions"
@@ -212,6 +213,20 @@
             android:textSize="14sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/iv_photo" />
+
+        <TextView
+            android:id="@+id/tv_edit_visits"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:onClick="editClicked"
+            android:text="@string/edit"
+            android:textColor="@color/colorPrimary"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_last_visit" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
