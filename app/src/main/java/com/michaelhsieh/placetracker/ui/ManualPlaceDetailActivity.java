@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -65,6 +66,12 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
     // label TextView and TextView of last date visited
     TextView lastVisitLabel;
     TextView lastVisitDisplay;
+
+    // track whether user can edit visits with drag and drop
+    private boolean isEditable = false;
+
+    // ItemTouchHelper to drag and drop visits
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +145,9 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
             adapter.setClickListener(this);
             recyclerView.setAdapter(adapter);
 
+            // set up ItemTouchHelper to swipe left to delete visit or drag and drop visits
+            setUpItemTouchHelper(recyclerView);
+
             // add visit when the add visit button is clicked
             Button addVisitButton = findViewById(R.id.btn_manual_add_visit);
             addVisitButton.setOnClickListener(new View.OnClickListener() {
@@ -208,9 +218,109 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         }
     }
 
+    /** Swipe left to delete a visit.
+     * Drag and drop to rearrange visit.
+     *
+     * @param recyclerView The RecyclerView displaying the list of visits
+     */
+    private void setUpItemTouchHelper(RecyclerView recyclerView) {
+
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+                ItemTouchHelper.LEFT) {
+
+            // disable long press drag since
+            // user can drag by clicking edit and dragging handles instead
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return false;
+            }
+
+            // disable swipe for VisitGroup at position 0
+            @Override
+            public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                if (viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) {
+                    Log.d(TAG, "getSwipeDirs: disable swipe on VisitGroup");
+                    return 0;
+                }
+                return super.getSwipeDirs(recyclerView, viewHolder);
+            }
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+
+                // don't allow VisitGroup to be moved
+                if (!(viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) && !(target instanceof VisitGroupAdapter.VisitGroupViewHolder)) {
+
+                    /* Subtract by 1 to get the correct visit list position of the Visits being moved.
+                     Since position 0 is already occupied by the VisitGroup parent, the first Visit
+                     is at adapter position 1.
+                     Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
+                    final int fromPos = viewHolder.getAdapterPosition() - NUM_VISIT_GROUPS;
+                    final int toPos = target.getAdapterPosition() - NUM_VISIT_GROUPS;
+                    // move item at fromPos to toPos in adapter.
+                    Visit visitToMove = visits.get(fromPos);
+                    moveSingleItem(fromPos, toPos, visitToMove);
+                    // true if moved, false otherwise
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                /* Get adapter position that was swiped and
+                subtract 1 because VisitGroup is at position 0, and
+                the first visit is at position 1. */
+                int posToDelete = viewHolder.getAdapterPosition() - 1;
+                Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
+                // delete place at that position from the database
+                Visit visitToDelete = visits.get(posToDelete);
+
+                // create delete visit message
+                // Are you sure you want to delete this visit on [date] at [time]?
+                String deleteVisitMessage = getResources().getString(R.string.delete_visit_message)
+                        + visitToDelete.getDate() + getResources().getString(R.string.at) +
+                        visitToDelete.getTime() +
+                        getResources().getString(R.string.question_mark);
+
+                new AlertDialog.Builder(ManualPlaceDetailActivity.this)
+                        .setTitle(R.string.delete_visit_title)
+                        .setMessage(deleteVisitMessage)
+
+                        // Specifying a listener allows you to take an action before dismissing the dialog.
+                        // The dialog is automatically dismissed when a dialog button is clicked.
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                // Continue with delete operation
+                                removeSingleItem(posToDelete);
+                            }
+                        })
+
+                        // if user cancels delete, then refresh the visit that was supposed to be swiped so
+                        // it doesn't get swiped off screen
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                // make the visit visible again
+                                adapter.notifyItemChanged(viewHolder.getAdapterPosition());
+                            }
+                        })
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .show();
+            }
+        });
+
+        itemTouchHelper.attachToRecyclerView(recyclerView);
+    }
+
+    /** Implement start dragging on a given ViewHolder.
+     *
+     * @param viewHolder The ViewHolder of the drag handle
+     */
     @Override
     public void requestDrag(RecyclerView.ViewHolder viewHolder) {
-        // manual place has no edit button so don't do anything with ViewHolder
+        itemTouchHelper.startDrag(viewHolder);
     }
 
     /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
@@ -231,6 +341,34 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         // show the date and time pickers
         // param is the clicked position so button click can update visit
         showDateTimePicker(positionInVisitList, visit);
+    }
+
+    /** Allow the user to drag and drop visits or update last visit when edit TextView is clicked.
+     *
+     * @param view The view clicked
+     */
+    public void editClicked(View view) {
+        TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
+        if (!isEditable) {
+            editDisplay.setText(getResources().getText(R.string.done));
+            // allow drag and drop
+            isEditable = true;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
+        } else {
+            // since user clicked done, disable drag and drop and update last visit
+            editDisplay.setText(getResources().getText(R.string.edit));
+            isEditable = false;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
+            if (visits != null) {
+                // update last visit
+                showOrHideLastVisit();
+            }
+            Log.d(TAG, "editClicked: done rearranging visits");
+        }
     }
 
     /** Insert an item into the RecyclerView
@@ -287,6 +425,22 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
 
         // update last visit
         showOrHideLastVisit();
+    }
+
+    /** Move an item from one position to another in the RecyclerView.
+     * @param fromPosition The starting visit list position of the visit
+     * @param toPosition The ending visit list position of the visit
+     * @param visit The visit being moved
+     */
+    private void moveSingleItem(int fromPosition, int toPosition, Visit visit) {
+        // update visits list
+        visits.remove(fromPosition);
+        visits.add(toPosition, visit);
+
+        // notify adapter
+        // add 1 to get the correct adapter position of the visit,
+        // since the visit list starts at position 1 of the adapter
+        adapter.notifyItemMoved(fromPosition + NUM_VISIT_GROUPS, toPosition + NUM_VISIT_GROUPS);
     }
 
     // show or hide the most recent date visited label and text

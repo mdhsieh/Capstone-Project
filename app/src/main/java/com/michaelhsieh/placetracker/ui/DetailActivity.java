@@ -329,7 +329,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        // set up ItemTouchHelper to swipe left to delete visit
+        // set up ItemTouchHelper to swipe left to delete visit or drag and drop visits
         setUpItemTouchHelper(recyclerView);
     }
 
@@ -620,7 +620,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         showDateTimePicker(positionInVisitList, visit);
     }
 
-    /** Allow the user to drag and drop visits or save changes when edit TextView is clicked.
+    /** Allow the user to drag and drop visits or update last visit when edit TextView is clicked.
      *
      * @param view The view clicked
      */
@@ -634,14 +634,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             // force onBindViewHolder again to update holder visibility
             adapter.notifyDataSetChanged();
         } else {
-            // since user clicked done, disable drag and drop and save changes
+            // since user clicked done, disable drag and drop and update last visit
             editDisplay.setText(getResources().getText(R.string.edit));
             isEditable = false;
             adapter.setHandleVisible(isEditable);
             // force onBindViewHolder again to update holder visibility
             adapter.notifyDataSetChanged();
-            // update last visit
-            showOrHideLastVisit();
+            if (visits != null) {
+                // update last visit
+                showOrHideLastVisit();
+            }
             Log.d(TAG, "editClicked: done rearranging visits");
         }
     }

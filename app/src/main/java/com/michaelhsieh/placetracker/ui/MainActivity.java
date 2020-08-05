@@ -313,7 +313,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         startActivityForResult(intent, DETAIL_ACTIVITY_REQUEST_CODE);
     }
 
-    /** Allow the user to drag and drop places or save changes when edit TextView is clicked.
+    /** Allow the user to drag and drop places or save positions when edit TextView is clicked.
      *
      * @param view The view clicked
      */
@@ -327,7 +327,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // force onBindViewHolder again to update holder visibility
             adapter.notifyDataSetChanged();
         } else {
-            // since user clicked done, disable drag and drop and save changes
+            // since user clicked done, disable drag and drop and save positions
             editDisplay.setText(getResources().getText(R.string.edit));
             isEditable = false;
             adapter.setHandleVisible(isEditable);
@@ -350,7 +350,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // user can drag by clicking edit and dragging handles instead
             @Override
             public boolean isLongPressDragEnabled() {
-                // return super.isLongPressDragEnabled();
                 return false;
             }
 
