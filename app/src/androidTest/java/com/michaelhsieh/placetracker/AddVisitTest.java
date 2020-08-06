@@ -34,6 +34,10 @@ import static org.hamcrest.Matchers.is;
 /** Searches a place and adds a visit to it.
  * <p></p>
  * This test assumes the place is at the first position of the RecyclerView
+ * <p></p>
+ * To pass this test, the test device must disable window animation scale,
+ * transition animation scale, and
+ * animator duration scale in developer options.
  */
 @LargeTest
 @RunWith(AndroidJUnit4.class)

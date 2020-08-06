@@ -62,7 +62,8 @@
             android:autofillHints="@string/name_hint"
             android:ems="10"
             android:hint="@string/name_hint"
-            android:inputType="textMultiLine"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_manual_name"
             app:layout_constraintTop_toTopOf="parent" />
@@ -79,7 +80,8 @@
             android:autofillHints=".AUTOFILL_HINT_POSTAL_ADDRESS"
             android:ems="10"
             android:hint="@string/address_hint"
-            android:inputType="textMultiLine"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_manual_address"
             app:layout_constraintTop_toBottomOf="@+id/et_manual_name" />

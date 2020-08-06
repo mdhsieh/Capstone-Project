@@ -13,9 +13,14 @@ import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -89,6 +94,38 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         lastVisitLabel = findViewById(R.id.tv_label_manual_last_visit);
         lastVisitDisplay = findViewById(R.id.tv_manual_last_visit);
         final EditText notesDisplay = findViewById(R.id.et_manual_notes);
+
+        // make name and address multi-line EditTexts with done button
+        nameDisplay.setHorizontallyScrolling(false);
+        nameDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
+        addressDisplay.setHorizontallyScrolling(false);
+        addressDisplay.setMaxLines(getResources().getInteger(R.integer.max_num_lines));
+
+        // clear focus when done pressed on soft keyboard
+        nameDisplay.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    // Clear focus here from EditText
+                    nameDisplay.clearFocus();
+                    // hide keyboard
+                    hideSoftKeyboard(nameDisplay);
+                }
+                return false;
+            }
+        });
+        addressDisplay.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+                    // Clear focus here from EditText
+                    addressDisplay.clearFocus();
+                    // hide keyboard
+                    hideSoftKeyboard(addressDisplay);
+                }
+                return false;
+            }
+        });
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
@@ -215,6 +252,61 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
         super.onRestoreInstanceState(savedInstanceState);
         if (adapter != null) {
             adapter.onRestoreInstanceState(savedInstanceState);
+        }
+    }
+
+    /** When user touches outside an EditText, clear that EditText's focus and close keyboard.
+     * <p></p>
+     * Used for name, address, and notes EditText
+     * to stop screen from jumping to focused EditText when ex. expanding visits or adding visits.
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            int x = (int) event.getRawX();
+            int y = (int) event.getRawY();
+
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains(x, y)) {
+                    // clear focus
+                    v.clearFocus();
+
+                    // without this part of code, if the user clicks on another EditText then
+                    // the keyboard closes and reopens immediately
+                    boolean touchTargetIsEditText = false;
+                    // Check if another EditText has been touched
+                    for (View vi : v.getRootView().getTouchables()) {
+                        if (vi instanceof EditText) {
+                            Rect clickedViewRect = new Rect();
+                            vi.getGlobalVisibleRect(clickedViewRect);
+                            if (clickedViewRect.contains(x, y)) {
+                                touchTargetIsEditText = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!touchTargetIsEditText) {
+                        // hide keyboard
+                        hideSoftKeyboard(v);
+                    }
+                }
+            }
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    /** Hide soft keyboard.
+     * @param view Used to retrieve the token identifying the window this view is attached to.
+     */
+    private void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 

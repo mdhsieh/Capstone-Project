@@ -95,7 +95,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private ArrayList<Place> refreshedPlaces;
 
-    // can the user edit places with drag and drop
+    // track whether user can edit places with drag and drop
     private boolean isEditable = false;
 
     // ItemTouchHelper to drag and drop places
