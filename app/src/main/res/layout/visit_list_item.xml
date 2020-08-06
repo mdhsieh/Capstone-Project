@@ -13,25 +13,31 @@
         android:layout_height="match_parent"
         android:layout_marginStart="@dimen/list_item_left_margin"
         android:layout_marginLeft="@dimen/list_item_left_margin"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
         android:gravity="center_vertical"
         app:layout_constraintEnd_toStartOf="@+id/list_item_visit_time"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="Friday, June 26, 2020" />
 
+    <!--Right margin is 8dp if the drag handle is visible,
+    or 32dp if the drag handle is gone-->
     <TextView
         android:id="@+id/list_item_visit_time"
         style="@style/MediumWhiteTextStyle"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_marginEnd="32dp"
-        android:layout_marginRight="32dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        app:layout_goneMarginEnd="32dp"
+        app:layout_goneMarginRight="32dp"
         android:gravity="center_vertical"
         app:layout_constraintEnd_toStartOf="@+id/iv_drag_handle"
         tools:text="10:42 AM" />
 
     <ImageView
         android:id="@+id/iv_drag_handle"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:contentDescription="@string/desc_drag_handle"
         android:src="@drawable/ic_reorder_white_64dp"
