@@ -65,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     // key to get the clicked place's position when Activity recreated, ex. when device rotated
     private static final String STATE_CLICKED_POSITION = "position";
 
+    // key to check whether user was editing before Activity recreated, ex. when device rotated
+    private static final String STATE_IS_EDITABLE = "is_editable";
+
     // PlaceModel ID key when using Intent
     public static final String EXTRA_PLACE_ID = "PlaceModel_ID";
 
@@ -183,6 +186,15 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // swipe left to delete a place
         // drag and drop to rearrange place
         setUpItemTouchHelper(recyclerView);
+
+        // if user was editing before ex. device rotation,
+        // set isEditable to true and display drag handles
+        if (savedInstanceState != null) {
+            if (savedInstanceState.getBoolean(STATE_IS_EDITABLE)) {
+                Log.d(TAG, "onCreate: allow editing");
+                allowEditing();
+            }
+        }
 
         // Initialize the SDK
         Places.initialize(getApplicationContext(), getString(R.string.google_places_api_key));
@@ -320,12 +332,13 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
     public void editClicked(View view) {
         TextView editDisplay = findViewById(R.id.tv_edit);
         if (!isEditable) {
-            editDisplay.setText(getResources().getText(R.string.done));
+            /*editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
             isEditable = true;
             adapter.setHandleVisible(isEditable);
             // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();
+            adapter.notifyDataSetChanged();*/
+            allowEditing();
         } else {
             // since user clicked done, disable drag and drop and save positions
             editDisplay.setText(getResources().getText(R.string.edit));
@@ -337,6 +350,19 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             // update all sorted place positions in Room Database
             setSortPositionsInDatabase();
         }
+    }
+
+    /** Allow user to drag and drop.
+     *
+     */
+    private void allowEditing() {
+        TextView editDisplay = findViewById(R.id.tv_edit);
+        editDisplay.setText(getResources().getText(R.string.done));
+        // allow drag and drop
+        isEditable = true;
+        adapter.setHandleVisible(isEditable);
+        // force onBindViewHolder again to update holder visibility
+        adapter.notifyDataSetChanged();
     }
 
     /** Swipe left to delete a place.
@@ -499,6 +525,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // Save the position of a place that's been clicked
         savedInstanceState.putInt(STATE_CLICKED_POSITION, clickedPlacePos);
+
+        // save whether the user was editing places or not
+        savedInstanceState.putBoolean(STATE_IS_EDITABLE, isEditable);
     }
 
     /** Check if connected to Wi-Fi or cellular network.

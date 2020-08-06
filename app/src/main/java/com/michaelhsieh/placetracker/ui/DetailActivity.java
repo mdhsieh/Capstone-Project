@@ -72,6 +72,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // key to get the visit list after ex. device rotated
     private static final String STATE_VISIT_LIST = "visit_list";
 
+    // key to check whether user was editing before Activity recreated, ex. when device rotated
+    private static final String STATE_IS_EDITABLE = "is_editable";
+
     private PlaceModel place;
 
     // custom adapter to display a group of visits using ExpandingRecyclerView
@@ -234,6 +237,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                             adapter.onRestoreInstanceState(savedInstanceState);
                         }
 
+                        // if user was editing before ex. device rotation,
+                        // set isEditable to true and display drag handles
+                        if (savedInstanceState != null) {
+                            // when Activity is recreated, isEditable is false
+                            if (savedInstanceState.getBoolean(STATE_IS_EDITABLE)) {
+                                Log.d(TAG, "onCreate: allow editing");
+                                allowEditing();
+                            }
+                        }
+
                         setUpPhoto();
 
                         setUpAddVisitButton();
@@ -249,61 +262,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         }
 
-    }
-
-    /** When user touches outside an EditText, clear that EditText's focus and close keyboard.
-     * <p></p>
-     * Used for name, address, and notes EditText
-     * to stop screen from jumping to focused EditText when ex. expanding visits or adding visits.
-     */
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-            int x = (int) event.getRawX();
-            int y = (int) event.getRawY();
-
-            View v = getCurrentFocus();
-            if ( v instanceof EditText) {
-                Rect outRect = new Rect();
-                v.getGlobalVisibleRect(outRect);
-                if (!outRect.contains(x, y)) {
-                    // clear focus
-                    v.clearFocus();
-
-                    // without this part of code, if the user clicks on another EditText then
-                    // the keyboard closes and reopens immediately
-                    boolean touchTargetIsEditText = false;
-                    // Check if another EditText has been touched
-                    for (View vi : v.getRootView().getTouchables()) {
-                        if (vi instanceof EditText) {
-                            Rect clickedViewRect = new Rect();
-                            vi.getGlobalVisibleRect(clickedViewRect);
-                            if (clickedViewRect.contains(x, y)) {
-                                touchTargetIsEditText = true;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!touchTargetIsEditText) {
-                        // hide keyboard
-                        hideSoftKeyboard(v);
-                    }
-                }
-            }
-        }
-        return super.dispatchTouchEvent(event);
-    }
-
-    /** Hide soft keyboard.
-     * @param view Used to retrieve the token identifying the window this view is attached to.
-     */
-    private void hideSoftKeyboard(View view) {
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
     }
 
     /** Set up the adapter, RecyclerView, and ItemTouchHelper.
@@ -331,6 +289,48 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         // set up ItemTouchHelper to swipe left to delete visit or drag and drop visits
         setUpItemTouchHelper(recyclerView);
+    }
+
+    /** Allow the user to drag and drop visits or update last visit when edit TextView is clicked.
+     *
+     * @param view The view clicked
+     */
+    public void editClicked(View view) {
+        TextView editDisplay = findViewById(R.id.tv_edit_visits);
+        if (!isEditable) {
+            /*editDisplay.setText(getResources().getText(R.string.done));
+            // allow drag and drop
+            isEditable = true;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();*/
+            allowEditing();
+        } else {
+            // since user clicked done, disable drag and drop and update last visit
+            editDisplay.setText(getResources().getText(R.string.edit));
+            isEditable = false;
+            adapter.setHandleVisible(isEditable);
+            // force onBindViewHolder again to update holder visibility
+            adapter.notifyDataSetChanged();
+            if (visits != null) {
+                // update last visit
+                showOrHideLastVisit();
+            }
+            Log.d(TAG, "editClicked: done rearranging visits");
+        }
+    }
+
+    /** Allow user to drag and drop.
+     *
+     */
+    private void allowEditing() {
+        TextView editDisplay = findViewById(R.id.tv_edit_visits);
+        editDisplay.setText(getResources().getText(R.string.done));
+        // allow drag and drop
+        isEditable = true;
+        adapter.setHandleVisible(isEditable);
+        // force onBindViewHolder again to update holder visibility
+        adapter.notifyDataSetChanged();
     }
 
     /** Swipe left to delete a visit.
@@ -592,12 +592,16 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         if (adapter != null) {
             adapter.onSaveInstanceState(outState);
         }
+
         // save the visit list on configuration change, ex. device rotated
         if (visits != null && visits.size() < MAX_NUM_VISITS) {
             outState.putParcelableArrayList(STATE_VISIT_LIST, new ArrayList<>(visits));
         } else if (visits != null) {
             Log.e(TAG, "visit list is too large. Not placing in outState bundle.");
         }
+
+        // save whether the user was editing visits or not
+        outState.putBoolean(STATE_IS_EDITABLE, isEditable);
     }
 
     /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
@@ -620,31 +624,58 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         showDateTimePicker(positionInVisitList, visit);
     }
 
-    /** Allow the user to drag and drop visits or update last visit when edit TextView is clicked.
-     *
-     * @param view The view clicked
+    /** When user touches outside an EditText, clear that EditText's focus and close keyboard.
+     * <p></p>
+     * Used for name, address, and notes EditText
+     * to stop screen from jumping to focused EditText when ex. expanding visits or adding visits.
      */
-    public void editClicked(View view) {
-        TextView editDisplay = findViewById(R.id.tv_edit_visits);
-        if (!isEditable) {
-            editDisplay.setText(getResources().getText(R.string.done));
-            // allow drag and drop
-            isEditable = true;
-            adapter.setHandleVisible(isEditable);
-            // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();
-        } else {
-            // since user clicked done, disable drag and drop and update last visit
-            editDisplay.setText(getResources().getText(R.string.edit));
-            isEditable = false;
-            adapter.setHandleVisible(isEditable);
-            // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();
-            if (visits != null) {
-                // update last visit
-                showOrHideLastVisit();
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+            int x = (int) event.getRawX();
+            int y = (int) event.getRawY();
+
+            View v = getCurrentFocus();
+            if ( v instanceof EditText) {
+                Rect outRect = new Rect();
+                v.getGlobalVisibleRect(outRect);
+                if (!outRect.contains(x, y)) {
+                    // clear focus
+                    v.clearFocus();
+
+                    // without this part of code, if the user clicks on another EditText then
+                    // the keyboard closes and reopens immediately
+                    boolean touchTargetIsEditText = false;
+                    // Check if another EditText has been touched
+                    for (View vi : v.getRootView().getTouchables()) {
+                        if (vi instanceof EditText) {
+                            Rect clickedViewRect = new Rect();
+                            vi.getGlobalVisibleRect(clickedViewRect);
+                            if (clickedViewRect.contains(x, y)) {
+                                touchTargetIsEditText = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!touchTargetIsEditText) {
+                        // hide keyboard
+                        hideSoftKeyboard(v);
+                    }
+                }
             }
-            Log.d(TAG, "editClicked: done rearranging visits");
+        }
+        return super.dispatchTouchEvent(event);
+    }
+
+    /** Hide soft keyboard.
+     * @param view Used to retrieve the token identifying the window this view is attached to.
+     */
+    private void hideSoftKeyboard(View view) {
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
 
