@@ -46,8 +46,6 @@
             android:name=".ui.ManualPlaceDetailActivity"
             android:parentActivityName=".ui.MainActivity" />
 
-        <!--service to get refreshed place info-->
-        <service android:name=".RefreshPlacesListService" />
         <!--service to update widget-->
         <service android:name=".widget.PlaceTrackerWidgetDisplayService"/>
     </application>
