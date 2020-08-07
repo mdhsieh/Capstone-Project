@@ -16,7 +16,6 @@ public class PlaceRepository {
     PlaceRepository(Application application) {
         PlaceRoomDatabase database = PlaceRoomDatabase.getDatabase(application);
         placeDao = database.placeDao();
-        /*allPlaces = placeDao.getPlaces();*/
         allPlaces = placeDao.getSortedPlaces();
     }
 

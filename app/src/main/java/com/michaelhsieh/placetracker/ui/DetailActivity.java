@@ -252,7 +252,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         if (isFirstObservedAfterRotation && savedInstanceState != null) {
                             // when Activity is recreated, isEditable is false
                             if (savedInstanceState.getBoolean(STATE_IS_EDITABLE)) {
-                                Log.d(TAG, "onCreate: allow editing");
                                 allowEditing();
                                 // ViewModel will observe place again if user ex.
                                 // clicks save button, so don't display drag handles after this
@@ -311,12 +310,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     public void editClicked(View view) {
         // TextView editDisplay = findViewById(R.id.tv_edit_visits);
         if (!isEditable) {
-            /*editDisplay.setText(getResources().getText(R.string.done));
-            // allow drag and drop
-            isEditable = true;
-            adapter.setHandleVisible(isEditable);
-            // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();*/
             allowEditing();
         } else {
             // since user clicked done, disable drag and drop and update last visit
@@ -329,7 +322,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // update last visit
                 showOrHideLastVisit();
             }
-            Log.d(TAG, "editClicked: done rearranging visits");
         }
     }
 
@@ -368,7 +360,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             @Override
             public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 if (viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) {
-                    Log.d(TAG, "getSwipeDirs: disable swipe on VisitGroup");
                     return 0;
                 }
                 return super.getSwipeDirs(recyclerView, viewHolder);
@@ -402,7 +393,6 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 subtract 1 because VisitGroup is at position 0, and
                 the first visit is at position 1. */
                 int posToDelete = viewHolder.getAdapterPosition() - 1;
-                Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
                 // delete place at that position from the database
                 Visit visitToDelete = visits.get(posToDelete);
 

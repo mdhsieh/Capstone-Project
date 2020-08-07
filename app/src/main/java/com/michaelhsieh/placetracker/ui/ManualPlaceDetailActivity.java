@@ -282,14 +282,7 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
      * @param view The view clicked
      */
     public void editClicked(View view) {
-        // TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
         if (!isEditable) {
-            /*editDisplay.setText(getResources().getText(R.string.done));
-            // allow drag and drop
-            isEditable = true;
-            adapter.setHandleVisible(isEditable);
-            // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();*/
             allowEditing();
         } else {
             // since user clicked done, disable drag and drop and update last visit

@@ -25,9 +25,6 @@ public interface PlaceDao {
     @Update
     void update(PlaceModel place);
 
-    /*@Query("SELECT * from place_table")
-    LiveData<List<PlaceModel>> getPlaces();*/
-
     // get places sorted by position
     @Query("SELECT * from place_table ORDER BY position ASC")
     LiveData<List<PlaceModel>> getSortedPlaces();

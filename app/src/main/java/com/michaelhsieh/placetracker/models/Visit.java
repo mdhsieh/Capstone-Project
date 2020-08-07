@@ -18,7 +18,6 @@ public class Visit implements Parcelable {
     private String date;
     private String time;
 
-    // public Visit(String date, String time) {
     public Visit(Calendar calendar) {
         this.calendar = calendar;
         // Date object representing this Calendar's time value
@@ -27,8 +26,6 @@ public class Visit implements Parcelable {
         this.time = DateFormat.getTimeInstance(DateFormat.SHORT).format(date);
         // format date to show day of week, month, day, year
         this.date = DateFormat.getDateInstance(DateFormat.FULL).format(date);
-        // this.date = date;
-        // this.time = time;
     }
 
     /** Get the Calendar used to display this Visit's date and time to the user.

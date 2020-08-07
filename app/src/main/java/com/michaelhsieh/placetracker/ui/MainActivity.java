@@ -172,8 +172,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                 // starts up and after rotation, not null
                 if (updatedPlaces != null) {
 
-                    Log.d(TAG, "onChanged");
-
                     // set places list to updated places list
                     places = updatedPlaces;
 
@@ -197,7 +195,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
         // set isEditable to true and display drag handles
         if (savedInstanceState != null) {
             if (savedInstanceState.getBoolean(STATE_IS_EDITABLE)) {
-                Log.d(TAG, "onCreate: allow editing");
                 allowEditing();
             }
         }
@@ -252,7 +249,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         // which is size of list before adding this place
                         sortPosition = places.size();
                     }
-                    Log.d(TAG, "onPlaceSelected: sort position " + sortPosition);
                     newPlace.setPosition(sortPosition);
 
                     // insert place into the database
@@ -336,14 +332,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      * @param view The view clicked
      */
     public void editClicked(View view) {
-        // TextView editDisplay = findViewById(R.id.tv_edit);
         if (!isEditable) {
-            /*editDisplay.setText(getResources().getText(R.string.done));
-            // allow drag and drop
-            isEditable = true;
-            adapter.setHandleVisible(isEditable);
-            // force onBindViewHolder again to update holder visibility
-            adapter.notifyDataSetChanged();*/
             allowEditing();
         } else {
             // since user clicked done, disable drag and drop and save positions
@@ -352,7 +341,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
             adapter.setHandleVisible(isEditable);
             // force onBindViewHolder again to update holder visibility
             adapter.notifyDataSetChanged();
-            Log.d(TAG, "editClicked: done rearranging places");
             // update all sorted place positions in Room Database
             setSortPositionsInDatabase();
         }
@@ -510,7 +498,6 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
                         // which is size of list before adding this place
                         sortPosition = places.size();
                     }
-                    Log.d(TAG, "onActivityResult: sort position " + sortPosition);
                     manualPlace.setPosition(sortPosition);
                 }
 
