@@ -29,10 +29,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.models.expandablegroup.VisitGroup;
 import com.michaelhsieh.placetracker.models.PlaceModel;
-import com.michaelhsieh.placetracker.models.Visit;
+import com.michaelhsieh.placetracker.models.expandablegroup.Visit;
 
 import java.util.Arrays;
 import java.util.Calendar;

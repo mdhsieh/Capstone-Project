@@ -3,6 +3,8 @@ package com.michaelhsieh.placetracker.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.michaelhsieh.placetracker.models.expandablegroup.Visit;
+
 import java.util.ArrayList;
 import java.util.List;
 

@@ -38,10 +38,9 @@ import android.widget.Toast;
 
 import com.michaelhsieh.placetracker.R;
 import com.michaelhsieh.placetracker.database.PlaceViewModel;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroup;
-import com.michaelhsieh.placetracker.expandablegroup.VisitGroupAdapter;
+import com.michaelhsieh.placetracker.models.expandablegroup.VisitGroup;
 import com.michaelhsieh.placetracker.models.PlaceModel;
-import com.michaelhsieh.placetracker.models.Visit;
+import com.michaelhsieh.placetracker.models.expandablegroup.Visit;
 import com.michaelhsieh.placetracker.widget.PlaceTrackerWidgetDisplayService;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package com.michaelhsieh.placetracker.expandablegroup;
+package com.michaelhsieh.placetracker.ui;
 
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -9,8 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.michaelhsieh.placetracker.R;
-import com.michaelhsieh.placetracker.ui.StartDragListener;
-import com.michaelhsieh.placetracker.models.Visit;
+import com.michaelhsieh.placetracker.models.expandablegroup.Visit;
+import com.michaelhsieh.placetracker.models.expandablegroup.VisitGroup;
 import com.thoughtbot.expandablerecyclerview.ExpandableRecyclerViewAdapter;
 import com.thoughtbot.expandablerecyclerview.models.ExpandableGroup;
 import com.thoughtbot.expandablerecyclerview.viewholders.ChildViewHolder;
