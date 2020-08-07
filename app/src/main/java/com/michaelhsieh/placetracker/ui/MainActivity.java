@@ -98,6 +98,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
     private ArrayList<Place> refreshedPlaces;
 
+    // clickable TextView to edit with drag and drop
+    TextView editDisplay;
+
     // track whether user can edit places with drag and drop
     private boolean isEditable = false;
 
@@ -136,6 +139,9 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
 
         // get TextView displaying empty list message
         emptyListDisplay = findViewById(R.id.tv_empty_list);
+
+        // get clickable TextView
+        editDisplay = findViewById(R.id.tv_edit);
 
         // places can be null before first LiveData update
         // ex. when app first started or screen rotated, places is null in onCreate
@@ -330,7 +336,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      * @param view The view clicked
      */
     public void editClicked(View view) {
-        TextView editDisplay = findViewById(R.id.tv_edit);
+        // TextView editDisplay = findViewById(R.id.tv_edit);
         if (!isEditable) {
             /*editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
@@ -356,7 +362,7 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      *
      */
     private void allowEditing() {
-        TextView editDisplay = findViewById(R.id.tv_edit);
+        // TextView editDisplay = findViewById(R.id.tv_edit);
         editDisplay.setText(getResources().getText(R.string.done));
         // allow drag and drop
         isEditable = true;

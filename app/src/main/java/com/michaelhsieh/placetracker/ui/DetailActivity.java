@@ -105,6 +105,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     EditText addressDisplay;
     EditText notesDisplay;
 
+    // clickable TextView to edit with drag and drop
+    TextView editDisplay;
+
+    // whether the ViewModel is being observed the first time after rotation
+    // used to display drag handles after rotation
+    private boolean isFirstObservedAfterRotation = true;
+
     // track whether user can edit visits with drag and drop
     private boolean isEditable = false;
 
@@ -163,6 +170,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         lastVisitDisplay = findViewById(R.id.tv_last_visit);
 
         notesDisplay = findViewById(R.id.et_notes);
+
+        // get clickable TextView
+        editDisplay = findViewById(R.id.tv_edit_visits);
 
         // find ImageView that display photo
         photo = findViewById(R.id.iv_photo);
@@ -239,11 +249,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                         // if user was editing before ex. device rotation,
                         // set isEditable to true and display drag handles
-                        if (savedInstanceState != null) {
+                        if (isFirstObservedAfterRotation && savedInstanceState != null) {
                             // when Activity is recreated, isEditable is false
                             if (savedInstanceState.getBoolean(STATE_IS_EDITABLE)) {
                                 Log.d(TAG, "onCreate: allow editing");
                                 allowEditing();
+                                // ViewModel will observe place again if user ex.
+                                // clicks save button, so don't display drag handles after this
+                                isFirstObservedAfterRotation = false;
                             }
                         }
 
@@ -296,7 +309,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      * @param view The view clicked
      */
     public void editClicked(View view) {
-        TextView editDisplay = findViewById(R.id.tv_edit_visits);
+        // TextView editDisplay = findViewById(R.id.tv_edit_visits);
         if (!isEditable) {
             /*editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
@@ -324,7 +337,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      *
      */
     private void allowEditing() {
-        TextView editDisplay = findViewById(R.id.tv_edit_visits);
+        // TextView editDisplay = findViewById(R.id.tv_edit_visits);
         editDisplay.setText(getResources().getText(R.string.done));
         // allow drag and drop
         isEditable = true;

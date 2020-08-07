@@ -75,6 +75,9 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
     TextView lastVisitLabel;
     TextView lastVisitDisplay;
 
+    // clickable TextView to edit with drag and drop
+    TextView editDisplay;
+
     // track whether user can edit visits with drag and drop
     private boolean isEditable = false;
 
@@ -129,6 +132,9 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
                 return false;
             }
         });
+
+        // get clickable TextView
+        editDisplay = findViewById(R.id.tv_manual_edit_visits);
 
         // Check whether we're recreating a previously destroyed instance
         if (savedInstanceState != null) {
@@ -276,7 +282,7 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
      * @param view The view clicked
      */
     public void editClicked(View view) {
-        TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
+        // TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
         if (!isEditable) {
             /*editDisplay.setText(getResources().getText(R.string.done));
             // allow drag and drop
@@ -304,7 +310,7 @@ public class ManualPlaceDetailActivity extends AppCompatActivity implements Visi
      *
      */
     private void allowEditing() {
-        TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
+        // TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
         editDisplay.setText(getResources().getText(R.string.done));
         // allow drag and drop
         isEditable = true;
