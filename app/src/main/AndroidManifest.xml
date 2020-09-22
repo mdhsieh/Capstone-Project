@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.michaelhsieh.placetracker">
-
     <!-- used to check Internet connection -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!-- permission needed in Android Pie (API 28) and higher -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- permission needed in Android Pie (API 28) and higher -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
@@ -14,11 +12,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <!--Add AdMob App ID-->
+        <activity android:name=".ui.AbstractDetailActivity"></activity>
+        <!-- Add AdMob App ID -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-8705794059560973~9730782762"/>
+            android:value="ca-app-pub-8705794059560973~9730782762" />
 
         <receiver android:name=".widget.PlaceTrackerAppWidget">
             <intent-filter>
@@ -28,10 +26,9 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/place_tracker_app_widget_info" />
-        </receiver>
-
-        <!--launch mode singleTop to not have multiple screens when re-opening widget and app-->
-        <activity android:name=".ui.MainActivity"
+        </receiver> <!-- launch mode singleTop to not have multiple screens when re-opening widget and app -->
+        <activity
+            android:name=".ui.MainActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -44,10 +41,8 @@
             android:parentActivityName=".ui.MainActivity" />
         <activity
             android:name=".ui.ManualPlaceDetailActivity"
-            android:parentActivityName=".ui.MainActivity" />
-
-        <!--service to update widget-->
-        <service android:name=".widget.PlaceTrackerWidgetDisplayService"/>
+            android:parentActivityName=".ui.MainActivity" /> <!-- service to update widget -->
+        <service android:name=".widget.PlaceTrackerWidgetDisplayService" />
     </application>
 
 </manifest>

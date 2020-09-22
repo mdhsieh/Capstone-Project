@@ -7,6 +7,8 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+# ignore jarRepositories.xml, which is auto-generated after updating to Android Studio 4.0 and building the app
+/.idea/jarRepositories.xml
 .DS_Store
 /build
 /captures
