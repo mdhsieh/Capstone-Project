@@ -30,16 +30,18 @@ import com.michaelhsieh.placetracker.models.expandablegroup.Visit;
 import java.util.Calendar;
 import java.util.List;
 
-/** Abstract class that stores the methods and variables which are the same for
+/** Abstract class that stores methods and fields which are the same for both
  * ManualPlaceDetailActivity and DetailActivity.
- *
+ * <p></p>
+ * This class does not have a layout and
+ * should be extended by ManualPlaceDetailActivity and DetailActivity.
  */
 public abstract class AbstractDetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener, StartDragListener {
 
     private static final String TAG = AbstractDetailActivity.class.getSimpleName();
 
-    // The class that is extending AbstractDetailActivity
-    // Used in showDateTimePicker and setUpItemTouchHelper's onSwiped
+    // This class or the class that is extending AbstractDetailActivity.
+    // Used in showDateTimePicker and setUpItemTouchHelper's onSwiped.
     private Activity activity;
 
     /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
@@ -140,6 +142,9 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Default Activity is AbstractDetailActivity
+        setActivity(this);
     }
 
     /** Allow the user to drag and drop visits or update last visit when edit TextView is clicked.
