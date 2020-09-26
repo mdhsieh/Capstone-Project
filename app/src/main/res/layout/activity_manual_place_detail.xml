@@ -120,12 +120,15 @@
 
         <TextView
             android:id="@+id/tv_manual_last_visit"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/tv_label_manual_last_visit"
             app:layout_constraintTop_toBottomOf="@+id/btn_manual_add_visit"
             tools:text="Tuesday, June 30, 2020 at 11:00 am" />
