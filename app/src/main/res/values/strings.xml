@@ -68,4 +68,6 @@
     <string name="desc_drag_handle">drag handle</string>
     <string name="edit">Edit</string>
     <string name="done">Done</string>
+    <!--empty places list and edit button clicked-->
+    <string name="edit_empty_list_error">No places yet! Please add a place to edit.</string>
 </resources>

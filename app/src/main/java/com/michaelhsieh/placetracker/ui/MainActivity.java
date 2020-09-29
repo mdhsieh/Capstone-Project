@@ -333,6 +333,10 @@ public class MainActivity extends AppCompatActivity implements PlaceAdapter.Item
      */
     public void editClicked(View view) {
         if (!isEditable) {
+            if (places != null && places.isEmpty()) {
+                // Show Toast message telling user to add a place to edit
+                Toast.makeText(this, R.string.edit_empty_list_error, Toast.LENGTH_LONG).show();
+            }
             allowEditing();
         } else {
             // since user clicked done, disable drag and drop and save positions
