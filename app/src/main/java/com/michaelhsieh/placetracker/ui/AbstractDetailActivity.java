@@ -48,7 +48,7 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
     The visits list starts at position 1. */
     private static final int NUM_VISIT_GROUPS = 1;
 
-    // the place which the user is adding manually
+    // the place which the user is viewing the details of
     private PlaceModel place;
 
     // custom adapter to display a group of visits using ExpandingRecyclerView
@@ -233,7 +233,7 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
                 the first visit is at position 1. */
                 int posToDelete = viewHolder.getAdapterPosition() - 1;
                 Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
-                // delete place at that position from the database
+                // delete visit at that position from the database
                 Visit visitToDelete = visits.get(posToDelete);
 
                 // create delete visit message

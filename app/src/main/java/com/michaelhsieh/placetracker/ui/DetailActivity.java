@@ -50,7 +50,8 @@ import java.util.List;
 
 import static com.michaelhsieh.placetracker.ui.MainActivity.EXTRA_PLACE_ID;
 
-public class DetailActivity extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener, StartDragListener {
+public class DetailActivity extends AbstractDetailActivity {
+        // extends AppCompatActivity implements VisitGroupAdapter.VisitItemClickListener, StartDragListener {
 
     private static final String TAG = DetailActivity.class.getSimpleName();
 
@@ -63,7 +64,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
     Get visit's list position + 1 to get the visit's adapter position.
     The adapter position is used to notify the adapter of changes to the visit list.*/
-    private static final int NUM_VISIT_GROUPS = 1;
+    /*private static final int NUM_VISIT_GROUPS = 1;*/
 
     // maximum number of visits in list to prevent TransactionTooLargeException when rotating device
     public static final int MAX_NUM_VISITS = 150;
@@ -74,19 +75,19 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     // key to check whether user was editing before Activity recreated, ex. when device rotated
     private static final String STATE_IS_EDITABLE = "is_editable";
 
-    private PlaceModel place;
+    /*private PlaceModel place;*/
 
     // custom adapter to display a group of visits using ExpandingRecyclerView
-    private VisitGroupAdapter adapter;
+    /*private VisitGroupAdapter adapter;*/
 
     // list of visits from place
-    List<Visit> visits;
+    /*List<Visit> visits;*/
 
-    TextView numVisitsDisplay;
+    /*TextView numVisitsDisplay;*/
 
     // label TextView and TextView of last date visited
-    TextView lastVisitLabel;
-    TextView lastVisitDisplay;
+    /*TextView lastVisitLabel;
+    TextView lastVisitDisplay;*/
 
     // ImageViews to display place's photos
     ImageView photo;
@@ -105,17 +106,17 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     EditText notesDisplay;
 
     // clickable TextView to edit with drag and drop
-    TextView editDisplay;
+    /*TextView editDisplay;*/
 
     // whether the ViewModel is being observed the first time after rotation
     // used to display drag handles after rotation
     private boolean isFirstObservedAfterRotation = true;
 
     // track whether user can edit visits with drag and drop
-    private boolean isEditable = false;
+    /*private boolean isEditable = false;*/
 
     // ItemTouchHelper to drag and drop visits
-    private ItemTouchHelper itemTouchHelper;
+    /*private ItemTouchHelper itemTouchHelper;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -164,14 +165,19 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
 
 
-        numVisitsDisplay = findViewById(R.id.tv_num_visits);
+        /*numVisitsDisplay = findViewById(R.id.tv_num_visits);
         lastVisitLabel = findViewById(R.id.tv_label_last_visit);
-        lastVisitDisplay = findViewById(R.id.tv_last_visit);
+        lastVisitDisplay = findViewById(R.id.tv_last_visit);*/
+        setActivity(this);
+        setNumVisitsDisplay(findViewById(R.id.tv_num_visits));
+        setLastVisitLabel(findViewById(R.id.tv_label_last_visit));
+        setLastVisitDisplay(findViewById(R.id.tv_last_visit));
 
         notesDisplay = findViewById(R.id.et_notes);
 
         // get clickable TextView
-        editDisplay = findViewById(R.id.tv_edit_visits);
+        /*editDisplay = findViewById(R.id.tv_edit_visits);*/
+        setEditDisplay(findViewById(R.id.tv_edit_visits));
 
         // find ImageView that display photo
         photo = findViewById(R.id.iv_photo);
@@ -192,13 +198,18 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                     if (placeModel != null) {
 
                         // change place to observed place from database
-                        place = placeModel;
+                        /*place = placeModel;*/
+                        setPlace(placeModel);
 
                         // rest of code using place is put here
-                        String name = place.getName();
+                        /*String name = place.getName();
                         String address = place.getAddress();
                         int numVisits = place.getNumVisits();
-                        String notes = place.getNotes();
+                        String notes = place.getNotes();*/
+                        String name = getPlace().getName();
+                        String address = getPlace().getAddress();
+                        int numVisits = getPlace().getNumVisits();
+                        String notes = getPlace().getNotes();
 
                         if (savedInstanceState == null) {
                             nameDisplay.setText(name);
@@ -211,28 +222,39 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                         // initialize the visit group and visits
                         if (savedInstanceState == null) {
-                            visits = place.getVisits();
+                            /*visits = place.getVisits();*/
+                            setVisits(getPlace().getVisits());
                         }
                         // else, use the visits list already in use. The user may have
                         // edited this list before rotation, ex. added and deleted visits
                         else {
                             if (savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST) != null) {
-                                visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
+                                /*visits = savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST);
                                 place.setVisits(visits);
-                                numVisits = place.getNumVisits();
+                                numVisits = place.getNumVisits();*/
+                                setVisits(savedInstanceState.getParcelableArrayList(STATE_VISIT_LIST));
+                                getPlace().setVisits(getVisits());
+                                numVisits = getPlace().getNumVisits();
                             } else {
-                                visits = place.getVisits();
+                                /*visits = place.getVisits();*/
+                                setVisits(getPlace().getVisits());
                             }
                         }
 
                         // list of visit groups which will only contain one group at position 0
-                        visitGroupList =
+                        /*visitGroupList =
                                 Arrays.asList
                                         (new VisitGroup(getResources().getString(R.string.dates_visited),
                                                 visits)
+                                        );*/
+                        visitGroupList =
+                                Arrays.asList
+                                        (new VisitGroup(getResources().getString(R.string.dates_visited),
+                                                getVisits())
                                         );
 
-                        numVisitsDisplay.setText(String.valueOf(numVisits));
+                        /*numVisitsDisplay.setText(String.valueOf(numVisits));*/
+                        getNumVisitsDisplay().setText(String.valueOf(numVisits));
 
                         // show last visit if PlaceModel already has visits,
                         // otherwise hide last visit text and label
@@ -242,8 +264,11 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                         setUpAdapter();
 
                         // if ex. device rotated, restore expand or collapse state of adapter
-                        if (savedInstanceState != null && adapter != null) {
+                        /*if (savedInstanceState != null && adapter != null) {
                             adapter.onRestoreInstanceState(savedInstanceState);
+                        }*/
+                        if (savedInstanceState != null && getAdapter() != null) {
+                            getAdapter().onRestoreInstanceState(savedInstanceState);
                         }
 
                         // if user was editing before ex. device rotation,
@@ -293,10 +318,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // instantiate the adapter with the list of visit groups and
         // DetailActivity as drag listener.
         // there's only one visit group
-        adapter = new VisitGroupAdapter(visitGroupList, this);
+        /*adapter = new VisitGroupAdapter(visitGroupList, this);*/
+        setAdapter(new VisitGroupAdapter(visitGroupList, this));
         // set the click listener for clicks on individual visits
-        adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        /*adapter.setClickListener(this);
+        recyclerView.setAdapter(adapter);*/
+        getAdapter().setClickListener(this);
+        recyclerView.setAdapter(getAdapter());
 
         // set up ItemTouchHelper to swipe left to delete visit or drag and drop visits
         setUpItemTouchHelper(recyclerView);
@@ -306,7 +334,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      *
      * @param view The view clicked
      */
-    public void editClicked(View view) {
+    /*public void editClicked(View view) {
         // TextView editDisplay = findViewById(R.id.tv_edit_visits);
         if (!isEditable) {
             allowEditing();
@@ -322,12 +350,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 showOrHideLastVisit();
             }
         }
-    }
+    }*/
 
     /** Allow user to drag and drop.
      *
      */
-    private void allowEditing() {
+    /*private void allowEditing() {
         // TextView editDisplay = findViewById(R.id.tv_edit_visits);
         editDisplay.setText(getResources().getText(R.string.done));
         // allow drag and drop
@@ -335,14 +363,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         adapter.setHandleVisible(isEditable);
         // force onBindViewHolder again to update holder visibility
         adapter.notifyDataSetChanged();
-    }
+    }*/
 
     /** Swipe left to delete a visit.
      * Drag and drop to rearrange visit.
      *
      * @param recyclerView The RecyclerView displaying the list of visits
      */
-    private void setUpItemTouchHelper(RecyclerView recyclerView) {
+    /*private void setUpItemTouchHelper(RecyclerView recyclerView) {
 
         itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
                 ItemTouchHelper.LEFT) {
@@ -370,10 +398,10 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 // don't allow VisitGroup to be moved
                 if (!(viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) && !(target instanceof VisitGroupAdapter.VisitGroupViewHolder)) {
 
-                    /* Subtract by 1 to get the correct visit list position of the Visits being moved.
+                    *//* Subtract by 1 to get the correct visit list position of the Visits being moved.
                      Since position 0 is already occupied by the VisitGroup parent, the first Visit
                      is at adapter position 1.
-                     Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
+                     Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. *//*
                     final int fromPos = viewHolder.getAdapterPosition() - NUM_VISIT_GROUPS;
                     final int toPos = target.getAdapterPosition() - NUM_VISIT_GROUPS;
                     // move item at fromPos to toPos in adapter.
@@ -388,9 +416,9 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
             @Override
             public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                /* Get adapter position that was swiped and
+                *//* Get adapter position that was swiped and
                 subtract 1 because VisitGroup is at position 0, and
-                the first visit is at position 1. */
+                the first visit is at position 1. *//*
                 int posToDelete = viewHolder.getAdapterPosition() - 1;
                 // delete place at that position from the database
                 Visit visitToDelete = visits.get(posToDelete);
@@ -430,25 +458,27 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         });
 
         itemTouchHelper.attachToRecyclerView(recyclerView);
-    }
+    }*/
 
     /** Implement start dragging on a given ViewHolder.
      *
      * @param viewHolder The ViewHolder of the drag handle
      */
-    @Override
+    /*@Override
     public void requestDrag(RecyclerView.ViewHolder viewHolder) {
         itemTouchHelper.startDrag(viewHolder);
-    }
+    }*/
 
     /** Display place photo and attribution text, if available.
      *
      */
     private void setUpPhoto() {
         // display bitmap photo if available
-        String base64String = place.getBase64String();
+        /*String base64String = place.getBase64String();*/
+        String base64String = getPlace().getBase64String();
         // display photo's attribution text if available
-        String attributions = place.getAttributions();
+        /*String attributions = place.getAttributions();*/
+        String attributions = getPlace().getAttributions();
         if (base64String != null && !base64String.isEmpty()) {
             // decode Base64 String to bitmap
             Bitmap bitmap = decodeBase64StringToBitmap(base64String);
@@ -501,9 +531,13 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
                 // create delete place message
                 // Are you sure you want to delete [place] at [address]?
-                String deleteMessage = getResources().getString(R.string.delete_place_message)
+                /*String deleteMessage = getResources().getString(R.string.delete_place_message)
                         + place.getName() + getResources().getString(R.string.at) +
                         place.getAddress() +
+                        getResources().getString(R.string.question_mark);*/
+                String deleteMessage = getResources().getString(R.string.delete_place_message)
+                        + getPlace().getName() + getResources().getString(R.string.at) +
+                        getPlace().getAddress() +
                         getResources().getString(R.string.question_mark);
 
                 // alert dialog to confirm user wants to delete this place
@@ -544,17 +578,24 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
                 } else {
                     // save the user's current EditText data for name, address, and notes
                     // visits should already be added and Place ID should stay the same
-                    place.setName(nameDisplay.getText().toString());
+                    /*place.setName(nameDisplay.getText().toString());
                     place.setAddress(addressDisplay.getText().toString());
-                    place.setNotes(notesDisplay.getText().toString());
+                    place.setNotes(notesDisplay.getText().toString());*/
+                    getPlace().setName(nameDisplay.getText().toString());
+                    getPlace().setAddress(addressDisplay.getText().toString());
+                    getPlace().setNotes(notesDisplay.getText().toString());
 
                     // update place in the database
-                    viewModel.update(place);
+                    /*viewModel.update(place);*/
+                    viewModel.update(getPlace());
                     // get the saved place's name, address, and number of visits and
                     // update the widget
-                    PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(DetailActivity.this,
+                    /*PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(DetailActivity.this,
                             place.getName(), place.getAddress(),
-                            place.getNumVisits());
+                            place.getNumVisits());*/
+                    PlaceTrackerWidgetDisplayService.startActionUpdatePlaceTrackerWidgets(DetailActivity.this,
+                            getPlace().getName(), getPlace().getAddress(),
+                            getPlace().getNumVisits());
 
                     finish();
                 }
@@ -567,13 +608,29 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      */
     private void setUpLastVisitDisplay() {
         // if last visit TextView clicked, copy the date and time to clipboard
-        lastVisitDisplay.setOnClickListener(new View.OnClickListener() {
+        /*lastVisitDisplay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (lastVisitDisplay.getVisibility() == View.VISIBLE) {
                     // label is only used by developer, can retrieve by using clip.getDescription()
                     String label = getString(R.string.visit_date_time_copy_label);
                     String text = lastVisitDisplay.getText().toString();
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    ClipData clip = ClipData.newPlainText(label, text);
+                    if (clipboard != null) {
+                        clipboard.setPrimaryClip(clip);
+                        Toast.makeText(getApplicationContext(), R.string.visit_date_time_copy_confirm_message, Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+        });*/
+        getLastVisitDisplay().setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (getLastVisitDisplay().getVisibility() == View.VISIBLE) {
+                    // label is only used by developer, can retrieve by using clip.getDescription()
+                    String label = getString(R.string.visit_date_time_copy_label);
+                    String text = getLastVisitDisplay().getText().toString();
                     ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
                     ClipData clip = ClipData.newPlainText(label, text);
                     if (clipboard != null) {
@@ -591,7 +648,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        if (adapter != null) {
+        /*if (adapter != null) {
             adapter.onSaveInstanceState(outState);
         }
 
@@ -603,7 +660,20 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         }
 
         // save whether the user was editing visits or not
-        outState.putBoolean(STATE_IS_EDITABLE, isEditable);
+        outState.putBoolean(STATE_IS_EDITABLE, isEditable);*/
+        if (getAdapter() != null) {
+            getAdapter().onSaveInstanceState(outState);
+        }
+
+        // save the visit list on configuration change, ex. device rotated
+        if (getVisits() != null && getVisits().size() < MAX_NUM_VISITS) {
+            outState.putParcelableArrayList(STATE_VISIT_LIST, new ArrayList<>(getVisits()));
+        } else if (getVisits() != null) {
+            Log.e(TAG, "visit list is too large. Not placing in outState bundle.");
+        }
+
+        // save whether the user was editing visits or not
+        outState.putBoolean(STATE_IS_EDITABLE, isEditable());
     }
 
     /** Called whenever a visit in the list is clicked. Show the date and time picker dialog.
@@ -611,12 +681,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      * @param view The View displaying this visit's date and time
      * @param position The adapter position of the Visit clicked, calculated by getAdapterPosition()
      */
-    @Override
+    /*@Override
     public void onItemClick(View view, int position) {
-        /* Subtract by 1 to get the correct visit list position of the Visit clicked.
+        *//* Subtract by 1 to get the correct visit list position of the Visit clicked.
          * Since position 0 is already occupied by the VisitGroup parent, the first Visit
          * is at adapter position 1.
-         * Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. */
+         * Using getAdapterPosition() by itself will cause an IndexOutOfBoundsException. *//*
         int positionInVisitList = position - NUM_VISIT_GROUPS;
 
         Visit visit = visits.get(positionInVisitList);
@@ -624,14 +694,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // show the date and time pickers
         // param is the clicked position so button click can update visit
         showDateTimePicker(positionInVisitList, visit);
-    }
+    }*/
 
     /** When user touches outside an EditText, clear that EditText's focus and close keyboard.
      * <p></p>
      * Used for name, address, and notes EditText
      * to stop screen from jumping to focused EditText when ex. expanding visits or adding visits.
      */
-    @Override
+    /*@Override
     public boolean dispatchTouchEvent(MotionEvent event) {
         if (event.getAction() == MotionEvent.ACTION_DOWN) {
 
@@ -669,22 +739,22 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             }
         }
         return super.dispatchTouchEvent(event);
-    }
+    }*/
 
     /** Hide soft keyboard.
      * @param view Used to retrieve the token identifying the window this view is attached to.
      */
-    private void hideSoftKeyboard(View view) {
+    /*private void hideSoftKeyboard(View view) {
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-    }
+    }*/
 
     /** Insert an item into the RecyclerView
      * @param visit The visit being inserted
      */
-    private void insertSingleItem(Visit visit) {
+    /*private void insertSingleItem(Visit visit) {
         // insert at the very end of the list
         int insertIndex = place.getNumVisits();
         // add visit
@@ -699,14 +769,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         // update last visit
         showOrHideLastVisit();
-    }
+    }*/
 
     /** Update an item in the RecyclerView
      *
      * @param updateIndex The visit list index of the visit being updated
      * @param visit The visit being updated
      */
-    private void updateSingleItem(int updateIndex, Visit visit) {
+    /*private void updateSingleItem(int updateIndex, Visit visit) {
         // update visit
         visits.set(updateIndex, visit);
         // notify adapter that visit has changed
@@ -717,12 +787,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // update last visit
         // need this method if the visit that was updated was the last visit
         showOrHideLastVisit();
-    }
+    }*/
 
     /** Delete an item from the RecyclerView
      * @param removeIndex The visit list index of the visit being removed
      */
-    private void removeSingleItem(int removeIndex) {
+    /*private void removeSingleItem(int removeIndex) {
         // remove visit
         visits.remove(removeIndex);
         // notify adapter that visit has been removed
@@ -735,14 +805,14 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         // update last visit
         showOrHideLastVisit();
-    }
+    }*/
 
     /** Move an item from one position to another in the RecyclerView.
      * @param fromPosition The starting visit list position of the visit
      * @param toPosition The ending visit list position of the visit
      * @param visit The visit being moved
      */
-    private void moveSingleItem(int fromPosition, int toPosition, Visit visit) {
+    /*private void moveSingleItem(int fromPosition, int toPosition, Visit visit) {
         // update visits list
         visits.remove(fromPosition);
         visits.add(toPosition, visit);
@@ -751,12 +821,12 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
         // add 1 to get the correct adapter position of the visit,
         // since the visit list starts at position 1 of the adapter
         adapter.notifyItemMoved(fromPosition + NUM_VISIT_GROUPS, toPosition + NUM_VISIT_GROUPS);
-    }
+    }*/
 
     /** Show or hide the most recent date visited label and text.
      *
      */
-    private void showOrHideLastVisit() {
+    /*private void showOrHideLastVisit() {
         if (place.getNumVisits() == 0) {
             lastVisitLabel.setVisibility(View.GONE);
             lastVisitDisplay.setVisibility(View.GONE);
@@ -768,7 +838,8 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
             String lastVisitString = lastVisit.getDate() + getString(R.string.at) + lastVisit.getTime();
             lastVisitDisplay.setText(lastVisitString);
         }
-    }
+    }*/
+
     /** Display the date and time picker dialog so user can edit a clicked Visit's
      * date and time. Updates the Visit if the user clicks the set button.
      * Deletes the Visit if the user clicks the delete visit button.
@@ -776,7 +847,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
      * @param pos The visit list position of the clicked Visit. Used to update or delete the Visit.
      * @param visit The visit that was clicked. Used to update the Visit.
      */
-    private void showDateTimePicker(int pos, Visit visit) {
+    /*private void showDateTimePicker(int pos, Visit visit) {
         final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
 
@@ -885,7 +956,7 @@ public class DetailActivity extends AppCompatActivity implements VisitGroupAdapt
 
         alertDialog.setView(dialogView);
         alertDialog.show();
-    }
+    }*/
 
     /** Decode Base64 String to Bitmap
      *
