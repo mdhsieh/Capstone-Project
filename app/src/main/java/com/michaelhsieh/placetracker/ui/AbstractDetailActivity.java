@@ -40,12 +40,19 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
 
     private static final String TAG = AbstractDetailActivity.class.getSimpleName();
 
-    // This class or the class that is extending AbstractDetailActivity.
+    // This Activity or the Activity that is extending AbstractDetailActivity.
     // Used in showDateTimePicker and setUpItemTouchHelper's onSwiped.
     private Activity activity;
 
     /* There's one VisitGroup, which is at position 0 of the VisitGroupAdapter.
-    The visits list starts at position 1. */
+    The visits list starts at position 1.
+
+    Get a clicked visit's adapter position - 1 to get the visit's list position.
+    For example first visit is at adapter position 1 but visit list position 0.
+    The visit list position is used as a parameter to update, delete, and add visits.
+
+    Get visit's list position + 1 to get the visit's adapter position.
+    The adapter position is used to notify the adapter of changes to the visit list.*/
     private static final int NUM_VISIT_GROUPS = 1;
 
     // the place which the user is viewing the details of
@@ -173,7 +180,6 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
      *
      */
     protected void allowEditing() {
-        // TextView editDisplay = findViewById(R.id.tv_manual_edit_visits);
         editDisplay.setText(getResources().getText(R.string.done));
         // allow drag and drop
         isEditable = true;
@@ -198,7 +204,6 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
             @Override
             public int getSwipeDirs(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
                 if (viewHolder instanceof VisitGroupAdapter.VisitGroupViewHolder) {
-                    Log.d(TAG, "getSwipeDirs: disable swipe on VisitGroup");
                     return 0;
                 }
                 return super.getSwipeDirs(recyclerView, viewHolder);
@@ -232,7 +237,6 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
                 subtract 1 because VisitGroup is at position 0, and
                 the first visit is at position 1. */
                 int posToDelete = viewHolder.getAdapterPosition() - 1;
-                Log.d(TAG, "onSwiped: position to delete is " + posToDelete);
                 // delete visit at that position from the database
                 Visit visitToDelete = visits.get(posToDelete);
 
@@ -243,7 +247,6 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
                         visitToDelete.getTime() +
                         getResources().getString(R.string.question_mark);
 
-                // new AlertDialog.Builder(ManualPlaceDetailActivity.this)
                 new AlertDialog.Builder(activity)
                         .setTitle(R.string.delete_visit_title)
                         .setMessage(deleteVisitMessage)
@@ -452,9 +455,7 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
      * @param visit The visit that was clicked. Used to update the Visit.
      */
     private void showDateTimePicker(int pos, Visit visit) {
-        // final View dialogView = View.inflate(this, R.layout.date_time_picker, null);
         final View dialogView = View.inflate(activity, R.layout.date_time_picker, null);
-        // final AlertDialog alertDialog = new AlertDialog.Builder(this).create();
         final AlertDialog alertDialog = new AlertDialog.Builder(activity).create();
 
         DatePicker datePicker = dialogView.findViewById(R.id.date_picker);
@@ -538,10 +539,8 @@ public abstract class AbstractDetailActivity extends AppCompatActivity implement
                         visit.getTime() +
                         getResources().getString(R.string.question_mark);
 
-                // new AlertDialog.Builder(ManualPlaceDetailActivity.this)
                 new AlertDialog.Builder(activity)
                         .setTitle(R.string.delete_visit_title)
-                        // .setMessage(R.string.delete_visit_message)
                         .setMessage(deleteVisitMessage)
 
                         // Specifying a listener allows you to take an action before dismissing the dialog.
