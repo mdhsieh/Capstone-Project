@@ -24,6 +24,15 @@ For example, you can just copy-paste this file into the "values" folder, replaci
 ## Download
 <a href='https://play.google.com/store/apps/details?id=com.michaelhsieh.placetracker'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height='90'/></a>
 
+## Features
+- Search places and add them to your list
+- View details
+- Add visit dates and times
+- Edit or copy visits
+- Add notes
+- Swipe to delete
+- Drag and drop to rearrange items
+
 ## Libraries
 - [Google Places SDK](https://developers.google.com/places/android-sdk/start)
 - [Expandable RecyclerView](https://github.com/thoughtbot/expandable-recycler-view)
