@@ -37,6 +37,12 @@ For example, you can just copy-paste this file into the "values" folder, replaci
 - [Google Places SDK](https://developers.google.com/places/android-sdk/start)
 - [Expandable RecyclerView](https://github.com/thoughtbot/expandable-recycler-view)
 
+## AndroidX
+- Room Database
+- ViewModel
+- LiveData
+- Espresso UI Testing
+
 ## Screenshots
 ![main screen with places list](place_tracker_1.PNG)
 ![main screen when searching](place_tracker_2.PNG)
